@@ -1,0 +1,21 @@
+{
+    "name": "gemvc/framework",
+    "description": "Super light Framework based on Gemvc Library",
+    "type": "library",
+    "require": {
+        "gemvc/library": "^1.4"
+    },
+    "license": "GNU GENERAL PUBLIC LICENSE Version 3",
+    "autoload": {
+        "psr-4": {
+            "GemFramework\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Roboxon",
+            "email": "roboxon@roboxon.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
