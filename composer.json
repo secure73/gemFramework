@@ -5,7 +5,7 @@
     "require": {
         "gemvc/library": "^1.4"
     },
-    "license": "GNU",
+    "license": "Apache-2.0",
     "autoload": {
         "psr-4": {
             "GemFramework\\": "src/"
