@@ -5,7 +5,7 @@ namespace GemFramework\Traits\Table;
  * @method remove
  * @method RemoveConditional
  */
-trait removeTrait
+trait RemoveTrait
 {
     /**
      * @ in case of success return 1

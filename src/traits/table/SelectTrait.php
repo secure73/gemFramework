@@ -2,11 +2,11 @@
 namespace GemFramework\Traits\Table;
 
 /**
- * @method id
- * @method ids
- * @method firstRows
- * @method lastRows
- * @method columnSelect
+ * @method id()
+ * @method ids()
+ * @method firstRows()
+ * @method lastRows()
+ * @method columnSelect()
  * select object with given id or array of objects by giving ids
  */
 trait SelectTrait{

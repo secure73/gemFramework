@@ -3,6 +3,8 @@
 namespace GemFramework\Traits\Table;
 
 /**
+ * @method activate()
+ * @method deactivate()
  * Activate and Deactivate
  * it need column isActive column in Database also isActive Properties
  */
