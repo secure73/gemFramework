@@ -1,6 +1,6 @@
 <?php
 namespace GemFramework\Traits\Table;
-trait removeTrait
+trait RemoveTrait
 {
     /**
      * @ in case of success return 1

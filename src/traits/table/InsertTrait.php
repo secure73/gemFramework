@@ -2,6 +2,9 @@
 
 namespace GemFramework\Traits\Table;
 
+/**
+ * @method insert()
+ */
 trait InsertTrait
 {
     /**

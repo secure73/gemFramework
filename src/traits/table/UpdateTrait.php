@@ -3,9 +3,9 @@
 namespace GemFramework\Traits\Table;
 
 /**
- * insert New Object into Database
+ * @method update()
  */
-trait InsertTrait
+trait UpdateTrait
 {
     /**
      * @insert current instance into Database
