@@ -5,7 +5,7 @@
     "require": {
         "gemvc/library": "^1.4"
     },
-    "license": "GNU GENERAL PUBLIC LICENSE Version 3",
+    "license": "GNU",
     "autoload": {
         "psr-4": {
             "GemFramework\\": "src/"
