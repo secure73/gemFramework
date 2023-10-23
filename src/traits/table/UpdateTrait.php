@@ -3,9 +3,12 @@
 namespace GemFramework\Traits\Table;
 
 /**
- * insert New Object into Database
+ * @method update()
+ * @method setNull()
+ * @method setTimeNow()
+ * Update current Object into Database
  */
-trait InsertTrait
+trait UpdateTrait
 {
     /**
      * @insert current instance into Database
@@ -44,5 +47,46 @@ trait InsertTrait
             return $this->updateQuery($query, $arrayBind);
         }
         return null;
+    }
+
+
+    /**
+     * @set a specific column to null based on condition whereColumn = $whereValue
+     *
+     * @exampel $this->setNull('deleted_at,'id',$this->id);
+     *
+     * @explain:  set deleted_at to null where id = $this->id
+     */
+    public function setNull(string $columnNameSetToNull, string $whereColumn, mixed $whereValue): int|null
+    {
+        $table = $this->setTable();
+        if(!$table)
+        {
+            $this->setError('table is not setted in function setTable');
+            return null;
+        }
+        $query = "UPDATE {$table}  SET  {$columnNameSetToNull} = NULL  WHERE  {$whereColumn}  = :whereValue";
+
+        return $this->updateQuery($query, [':whereValue' => $whereValue]);
+    }
+
+    /**
+     * @set a specific column to time now based on condition whereColumn = $whereValue
+     *
+     * @exampel $order->setTimeNow('paid_at','id',$this->id);
+     *
+     * @explain:  set paid_at  to 18-08-2022 12:45:13 where id = $this->id
+     */
+    public function setTimeNow(string $columnNameSetToNowTomeStamp, string $whereColumn, mixed $whereValue): int|null
+    {
+        $table = $this->setTable();
+        if(!$table)
+        {
+            $this->setError('table is not setted in function setTable');
+            return null;
+        }
+        $query = "UPDATE {$table}  SET  {$columnNameSetToNowTomeStamp} = NOW()  WHERE  {$whereColumn}  = :whereValue";
+
+        return $this->updateQuery($query, [':whereValue' => $whereValue]);
     }
 }
