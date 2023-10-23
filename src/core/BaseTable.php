@@ -10,4 +10,15 @@ class BaseTable extends PdoQuery
     {
         parent::__construct(PdoConnManager::connect($connectionName));
     }
+    public static function safeAssociArrayToObject(array $array, object $TargetClass): object
+    {
+        $instance = new $TargetClass();
+        foreach ($instance as $key => $value) {
+            if (isset($array[$key])) {
+                $instance->$key = $array[$key];
+            }
+        }
+        return $instance;
+    }
+
 }
