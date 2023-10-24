@@ -1,13 +1,10 @@
 <?php
 namespace GemFramework\Traits\Table;
-<<<<<<< HEAD
-=======
 
 /**
  * @method remove
  * @method RemoveConditional
  */
->>>>>>> e1c71f343beb225d113822736b4f7f3d04a71b07
 trait RemoveTrait
 {
     /**
