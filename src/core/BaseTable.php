@@ -19,11 +19,100 @@ use GemLibrary\Database\PdoQuery;
         $this->connectionName = PdoConnManager::connect($connectionName);
     }
 
-    public function pdoQuery():PdoQuery|null
+    public function getError():string|null
+    {
+        return $this->connection->getError();
+    }
+
+    public function affectedRows():int|null
+    {
+        return $this->connection->affectedRows();
+    }
+
+    public function lastInsertId():int|null
+    {
+        return $this->connection->lastInsertId();
+    }
+
+    public function getQuery():string|null
+    {
+        return $this->connection->getQuery();
+    }
+
+    public function isConnected():bool
+    {
+        return $this->connection->isConnected();
+    }
+
+    public function query(string $query)
+    {
+        return $this->connection->query($query);
+    }
+
+    public function bind(string $param , mixed $bindValue):void
+    {
+        return $this->connection->bind($param,$bindValue);
+    }
+
+    public function execute():bool
+    {
+        return $this->connection->execute();
+    }
+
+    public function getExecutionTime():int|null
+    {
+       return $this->connection->getExecutionTime();
+    }
+
+    private function pdoQuery():PdoQuery|null
     {
         if($this->connection->isConnected())
         {
             return new PdoQuery($this->connection);
+        }
+        $this->error = $this->connection->getError();
+        return null;
+    }
+
+    public function insertQuery(string $insertQuery , array $arrayBindKeyValue):int|null
+    {
+        $pdoQuery = $this->pdoQuery();
+        if($pdoQuery)
+        {
+            return $pdoQuery->insertQuery($insertQuery,$arrayBindKeyValue);
+        }
+        return null;
+
+    }
+
+    public function DeleteQuery(string $deleteQuery , array $arrayBindKeyValue):int|null
+    {
+        $pdoQuery = $this->pdoQuery();
+        if($pdoQuery)
+        {
+            return $pdoQuery->deleteQuery($deleteQuery,$arrayBindKeyValue);
+        }
+        return null;
+
+    }
+
+    public function updateQuery(string $updatetQuery , array $arrayBindKeyValue):int|null
+    {
+        $pdoQuery = $this->pdoQuery();
+        if($pdoQuery)
+        {
+            return $pdoQuery->updateQuery($updatetQuery,$arrayBindKeyValue);
+        }
+        return null;
+
+    }
+
+    public function selectQuery(string $selectQuery , array $arrayBindKeyValue):array|null
+    {
+        $pdoQuery = $this->pdoQuery();
+        if($pdoQuery)
+        {
+            return $pdoQuery->selectQuery($selectQuery,$arrayBindKeyValue);
         }
         return null;
     }

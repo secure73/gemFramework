@@ -10,6 +10,7 @@ use GemFramework\Traits\Table\SelectTrait;
 use GemFramework\Traits\Table\UpdateTrait;
 use GemLibrary\Database\QueryBuilder;
 
+
 class UserTable extends BaseTable
 {
     public int $id;
@@ -30,4 +31,5 @@ class UserTable extends BaseTable
     {
         return "users";
     }
+
 }
