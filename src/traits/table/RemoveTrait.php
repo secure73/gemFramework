@@ -2,6 +2,9 @@
 namespace GemFramework\Traits\Table;
 
 /**
+ * this trait deliver tow methods:
+ * remove():int|null remove frome DB based on this->id
+ * RemoveConditional(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null) int|null
  * @method remove
  * @method RemoveConditional
  */

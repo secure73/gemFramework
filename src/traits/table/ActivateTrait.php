@@ -11,6 +11,10 @@ namespace GemFramework\Traits\Table;
 trait ActivateTrait
 {
     /**
+     * this trait deliver tow methods:
+     * activate():int|null set isActive to 1
+     * deactivate():int|null set isActive to 0
+     * Important : need column isActive boolean 
      * @return int|null
      * @Update current instance isActive = 1
      *

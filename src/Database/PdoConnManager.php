@@ -1,10 +1,10 @@
 <?php
 namespace GemFramework\Database;
-use Gemvc\Database\PdoConnection;
+use GemLibrary\Database\PdoConnection;
 
 /**
  * @param string|null $connectionName
- * @return PdcoConnection
+ * @return \Gemlibrary\Database\PdoConnection
  * in case of null , it will use default connection
  * Manage Pdo connections based on config.php file
  * you shall just type connection name and it will care for the rest of the connection

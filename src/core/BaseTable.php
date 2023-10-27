@@ -2,13 +2,30 @@
 namespace GemFramework\Core;
 
 use GemFramework\Database\PdoConnManager;
-use Gemvc\Database\PdoQuery;
+use GemLibrary\Database\PdoConnection;
+use GemLibrary\Database\PdoQuery;
 
-class BaseTable extends PdoQuery
+
+/**
+ * property: connection PdoConnection
+ * method: pdoQuery(): PdoQuery
+ * @property PdoConnection|null $connection
+ */
+ class BaseTable 
 {
+    public ?PdoConnection $connection =null;
     public function __construct(?string $connectionName = null)
     {
-        parent::__construct(PdoConnManager::connect($connectionName));
+        $this->connectionName = PdoConnManager::connect($connectionName);
+    }
+
+    public function pdoQuery():PdoQuery|null
+    {
+        if($this->connection->isConnected())
+        {
+            return new PdoQuery($this->connection);
+        }
+        return null;
     }
 
     private function fetchObject(array $row)
@@ -27,7 +44,8 @@ class BaseTable extends PdoQuery
             foreach($rows as $row)
             {
                 $obj = new $this();
-                $objects[] = $obj->fetchObject($row);
+                $obj->fetchObject($row);
+                $objects[] = $obj;
             }
         return $objects;
     }

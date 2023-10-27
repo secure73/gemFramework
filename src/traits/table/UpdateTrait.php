@@ -3,35 +3,27 @@
 namespace GemFramework\Traits\Table;
 
 /**
- * @method update()
-<<<<<<< HEAD
-=======
- * @method setNull()
- * @method setTimeNow()
- * Update current Object into Database
->>>>>>> e1c71f343beb225d113822736b4f7f3d04a71b07
+ *this trait update single column with property id 
+ *method : update():int|null;
+ * @update current instance
+ * @you can call affectedRows() and it shall be 1
+ * @error: $this->getError();
  */
 trait UpdateTrait
 {
     /**
-     * @insert current instance into Database
-     *
-     * @will return lastInsertedId
-     *
+     * @update current instance
      * @you can call affectedRows() and it shall be 1
-     *
      * @error: $this->getError();
      */
     public function update(): int|null
     {
         $table = $this->setTable();
-        if(!$table)
-        {
+        if (!$table) {
             $this->setError('table is not setted in function setTable');
             return null;
         }
-        if(!isset($this->id) || $this->id < 1)
-        {
+        if (!isset($this->id) || $this->id < 1) {
             $this->setError('property id does existed or not setted in object');
             return null;
         }
@@ -63,8 +55,7 @@ trait UpdateTrait
     public function setNull(string $columnNameSetToNull, string $whereColumn, mixed $whereValue): int|null
     {
         $table = $this->setTable();
-        if(!$table)
-        {
+        if (!$table) {
             $this->setError('table is not setted in function setTable');
             return null;
         }
@@ -83,8 +74,7 @@ trait UpdateTrait
     public function setTimeNow(string $columnNameSetToNowTomeStamp, string $whereColumn, mixed $whereValue): int|null
     {
         $table = $this->setTable();
-        if(!$table)
-        {
+        if (!$table) {
             $this->setError('table is not setted in function setTable');
             return null;
         }

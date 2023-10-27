@@ -2,6 +2,10 @@
 namespace GemFramework\Traits\Table;
 
 /**
+ * this Trait deliver tow methods:
+ * delete():int|null
+ * restore():int|null
+ * the method update deleted_at to null or timestamp
  * @method delete()
  * @method restore()
  */

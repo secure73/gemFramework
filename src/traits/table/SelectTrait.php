@@ -2,6 +2,12 @@
 namespace GemFramework\Traits\Table;
 
 /**
+ * this trait deliver 5 methods
+ * id():bool if true set property to current object
+ * ids(array[ids]):array<this>|null
+ * firstRows(conditions):array<this>|null
+ * lastRows(conditions):array<this>|null
+ * columnSelect(conditions):array<this>|null
  * @method id()
  * @method ids()
  * @method firstRows()
@@ -46,7 +52,7 @@ trait SelectTrait{
         if(!$table)
         {
             $this->setError('table is not setted in function setTable');
-            return false;
+            return null;
         }
         $stringIds = '';
         foreach ($ids as $id) {
@@ -65,6 +71,7 @@ trait SelectTrait{
 
     /**
      * @return null|array<$this>
+     * in case of failure return null
      */
     public function firstRows(
         int $countRows,
@@ -77,7 +84,7 @@ trait SelectTrait{
         if(!$table)
         {
             $this->setError('table is not setted in function setTable');
-            return false;
+            return null;
         }
         $arrayBindValue = [];
         $where = " WHERE {$whereColumn} ".$whereCondition->value." :{$whereColumn}";
@@ -96,6 +103,7 @@ trait SelectTrait{
 
     /**
      * @return null|array<$this>
+     * in case of failure return null
      */
     public function lastRows(int $countRows, string $orderByColumnName, ?string $whereColumn = null, ?\SqlEnumCondition $whereCondition = null, int|string|bool $whereValue = null): null|array
     {
@@ -103,7 +111,7 @@ trait SelectTrait{
         if(!$table)
         {
             $this->setError('table is not setted in function setTable');
-            return false;
+            return null;
         }
         $arrayBindValue = [];
         $where = '';
@@ -128,10 +136,11 @@ trait SelectTrait{
 
      /**
      * @return null|array<$this>
+     * in case of failure return null
      */
     public function columnSelect(
-        ?string $firstColumn = null,
-        ?\SqlEnumCondition $firstCondition = null,
+        string $firstColumn = null,
+        \SqlEnumCondition $firstCondition = null,
         mixed $firstValue = null,
         ?string $secondColumn = null,
         ?\SqlEnumCondition $secondCondition = null,
@@ -149,7 +158,7 @@ trait SelectTrait{
         if(!$table)
         {
             $this->setError('table is not setted in function setTable');
-            return false;
+            return null;
         }
         $limit = '';
         $arrayBindValue = [];

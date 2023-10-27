@@ -3,6 +3,7 @@
 namespace GemFramework\Traits\Table;
 
 /**
+ * this trait will insert object into database
  * @method insert()
  */
 trait InsertTrait
