@@ -1,29 +1,24 @@
 <?php
 namespace App\Model;
 use App\Table\UserTable;
-class UserModel {
-    protected UserTable $userTable;
+use GemLibrary\Helper\CryptoHelper;
 
+class UserModel {
+    public $error;
     public function __construct()
     {
-        $this->userTable = new UserTable();
     }
 
-    public function sdfsdf()
+    public function create($username , $password)
     {
-        $user = new UserTable();
-        if($user->id(9))
+        $table = new UserTable();
+        $table->email = $username;
+        $table->password = CryptoHelper::hashPassword($password);
+        if($table->insert())
         {
-            if($user->deactivate())
-            {
-                echo $user->getError();
-            }
-            if()
+            return $table->lastInsertId();
         }
+        $this->error = $table->getError();
+        return false;
     }
-
-
-
-
-
 }

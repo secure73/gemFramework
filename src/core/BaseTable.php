@@ -144,6 +144,12 @@ use GemLibrary\Database\PdoQuery;
         return null;
     }
 
+    public function secure()
+    {
+        $this->connection->secure();
+        $this->connection = null;
+    }
+
     private function fetchObject(array $row)
     {
         foreach($row as $key => $value)
