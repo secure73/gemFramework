@@ -8,7 +8,6 @@ use GemFramework\Traits\Table\RemoveTrait;
 use GemFramework\Traits\Table\SafeDeleteTrait;
 use GemFramework\Traits\Table\SelectTrait;
 use GemFramework\Traits\Table\UpdateTrait;
-use GemLibrary\Database\QueryBuilder;
 
 
 class UserTable extends BaseTable
@@ -30,6 +29,13 @@ class UserTable extends BaseTable
     public function setTable():string
     {
         return "users";
+    }
+
+    public function getT()
+    {
+        $query = 'Select * from users where email = :email';
+        $arry['email'] = "ali";
+        return $this->selectQuery($query,$arry);
     }
 
 }
