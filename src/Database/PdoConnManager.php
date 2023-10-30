@@ -9,22 +9,41 @@ use GemLibrary\Database\PdoConnection;
  * Manage Pdo connections based on config.php file
  * you shall just type connection name and it will care for the rest of the connection
  */
-class PdoConnManager
+class PdoConnManager extends PdoConnection
 {
-    public static function connect(string $connectionName = null):PdoConnection
+
+    public function __construct(?string $connectionName = null , ?array $pdo_db_options = null)
     {
-       if(!$connectionName)
-       {
-        $connectionName = 'default';
-       }
-       $options__db = [
+        $pdo_db_options = $pdo_db_options ? $pdo_db_options :  [
             \PDO::ATTR_PERSISTENT => true,
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         ];
-        return new  PdoConnection(self::dsn($connectionName),"root","",$options__db);
+        $connectionName = $connectionName ? $connectionName : DEFAULT_CONNECTION_NAME;
+        parent::__construct($this->dsn($connectionName),$this->getUserName($connectionName),$this->getPassword($connectionName),$this->getOptions());
     }
 
-    private static function dsn(string $connecionName):string
+    private function getUserName(string $connecionName):string
+    {
+        return DB_CONNECTIONS[$connecionName]['username'];
+    }
+    private function getPassword(string $connecionName):string
+    {
+        return DB_CONNECTIONS[$connecionName]['password'];
+    }
+
+    private function getOptions(?array $options = null):array
+    {
+        if(!$options)
+        {
+            return [
+                \PDO::ATTR_PERSISTENT => true,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            ];
+        }
+        return $options;
+    }
+
+    private  function dsn(string $connecionName):string
     {
         $dsn = DB_CONNECTIONS[$connecionName];
         if($dsn['type'] == 'mysql')
@@ -34,7 +53,7 @@ class PdoConnManager
         return "";
     }
 
-    private static function createMysqlDsn(array $arrayConnection)
+    private function createMysqlDsn(array $arrayConnection):string
     {
         $string = $arrayConnection['type'].'host='.$arrayConnection['host'].';dbname='.$arrayConnection['database_name'].';charset=UTF8';
         if($arrayConnection['port'] !== "")

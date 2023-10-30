@@ -3,22 +3,15 @@ namespace App\Model;
 use App\Table\UserTable;
 use GemLibrary\Helper\CryptoHelper;
 
-class UserModel {
-    public $error;
+class UserModel extends UserTable{
     public function __construct()
     {
+        parent::__construct();
     }
 
-    public function create($username , $password)
+    public function create():int|null
     {
-        $table = new UserTable();
-        $table->email = $username;
-        $table->password = CryptoHelper::hashPassword($password);
-        if($table->insert())
-        {
-            return $table->lastInsertId();
-        }
-        $this->error = $table->getError();
-        return false;
+        $this->password = CryptoHelper::hashPassword($this->password);
+        return $this->insert();
     }
 }
