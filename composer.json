@@ -3,7 +3,7 @@
     "description": "Super light Framework based on Gemvc Library",
     "type": "library",
     "require": {
-        "gemvc/library": "^1.4"
+        "gemvc/library": "^1.5"
     },
     "license": "Apache-2.0",
     "autoload": {
