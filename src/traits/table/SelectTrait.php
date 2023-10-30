@@ -8,11 +8,11 @@ namespace GemFramework\Traits\Table;
  * firstRows(conditions):array<this>|null
  * lastRows(conditions):array<this>|null
  * columnSelect(conditions):array<this>|null
- * @method id()
- * @method ids()
- * @method firstRows()
- * @method lastRows()
- * @method columnSelect()
+ * @method selectById()
+ * @method selectByIds()
+ * @method selectFirstRows()
+ * @method selectLastRows()
+ * @method selectByColumns()
  * select object with given id or array of objects by giving ids
  */
 trait SelectTrait{
@@ -22,7 +22,7 @@ trait SelectTrait{
      * @return bool
      * set $this value and return true if found, false otherwise
      */
-    public function id(int $id): bool
+    public function selectById(int $id): bool
     {
         $table = $this->setTable();
         if(!$table)
@@ -46,7 +46,7 @@ trait SelectTrait{
      * @return null|array<$this>
      * in case of failure return null
      */
-    public function ids(array $ids): array|null
+    public function selectByIds(array $ids): array|null
     {
         $table = $this->setTable();
         if(!$table)
@@ -73,7 +73,7 @@ trait SelectTrait{
      * @return null|array<$this>
      * in case of failure return null
      */
-    public function firstRows(
+    public function selectFirstRows(
         int $countRows,
         string $whereColumn,
         \SqlEnumCondition $whereCondition,
@@ -105,7 +105,7 @@ trait SelectTrait{
      * @return null|array<$this>
      * in case of failure return null
      */
-    public function lastRows(int $countRows, string $orderByColumnName, ?string $whereColumn = null, ?\SqlEnumCondition $whereCondition = null, int|string|bool $whereValue = null): null|array
+    public function selectLastRows(int $countRows, string $orderByColumnName, ?string $whereColumn = null, ?\SqlEnumCondition $whereCondition = null, int|string|bool $whereValue = null): null|array
     {
         $table = $this->setTable();
         if(!$table)
@@ -138,7 +138,7 @@ trait SelectTrait{
      * @return null|array<$this>
      * in case of failure return null
      */
-    public function columnSelect(
+    public function selectByColumns(
         string $firstColumn = null,
         \SqlEnumCondition $firstCondition = null,
         mixed $firstValue = null,
