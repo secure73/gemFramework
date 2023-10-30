@@ -36,7 +36,6 @@ use GemFramework\Database\PdoConnManager;
             if ($this->executeQuery($insertQuery, $arrayBindKeyValue)) {
                 return (int) $this->lastInsertId();
             }
-            $this->secure();
         }
         return null;
     }
@@ -51,14 +50,14 @@ use GemFramework\Database\PdoConnManager;
      */
     public function selectQuery(string $selectQuery, array $arrayBindKeyValue = []): array|null
     {
-        $result = null;
-        if($this->isConnected()) {
-            if ($this->executeQuery($selectQuery, $arrayBindKeyValue)) {
-                $result = $this->connection->fetchAll();
-            }
-            $this->secure();
+        if(!$this->isConnected())
+        {
+            return null;
         }
-        return $result;
+         if ($this->executeQuery($selectQuery, $arrayBindKeyValue)) {
+                return $this->fetchAllObjects($this->fetchAll());
+        }
+        return null;
     }
 
     /**
@@ -75,7 +74,6 @@ use GemFramework\Database\PdoConnManager;
             if ($this->executeQuery($selectCountQuery, $arrayBindKeyValue)) {
                 $result = $this->fetchColumn();
             }
-            $this->secure();
         }
 
         return $result;
@@ -96,7 +94,6 @@ use GemFramework\Database\PdoConnManager;
             if ($this->executeQuery($updateQuery, $arrayBindKeyValue)) {
                 $result = $this->affectedRows();
             }
-            $this->secure();
         }
 
         return $result;
@@ -118,7 +115,6 @@ use GemFramework\Database\PdoConnManager;
             if ($this->executeQuery($deleteQuery, $arrayBindKeyValue)) {
                 $result = $this->affectedRows();
             }
-            $this->secure();
         }
 
         return $result;
@@ -157,8 +153,12 @@ use GemFramework\Database\PdoConnManager;
         }
     }
 
-    private function fetchAllObjects(array $rows):array
+    private function fetchAllObjects(?array $rows = null):null|array
     {
+        if(!$rows)
+        {
+            return null;
+        }
         $objects = [];
             foreach($rows as $row)
             {
