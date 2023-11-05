@@ -1,8 +1,9 @@
 <?php
 namespace GemFramework\Core;
 
-use Gemvc\Http\GemRequest;
-use Gemvc\Http\JsonResponse;
+use GemLibrary\Http\JsonResponse;
+use GemLibrary\Http\GemRequest;
+
 
 class Bootstrap {
 
@@ -14,6 +15,7 @@ class Bootstrap {
     public bool         $isMethodExists;
     public ?string      $error;
     public JsonResponse $response;
+    
     public function __construct(GemRequest $gemRequest)
     {
         $this->gemRequest = $gemRequest;
