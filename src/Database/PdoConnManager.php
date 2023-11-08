@@ -12,6 +12,10 @@ use GemLibrary\Database\PdoConnection;
 class PdoConnManager extends PdoConnection
 {
 
+    /**
+     * @param string|null $connectionName	
+     * @param array<mixed>|null $pdo_db_options
+     */
     public function __construct(?string $connectionName = null , ?array $pdo_db_options = null)
     {
         $pdo_db_options = $pdo_db_options ? $pdo_db_options :  [
@@ -31,6 +35,10 @@ class PdoConnManager extends PdoConnection
         return DB_CONNECTIONS[$connecionName]['password'];
     }
 
+    /**
+     * @param array<mixed>|null $options
+     * @return array<mixed>
+     */
     private function getOptions(?array $options = null):array
     {
         if(!$options)
@@ -46,20 +54,26 @@ class PdoConnManager extends PdoConnection
     private  function dsn(string $connecionName):string
     {
         $dsn = DB_CONNECTIONS[$connecionName];
+        /**@phpstan-ignore-next-line */
         if($dsn['type'] == 'mysql')
         {
             return self::createMysqlDsn($dsn);
         }
+        /**@phpstan-ignore-next-line */
         return "";
     }
 
+    /**
+     * @param array<mixed> $arrayConnection
+     */
     private function createMysqlDsn(array $arrayConnection):string
     {
-        $string = $arrayConnection['type'].'host='.$arrayConnection['host'].';dbname='.$arrayConnection['database_name'].';charset=UTF8';
+        $port = '3306';
         if($arrayConnection['port'] !== "")
         {
-            $string .= ';'.$arrayConnection['port'];
+            $port = $arrayConnection['port'];
         }
-        return $string;
+        /**@phpstan-ignore-next-line */
+        return $arrayConnection['type'].':host='.$arrayConnection['host'].";port=$port;".'dbname='.$arrayConnection['database_name'].';charset=UTF8';
     }
 }

@@ -1,12 +1,13 @@
 <?php
 
 namespace GemFramework\Traits\Table;
+use SqlEnumCondition;
 
 /**
  * @method activate()
  * @method deactivate()
  * Activate and Deactivate
- * it need column isActive column in Database also isActive Properties
+ * it need column isActive column in Database also is_active Properties
  */
 trait ActivateTrait
 {
@@ -37,12 +38,12 @@ trait ActivateTrait
             $this->setError('property id does existed or not setted in object');
             return null;
         }
-        if(!property_exists($this,'isActive'))
+        if(!property_exists($this,'is_active'))
         {
-            $this->setError('property isActive does existed or not setted in object');
+            $this->setError('property is_active does existed or not setted in object');
             return null;
         }
-        $query = "UPDATE $table SET isActive = 1 WHERE id = :id";
+        $query = "UPDATE $table SET is_active = 1 WHERE id = :id";
         $arrayBind[':id'] = $this->id;
         return $this->updateQuery($query, $arrayBind);
     }
@@ -70,13 +71,24 @@ trait ActivateTrait
             $this->setError('property id does existed or not setted in object');
             return null;
         }
-        if(!property_exists($this,'isActive'))
+        if(!property_exists($this,'is_active'))
         {
-            $this->setError('property isActive does existed or not setted in object');
+            $this->setError('property is_active does existed or not setted in object');
             return null;
         }
-        $query = "UPDATE $table SET isActive = 0 WHERE id = :id";
+        $query = "UPDATE $table SET is_active = 0 WHERE id = :id";
         $arrayBind[':id'] = $this->id;
         return $this->updateQuery($query, $arrayBind);
+    }
+
+    public function selectActives()
+    {
+        $table = $this->setTable();
+        if(!$table)
+        {
+            $this->setError('table is not setted in function setTable');
+            return null;
+        }
+        return $this->selectByColumns('is_active',\SqlEnumCondition::Equal,1);
     }
 }

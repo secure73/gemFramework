@@ -25,11 +25,6 @@ trait InsertTrait
             $this->setError('table is not setted in function setTable');
             return null;
         }
-        if(!isset($this->id))
-        {
-            $this->setError('property id does existed or not setted in object');
-            return null;
-        }
         $columns = '';
         $params = '';
         $arrayBind = [];
