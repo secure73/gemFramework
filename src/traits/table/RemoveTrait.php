@@ -1,39 +1,23 @@
 <?php
 namespace GemFramework\Traits\Table;
 
-/**
- * this trait deliver tow methods:
- * remove():int|null remove frome DB based on this->id
- * RemoveConditional(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null) int|null
- * @method remove
- * @method RemoveConditional
- */
-trait RemoveTrait
-{
+trait RemoveTrait {
     /**
-     * @ in case of success return 1
-     * @Attention:  remove Object compleetly from Database and only work with property id
+     * 
+     * NOTE:  remove Object from Database.
+     * @ in case of success return count removed items
+     * @Attention:  remove Object from Database
+     * @return int|null
      */
     public function remove(): int|null
     {
-        $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
-            return null;
-        }
         if(!isset($this->id))
         {
-            $this->setError('property id does existed or not setted in object');
+            $this->setError('property id does not exist or is not set in object');
             return null;
         }
-        $query = "DELETE FROM {$table} WHERE id = :id";
-        if (isset($this->id) && $this->id > 0) {
-            return $this->deleteQuery($query, [':id' => $this->id]);
-        }
-        $this->setError('Object id is not set or it is less than 1');
 
-        return null;
+        return $this->removeConditional('id', $this->id);
     }
 
     /**
@@ -41,22 +25,26 @@ trait RemoveTrait
      * @ in case of success return count removed items
      * @Attention:  remove Object compleetly from Database
      */
-    public function RemoveConditional(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
+
+    public function removeConditional(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
     {
         $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
+        if (!$table) {
+            $this->setError('Table is not set in function setTable.');
             return null;
         }
+
         $query = "DELETE FROM {$table} WHERE {$whereColumn} = :{$whereColumn}";
         if ($secondWhereColumn) {
             $query .= " AND {$secondWhereColumn} = :{$secondWhereColumn}";
         }
-        $arrayBind[':'.$whereColumn] = $whereValue;
+
+        $arrayBind = [':'.$whereColumn => $whereValue];
         if ($secondWhereColumn) {
             $arrayBind[':'.$secondWhereColumn] = $secondWhereValue;
         }
+
         return $this->deleteQuery($query, $arrayBind);
     }
+
 }
