@@ -1,4 +1,5 @@
 <?php
+
 namespace GemFramework\Traits\Table;
 
 /**
@@ -12,66 +13,92 @@ namespace GemFramework\Traits\Table;
  * @method selectByIds()
  * @method selectFirstRows()
  * @method selectLastRows()
- * @method selectByColumns()
  * select object with given id or array of objects by giving ids
  */
-trait SelectTrait{
+trait SelectTrait
+{
+
 
     /**
      * @param int $id
      * @return bool
-     * set $this value and return true if found, false otherwise
+     * Set $this value and return true if found, false otherwise
      */
     public function selectById(int $id): bool
     {
         $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
+        if (!$table) {
+            $this->setError('Table is not set in function setTable');
             return false;
         }
-        $row = $this->selectQuery("SELECT * FROM $table WHERE id = :id", [':id' => $id]);
-        if (null !== $row && isset($row[0]) && \is_array($row[0])) {
-            $this->fetchObject($row[0]);
+
+        $query = "SELECT * FROM {$table} WHERE id = :id";
+        $statement = $this->prepareQuery($query);
+        $statement->bindValue(':id', $id, \PDO::PARAM_INT);
+
+        $queryResult = $this->executeQuery($statement);
+        if ($queryResult === false) {
+            $this->setError('Failed to select row from table');
+            return false;
+        }
+
+        $row = $this->fetchObject($queryResult);
+        if ($row) {
+            $this->fetchObject($row);
             return true;
         } else {
-            $this->setError('Object with given id dose not Existed');
+            $this->setError('Object with given id does not exist');
+            return false;
         }
-        return false;
     }
 
-    
     /**
      * @param array<int> $ids
      * @return null|array<$this>
      * in case of failure return null
      */
-    public function selectByIds(array $ids): array|null
+    public function selectByIds(array $ids): ?array
     {
         $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
+        if (!$table) {
+            $this->setError('table is not set in function setTable');
             return null;
         }
-        $stringIds = '';
-        foreach ($ids as $id) {
-            $stringIds .= $id.',';
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $query = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
+        $statement = $this->prepareQuery($query);
+        if (!$statement) {
+            $this->setError('Failed to prepare select statement');
+            return null;
         }
-        $stringIds = rtrim($stringIds, ',');
-        $query = "SELECT * FROM {$table} WHERE id IN ({$stringIds})";
-        $queryResult = $this->selectQuery($query, []);
-        if(is_array($queryResult))
-        {
-            return $this->fetchAllObjects($queryResult);
+
+        if (!$this->bindValues($statement, $ids)) {
+            $this->setError('Failed to bind values to select statement');
+            return null;
         }
-        return null;
+
+        $queryResult = $this->executeQuery($statement);
+        if ($queryResult === false) {
+            $this->setError('Failed to execute select statement');
+            return null;
+        }
+
+        return $this->fetchAllObjects($queryResult);
     }
 
 
+
     /**
-     * @return null|array<$this>
-     * in case of failure return null
+     * Select the first rows from the table based on the given conditions.
+     *
+     * @param int $countRows The number of rows to select.
+     * @param string $whereColumn The name of the column to search by.
+     * @param \SqlEnumCondition $whereCondition The condition to apply to the column.
+     * @param mixed $whereValue The value to search for in the column.
+     * @param string|null $orderByColumnName The name of the column to order the results by.
+     * @return array|null An array of objects representing the selected rows, or null if the selection failed.
      */
     public function selectFirstRows(
         int $countRows,
@@ -79,22 +106,67 @@ trait SelectTrait{
         \SqlEnumCondition $whereCondition,
         mixed $whereValue,
         ?string $orderByColumnName = null
-    ): null|array {
+    ): ?array {
         $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
+        if (!$table) {
+            $this->setError('Table is not set in function setTable');
             return null;
         }
-        $arrayBindValue = [];
-        $where = " WHERE {$whereColumn} ".$whereCondition->value." :{$whereColumn}";
-        $arrayBindValue[':'.$whereColumn] = $whereValue;
-        $query = ($orderByColumnName) ? 
-                "SELECT * FROM {$table} ORDER BY {$orderByColumnName} {$where} LIMIT {$countRows}" :
-                "SELECT * FROM {$table} {$where} LIMIT {$countRows}";
-        $queryResult = $this->selectQuery($query,  $arrayBindValue);
-        if(is_array($queryResult))
-        {
+
+        $whereClause = "WHERE {$whereColumn} {$whereCondition->value} :{$whereColumn}";
+        $orderByClause = $orderByColumnName ? "ORDER BY {$orderByColumnName}" : "";
+        $limitClause = "LIMIT {$countRows}";
+
+        $query = "SELECT * FROM {$table} {$whereClause} {$orderByClause} {$limitClause}";
+        $statement = $this->prepareQuery($query);
+        $statement->bindValue(":{$whereColumn}", $whereValue);
+
+        $queryResult = $this->executeQuery($statement);
+        if ($queryResult === false) {
+            $this->setError('Failed to select rows from table');
+            return null;
+        }
+
+        return $this->fetchAllObjects($queryResult);
+    }
+
+
+    /**
+     * Select the last rows from the table based on the given conditions.
+     *
+     * @param int $countRows The number of rows to select.
+     * @param string $orderByColumnName The name of the column to order the results by.
+     * @param string|null $whereColumn The name of the column to search by.
+     * @param \SqlEnumCondition|null $whereCondition The condition to apply to the column.
+     * @param int|string|bool|null $whereValue The value to search for in the column.
+     * @return array|null An array of objects representing the selected rows, or null if the selection failed.
+     */
+    public function selectLastRows(
+        int $countRows,
+        string $orderByColumnName,
+        ?string $whereColumn = null,
+        ?\SqlEnumCondition $whereCondition = null,
+        int|string|bool|null $whereValue = null
+    ): ?array {
+        $table = $this->setTable();
+        if (!$table) {
+            $this->setError('table is not set in function setTable');
+            return null;
+        }
+
+        $whereClause = '';
+        $bindValues = [];
+
+        // Add WHERE clause if necessary
+        if ($whereColumn !== null && $whereCondition !== null && $whereValue !== null) {
+            $whereClause = " WHERE {$whereColumn} {$whereCondition->value} :whereValue";
+            $bindValues = [':whereValue' => $whereValue];
+        }
+
+        $query = "SELECT * FROM {$table} {$whereClause} ORDER BY {$orderByColumnName} DESC LIMIT {$countRows}";
+
+        $queryResult = $this->selectQuery($query, $bindValues);
+        if (is_array($queryResult)) {
             return $this->fetchAllObjects($queryResult);
         }
         return null;
@@ -102,55 +174,23 @@ trait SelectTrait{
 
 
     /**
-     * @return null|array<$this>
-     * in case of failure return null
+     * Select rows from the table based on the given columns and conditions.
+     *
+     * @param string $firstColumn The name of the first column to search by.
+     * @param \SqlEnumCondition $firstCondition The condition to apply to the first column.
+     * @param mixed $firstValue The value to search for in the first column.
+     * @param string|null $secondColumn The name of the second column to search by.
+     * @param \SqlEnumCondition|null $secondCondition The condition to apply to the second column.
+     * @param mixed|null $secondValue The value to search for in the second column.
+     * @param string|null $orderBy The name of the column to order the results by.
+     * @param string|null $ASC_DES The order in which to sort the results (ASC or DESC).
+     * @param int|null $limit_count The maximum number of rows to return.
+     * @param int|null $limit_offset The number of rows to skip before starting to return results.
+     * @param bool|null $isDel Whether to include deleted rows in the results.
+     * @param bool|null $deactives Whether to include inactive rows in the results.
+     * @param bool|null $actives Whether to include active rows in the results.
+     * @return null|array<$this> An array of objects representing the selected rows, or null if the selection failed.
      */
-    public function selectLastRows(int $countRows, string $orderByColumnName, ?string $whereColumn = null, ?\SqlEnumCondition $whereCondition = null, int|string|bool $whereValue = null): null|array
-    {
-        $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
-            return null;
-        }
-        $arrayBindValue = [];
-        $where = '';
-        if (null !== $whereColumn && null !== $whereCondition) {
-            $where = " WHERE {$whereColumn} ".$whereCondition->value;
-        }
-        if (null !== $whereValue) {
-            $where .= " :{$whereValue}";
-            $arrayBindValue[':'.$whereValue] = $whereValue;
-        }
-
-        $query = "SELECT * FROM {$table} ORDER BY {$orderByColumnName} DESC {$where} LIMIT {$countRows}";
-
-        $queryResult = $this->selectQuery($query, $arrayBindValue);
-        if(is_array($queryResult))
-        {
-            return $this->fetchAllObjects($queryResult);
-        }
-        return null;
-    }
-
-
-       /**
-        * @param string $firstColumn
-        * @param \SqlEnumCondition $firstCondition
-        * @param mixed $firstValue
-        * @param string|null $secondColumn
-        * @param \SqlEnumCondition|null $secondCondition
-        * @param mixed|null $secondValue
-        * @param string|null $orderBy
-        * @param string|null $ASC_DES
-        * @param int|null $limit_count
-        * @param int|null $limit_offset
-        * @param bool|null $isDel
-        * @param bool|null $deactives
-        * @param bool|null $actives
-        * @return null|array<$this>
-        * in case of failure return null
-       */
     public function selectByColumns(
         string $firstColumn,
         \SqlEnumCondition $firstCondition,
@@ -167,46 +207,59 @@ trait SelectTrait{
         ?bool $actives = null
     ): null|array {
         $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
+        if (!$table) {
+            $this->setError('table is not set in function setTable');
             return null;
         }
-        $limit = '';
+
+        $where = '';
         $arrayBindValue = [];
 
-        $isDel ? ' AND deleted_at IS NOT NULL ' : '';
-        $actives ? ' AND is_active = 1 ' : '';
-        
-        $deactives ? ' AND is_active IS NOT 1 ' : '';
-        if ($orderBy) {
-            $orderBy = " ORDER BY {$orderBy} {$ASC_DES}";
+        // Add conditions to the WHERE clause based on the input parameters.
+        $where .= " WHERE {$firstColumn} " . $firstCondition->value . " :{$firstColumn}";
+        $arrayBindValue[':' . $firstColumn] = $firstValue;
+
+        if ($secondColumn && $secondCondition && $secondValue) {
+            $where .= " AND {$secondColumn} " . $secondCondition->value . " :{$secondColumn}";
+            $arrayBindValue[':' . $secondColumn] = $secondValue;
         }
-        if ($limit_count) {
-            $limit = " LIMIT {$limit_count}";
-            if ($limit_offset) {
-                $limit = " LIMIT {$limit_offset} , {$limit_count}";
+
+        if ($isDel) {
+            $where .= ' AND deleted_at IS NOT NULL';
+        }
+
+        if ($actives) {
+            $where .= ' AND is_active = 1';
+        }
+
+        if ($deactives) {
+            $where .= ' AND is_active = 0';
+        }
+
+        // Add an ORDER BY clause if specified.
+        $orderByClause = '';
+        if ($orderBy) {
+            $orderByClause = " ORDER BY {$orderBy}";
+            if ($ASC_DES) {
+                $orderByClause .= " {$ASC_DES}";
             }
         }
 
-        $query = "SELECT * FROM {$table} ";
-        $firstColumnQuery = null;
-        $secondColumnQuery = null;
-        
-        $firstValue = (' LIKE ' === (string) $firstCondition->value) ? '%'.$firstValue : $firstValue;
-        $firstColumnQuery = " {$firstColumn} {$firstCondition->value} :{$firstColumn}";
-        $arrayBindValue[':'.$firstColumn] = $firstValue;
-        
-        if (null !== $secondColumn && null !== $secondCondition) {
-            $secondColumnQuery = " AND {$secondColumn} {$secondCondition->value} :{$secondColumn}";
-            $secondValue = (' LIKE ' === $secondCondition->value) ? '%'.$secondValue : $secondValue;
-            $arrayBindValue[':'.$secondColumn] = $secondValue;
+        // Add a LIMIT clause if specified.
+        $limitClause = '';
+        if ($limit_count) {
+            $limitClause = " LIMIT {$limit_count}";
+            if ($limit_offset) {
+                $limitClause .= " OFFSET {$limit_offset}";
+            }
         }
-        $query .= "WHERE  {$firstColumnQuery} {$secondColumnQuery} {$isDel} {$actives} {$deactives} {$orderBy} {$limit}";
-        $query = trim($query);
+
+        // Construct the final query and execute it.
+        $query = "SELECT * FROM {$table}{$where}{$orderByClause}{$limitClause}";
         $queryResult = $this->selectQuery($query, $arrayBindValue);
-        if(is_array($queryResult))
-        {
+
+        // Return the results as an array of objects, or null if the selection failed.
+        if (is_array($queryResult)) {
             return $this->fetchAllObjects($queryResult);
         }
         return null;
