@@ -16,4 +16,29 @@ class Table extends PdoQuery
         $conn = new PdoConnManager($connectionName);
         parent::__construct($conn);
     }
+
+    protected function fetchAllObjects(array $selectQueryResult)
+    {
+        $result = array();
+
+        foreach ($selectQueryResult as $item) {
+
+            $result[] = $this->fetchObject($item);
+            
+        }
+        return $result;
+        
+    }
+
+    protected function fetchObject(array $selectQueryResult)
+    {
+        $instance = new $this();
+        foreach ($selectQueryResult as $key => $value) {
+
+            $instance->$key = $value;
+            
+        }
+        return $instance;
+    }
+}
 }
