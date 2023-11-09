@@ -134,14 +134,27 @@ trait SelectTrait{
     }
 
 
-     /**
-     * @return null|array<$this>
-     * in case of failure return null
-     */
+       /**
+        * @param string $firstColumn
+        * @param \SqlEnumCondition $firstCondition
+        * @param mixed $firstValue
+        * @param string|null $secondColumn
+        * @param \SqlEnumCondition|null $secondCondition
+        * @param mixed|null $secondValue
+        * @param string|null $orderBy
+        * @param string|null $ASC_DES
+        * @param int|null $limit_count
+        * @param int|null $limit_offset
+        * @param bool|null $isDel
+        * @param bool|null $deactives
+        * @param bool|null $actives
+        * @return null|array<$this>
+        * in case of failure return null
+       */
     public function selectByColumns(
-        string $firstColumn = null,
-        \SqlEnumCondition $firstCondition = null,
-        mixed $firstValue = null,
+        string $firstColumn,
+        \SqlEnumCondition $firstCondition,
+        mixed $firstValue,
         ?string $secondColumn = null,
         ?\SqlEnumCondition $secondCondition = null,
         mixed $secondValue = null,
@@ -152,7 +165,6 @@ trait SelectTrait{
         ?bool $isDel = null,
         ?bool $deactives = null,
         ?bool $actives = null
-
     ): null|array {
         $table = $this->setTable();
         if(!$table)
@@ -164,9 +176,9 @@ trait SelectTrait{
         $arrayBindValue = [];
 
         $isDel ? ' AND deleted_at IS NOT NULL ' : '';
-        $actives ? ' AND isActive = 1 ' : '';
+        $actives ? ' AND is_active = 1 ' : '';
         
-        $deactives ? ' AND isActive IS NOT 1 ' : '';
+        $deactives ? ' AND is_active IS NOT 1 ' : '';
         if ($orderBy) {
             $orderBy = " ORDER BY {$orderBy} {$ASC_DES}";
         }
@@ -180,14 +192,11 @@ trait SelectTrait{
         $query = "SELECT * FROM {$table} ";
         $firstColumnQuery = null;
         $secondColumnQuery = null;
-
-        if(null !== $firstColumn && null !== $firstCondition)
-        {
-            $firstValue = (' LIKE ' === (string) $firstCondition->value) ? '%'.$firstValue : $firstValue;
-            $firstColumnQuery = " {$firstColumn} {$firstCondition->value} :{$firstColumn}";
-            $arrayBindValue[':'.$firstColumn] = $firstValue;
-        }
-
+        
+        $firstValue = (' LIKE ' === (string) $firstCondition->value) ? '%'.$firstValue : $firstValue;
+        $firstColumnQuery = " {$firstColumn} {$firstCondition->value} :{$firstColumn}";
+        $arrayBindValue[':'.$firstColumn] = $firstValue;
+        
         if (null !== $secondColumn && null !== $secondCondition) {
             $secondColumnQuery = " AND {$secondColumn} {$secondCondition->value} :{$secondColumn}";
             $secondValue = (' LIKE ' === $secondCondition->value) ? '%'.$secondValue : $secondValue;
@@ -195,7 +204,6 @@ trait SelectTrait{
         }
         $query .= "WHERE  {$firstColumnQuery} {$secondColumnQuery} {$isDel} {$actives} {$deactives} {$orderBy} {$limit}";
         $query = trim($query);
-        //echo $query;
         $queryResult = $this->selectQuery($query, $arrayBindValue);
         if(is_array($queryResult))
         {
@@ -203,5 +211,4 @@ trait SelectTrait{
         }
         return null;
     }
-
 }
