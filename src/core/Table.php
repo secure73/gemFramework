@@ -41,4 +41,3 @@ class Table extends PdoQuery
         return $instance;
     }
 }
-}
