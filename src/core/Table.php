@@ -143,7 +143,7 @@ use GemFramework\Database\PdoConnManager;
         return false;
     }
 
-    private function fetchObject(array $row)
+    public function fetchObject(array $row)
     {
         foreach($row as $key => $value)
         {
@@ -153,7 +153,7 @@ use GemFramework\Database\PdoConnManager;
         }
     }
 
-    private function fetchAllObjects(?array $rows = null):null|array
+    public function fetchAllObjects(?array $rows = null):null|array
     {
         if(!$rows)
         {
