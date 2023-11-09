@@ -3,42 +3,42 @@
 namespace GemFramework\Traits\Table;
 
 /**
- * this trait will insert object into database
+ * This trait will insert object into database
  * @method insert()
  */
 trait InsertTrait
 {
     /**
-     * @insert current instance into Database
+     * Insert current instance into Database
      *
-     * @will return lastInsertedId
+     * @return int|false Last inserted ID or false on failure
      *
-     * @you can call affectedRows() and it shall be 1
-     *
-     * @error: $this->getError();
+     * @throws \Exception If insertQuery method throws an exception
      */
-    public function insert(): int|null
+    public final function insert(): int|false
     {
         $table = $this->setTable();
-        if(!$table)
-        {
-            $this->setError('table is not setted in function setTable');
-            return null;
+        if (!$table) {
+            $this->setError('Table is not set in function setTable');
+            return false;
         }
+
         $columns = '';
         $params = '';
         $arrayBind = [];
         $query = "INSERT INTO {$table} ";
-        // @phpstan-ignore-next-line
-        foreach ($this as $key => $value) {
+
+        foreach ((object) $this as $key => $value) {
             $columns .= $key . ',';
             $params .= ':' . $key . ',';
             $arrayBind[':' . $key] = $value;
         }
+
         $columns = rtrim($columns, ',');
         $params = rtrim($params, ',');
 
-        $query .= " ({$columns}) values ({$params})";
+        $query .= " ({$columns}) VALUES ({$params})";
         return $this->insertQuery($query, $arrayBind);
     }
+
 }
