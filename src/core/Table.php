@@ -55,7 +55,7 @@ use GemFramework\Database\PdoConnManager;
             return null;
         }
          if ($this->executeQuery($selectQuery, $arrayBindKeyValue)) {
-                return $this->fetchAllObjects($this->fetchAll());
+                return $this->fetchAllObjects();
         }
         return null;
     }
@@ -119,54 +119,4 @@ use GemFramework\Database\PdoConnManager;
 
         return $result;
     }
-
-    /**
-     * @param array<mixed> $arrayBind
-     *
-     * @success set this->affectedRows
-     *
-     * @error set this->error and return false
-     */
-    private function executeQuery(string $query, array $arrayBind): bool
-    {
-        if ($this->isConnected()) {
-            $this->query($query);
-            foreach ($arrayBind as $key => $value) {
-                $this->bind($key, $value);
-            }
-            if (!$this->execute()) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function fetchObject(array $row)
-    {
-        foreach($row as $key => $value)
-        {
-            if(property_exists($this, $key)){
-                $this->$key = $value;
-            }
-        }
-    }
-
-    public function fetchAllObjects(?array $rows = null):null|array
-    {
-        if(!$rows)
-        {
-            return null;
-        }
-        $objects = [];
-            foreach($rows as $row)
-            {
-                $obj = new $this();
-                $obj->fetchObject($row);
-                $objects[] = $obj;
-            }
-        return $objects;
-    }
-
 }
