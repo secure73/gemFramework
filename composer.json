@@ -14,8 +14,14 @@
             "GemFramework\\Traits\\" : "src/traits/",
             "GemFramework\\Traits\\Table\\" : "src/traits/table/",
             "GemFramework\\Traits\\Model\\" : "src/traits/model/",
-            "GemFramework\\Traits\\Controller\\" : "src/traits/controller/"
-        }
+            "GemFramework\\Traits\\Controller\\" : "src/traits/controller/",
+            "Controller\\": "../app/controller/",
+            "Model\\": "../app/model/",
+            "Table\\": "../app/table/"
+        },
+        "files": [
+            "../app/config.php"
+        ]
     },
     "authors": [
         {
