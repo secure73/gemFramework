@@ -15,13 +15,13 @@
             "GemFramework\\Traits\\Table\\" : "src/traits/table/",
             "GemFramework\\Traits\\Model\\" : "src/traits/model/",
             "GemFramework\\Traits\\Controller\\" : "src/traits/controller/",
-            "App\\": "../app/",
-            "App\\Controller\\": "../app/controller/",
-            "App\\Model\\": "../app/model/",
-            "App\\Table\\": "../app/table/"
+            "App\\": "../../../app/",
+            "App\\Controller\\": "../../../app/controller/",
+            "App\\Model\\": "../../../app/model/",
+            "App\\Table\\": "../../../app/table/"
         },
         "files": [
-            "../app/config.php"
+            "../../../app/config.php"
         ]
     },
     "authors": [
