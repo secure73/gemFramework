@@ -10,19 +10,17 @@ class Bootstrap
 {
     public GemRequest   $gemRequest;
     public ?object      $service;
-    public string       $controller;
-    public string       $method;
+    public string       $controller ='Index';
+    public string       $method = 'index';
     public ?string      $error;
 
     public function __construct(GemRequest $gemRequest)
     {
-        $this->controller = 'Index';
-        $this->method = 'index';
         $this->gemRequest = $gemRequest;
         $segments = explode('/',$this->gemRequest->requestedUrl);
         if(isset($segments[URI_CONTROLLER_SEGMENT]) && $segments[URI_CONTROLLER_SEGMENT] !== "")
         {
-            $this->controller = 'App\\Controller\\'.ucfirst(trim($segments[URI_CONTROLLER_SEGMENT])).'Controller';
+            $this->controller = ucfirst(trim($segments[URI_CONTROLLER_SEGMENT]));
         }
         if(isset($segments[URI_METHOD_SEGMENT]) && $segments[URI_METHOD_SEGMENT] !== "")
         {
@@ -44,7 +42,7 @@ class Bootstrap
     private function makeInstanceService(): bool
     {
         try {
-            $controller = $this->controller;
+            $controller = 'App\\Controller\\'.$this->controller.'Controller';
             $method = $this->method;
             $ins = new $controller($this->gemRequest);
             $res = $ins->$method();
