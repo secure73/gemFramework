@@ -22,7 +22,7 @@ class Bootstrap
         $segments = explode('/',$this->gemRequest->requestedUrl);
         if(isset($segments[URI_CONTROLLER_SEGMENT]) && $segments[URI_CONTROLLER_SEGMENT] !== "")
         {
-            $this->controller = ucfirst($segments[2]);
+            $this->controller = 'App\\Controller\\'.ucfirst(trim($segments[URI_CONTROLLER_SEGMENT])).'Controller';
         }
         if(isset($segments[URI_METHOD_SEGMENT]) && $segments[URI_METHOD_SEGMENT] !== "")
         {
@@ -33,48 +33,31 @@ class Bootstrap
 
     public function runApp():void
     {
-        if ($this->makeInstanceService()) {
-            if ($this->isFunctionExists()) {
-                $method = $this->method;
-                $res = $this->service->$method();
-                if (!$res instanceof JsonResponse) {
-                    $jsonResponse = new JsonResponse();
-                    $jsonResponse->internalError('Method ' . $this->controller . '/' . $this->method . 'dosent return Object of JsonResponse');
-                    $jsonResponse->show();
-                    die;
-                } else {
-                    $res->show();
-                    die;
-                }
-            }
+        if (!$this->makeInstanceService()) {     
+            $jsonResponse = new JsonResponse();
+            $jsonResponse->internalError($this->error);
+            $jsonResponse->show();
         }
-        $jsonResponse = new JsonResponse();
-        $jsonResponse->notFound($this->error);
-        $jsonResponse->show();
         
     }
 
     private function makeInstanceService(): bool
     {
-
         try {
-            $service =  'App\\Controller\\' . $this->controller . 'Controller';
-            $this->service = new $service($this->gemRequest);
+            $controller = $this->controller;
+            $method = $this->method;
+            $ins = new $controller($this->gemRequest);
+            $res = $ins->$method();
+            if (!$res instanceof JsonResponse) {
+                $this->error = 'Method ' . $this->controller . '/' . $this->method . 'dosent return Object of JsonResponse';
+            } else {
+                $res->show();
+                die;
+            }
             return true;
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
         }
-        return false;
-    }
-
-    private function isFunctionExists(): bool
-    {
-        if (is_object($this->service)) {
-            if (method_exists($this->service, $this->method)) {
-                return true;
-            }
-        }
-        $this->error = "service $this->controller/$this->method not found";
         return false;
     }
 }
