@@ -16,7 +16,7 @@ trait UpdateTrait
      * @you can call affectedRows() and it shall be 1
      * @error: $this->getError();
      */
-    public function update(): int|null
+    public function updateSingle(): int|null
     {
         $table = $this->setTable();
         if (!$table) {
