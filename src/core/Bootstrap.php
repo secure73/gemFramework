@@ -18,13 +18,13 @@ class Bootstrap
     {
         $this->gemRequest = $gemRequest;
         $segments = explode('/',$this->gemRequest->requestedUrl);
-        if(isset($segments[URI_CONTROLLER_SEGMENT]) && $segments[URI_CONTROLLER_SEGMENT] !== "")
+        if(isset($_ENV['URI_CONTROLLER_SEGMENT']) && $_ENV['URI_CONTROLLER_SEGMENT'] !== "")
         {
-            $this->controller = ucfirst(trim($segments[URI_CONTROLLER_SEGMENT]));
+            $this->controller = ucfirst(trim($_ENV['URI_CONTROLLER_SEGMENT']));
         }
-        if(isset($segments[URI_METHOD_SEGMENT]) && $segments[URI_METHOD_SEGMENT] !== "")
+        if(isset($_ENV['URI_METHOD_SEGMENT']) && $_ENV['URI_METHOD_SEGMENT'] !== "")
         {
-            $this->method = $segments[URI_METHOD_SEGMENT];
+            $this->method = $_ENV['URI_METHOD_SEGMENT'];
         }
         $this->runApp();
     }
