@@ -25,7 +25,7 @@ trait ActivateTrait
      *
      * @error: $this->getError();
      */
-    public function activate():int|null
+    public function activateQuery():int|null
     {
         $table = $this->setTable();
         if(!$table)
@@ -58,7 +58,7 @@ trait ActivateTrait
      *
      * @error: $this->getError();
      */
-    public function deactivate():int|null
+    public function deactivateQuery():int|null
     {
         $table = $this->setTable();
         if(!$table)
