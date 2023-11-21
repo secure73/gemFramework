@@ -1,15 +1,14 @@
 <?php
 
 namespace GemFramework\Traits\Table;
-use SqlEnumCondition;
 
 /**
- * @method activate()
- * @method deactivate()
+ * @method activateQuery()
+ * @method deactivateQuery()
  * Activate and Deactivate
  * it need column isActive column in Database also is_active Properties
  */
-trait ActivateTrait
+trait ActivateQueryTrait
 {
     /**
      * this trait deliver tow methods:
