@@ -15,7 +15,7 @@ namespace GemFramework\Traits\Table;
  * @method selectLastRows()
  * select object with given id or array of objects by giving ids
  */
-trait SelectTrait
+trait SelectQueryTrait
 {
 
 

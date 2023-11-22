@@ -9,7 +9,7 @@ namespace GemFramework\Traits\Table;
  * @method delete()
  * @method restore()
  */
-trait SafeDeleteTrait
+trait SafeDeleteQueryTrait
 {  
     /**
      * @param int|null $id

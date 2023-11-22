@@ -1,5 +1,5 @@
 <?php
-namespace AppTraits\Model;
+namespace GemFramework\Traits\Model;
 
 use GemFramework\Traits\Table\ActivateQueryTrait;
 use GemLibrary\Http\GemRequest;

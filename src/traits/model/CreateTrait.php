@@ -1,5 +1,5 @@
 <?php
-namespace AppTraits\Model;
+namespace GemFramework\Traits\Model;
 use GemLibrary\Http\GemRequest;
 use GemLibrary\Http\JsonResponse;
 

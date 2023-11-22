@@ -6,7 +6,7 @@ namespace GemFramework\Traits\Table;
  * This trait will insert object into database
  * @method insert()
  */
-trait InsertTrait
+trait InsertQueryTrait
 {
     /**
      * Insert current instance into Database

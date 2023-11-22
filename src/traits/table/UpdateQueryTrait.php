@@ -9,7 +9,7 @@ namespace GemFramework\Traits\Table;
  * @you can call affectedRows() and it shall be 1
  * @error: $this->getError();
  */
-trait UpdateTrait
+trait UpdateQueryTrait
 {
     /**
      * @update current instance

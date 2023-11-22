@@ -1,7 +1,7 @@
 <?php
 namespace GemFramework\Traits\Table;
 
-trait RemoveTrait {
+trait RemoveQueryTrait {
     /**
      * 
      * NOTE:  remove Object from Database.
