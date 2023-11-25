@@ -2,9 +2,10 @@
 namespace GemFramework\Traits\Model;
 use GemLibrary\Http\GemRequest;
 use GemLibrary\Http\JsonResponse;
-
+use GemFramework\Traits\Table\UpdateQueryTrait;
 trait UpdateTrait
 {
+
     public function update(GemRequest $request):JsonResponse
     {
         $jsonResponse = new JsonResponse();
@@ -14,7 +15,7 @@ trait UpdateTrait
             return $jsonResponse;
         }
         
-        if($this->updateSingle())
+        if($this->updateSingleQuery())
         {
             $jsonResponse->updated($this,1,'updated successfully');
         }
