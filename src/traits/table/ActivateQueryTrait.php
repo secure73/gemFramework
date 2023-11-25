@@ -80,7 +80,7 @@ trait ActivateQueryTrait
         return $this->updateQuery($query, $arrayBind);
     }
 
-    public function selectActives()
+    public function selectActivesQuery()
     {
         $table = $this->setTable();
         if(!$table)
