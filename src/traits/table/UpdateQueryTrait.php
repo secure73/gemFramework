@@ -16,7 +16,7 @@ trait UpdateQueryTrait
      * @you can call affectedRows() and it shall be 1
      * @error: $this->getError();
      */
-    public function updateSingle(): int|null
+    public function updateSingleQuery(): int|null
     {
         $table = $this->setTable();
         if (!$table) {
@@ -52,7 +52,7 @@ trait UpdateQueryTrait
      *
      * @explain:  set deleted_at to null where id = $this->id
      */
-    public function setNull(string $columnNameSetToNull, string $whereColumn, mixed $whereValue): int|null
+    public function setNullQuery(string $columnNameSetToNull, string $whereColumn, mixed $whereValue): int|null
     {
         $table = $this->setTable();
         if (!$table) {
@@ -71,7 +71,7 @@ trait UpdateQueryTrait
      *
      * @explain:  set paid_at  to 18-08-2022 12:45:13 where id = $this->id
      */
-    public function setTimeNow(string $columnNameSetToNowTomeStamp, string $whereColumn, mixed $whereValue): int|null
+    public function setTimeNowQuery(string $columnNameSetToNowTomeStamp, string $whereColumn, mixed $whereValue): int|null
     {
         $table = $this->setTable();
         if (!$table) {
