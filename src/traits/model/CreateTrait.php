@@ -13,7 +13,7 @@ trait CreateTrait
             $jsonResponse->badRequest($request->getError());
             return $jsonResponse;
         }
-        $id = $this->insertSingle();
+        $id = $this->insertSingleQuery();
         if($id)
         {
             $jsonResponse->success($id,null,'created successfully');
