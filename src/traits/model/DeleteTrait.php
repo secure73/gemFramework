@@ -1,12 +1,13 @@
 <?php
 namespace GemFramework\Traits\Model;
+
+use GemFramework\Traits\Table\SafeDeleteQueryTrait;
 use GemLibrary\Http\GemRequest;
 use GemLibrary\Http\JsonResponse;
-use GemFramework\Traits\Table\SafeDeleteTrait;
 
 trait DeleteTrait
 {
-    use SafeDeleteTrait;
+    use SafeDeleteQueryTrait;
     public function delete(GemRequest $request):JsonResponse
     {
         $jsonResponse = new JsonResponse();
@@ -16,7 +17,7 @@ trait DeleteTrait
             return $jsonResponse;
         }
         
-        if($this->safeDelete($this->id))
+        if($this->safeDeleteQuery($this->id))
         {
             $jsonResponse->success($this,1,'deleted successfully');
         }
