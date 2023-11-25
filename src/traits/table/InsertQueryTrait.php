@@ -15,7 +15,7 @@ trait InsertQueryTrait
      *
      * @throws \Exception If insertQuery method throws an exception
      */
-    public final function insertSingle(): int|false
+    public final function insertSingleQuery(): int|false
     {
         $table = $this->setTable();
         if (!$table) {
