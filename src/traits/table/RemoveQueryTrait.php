@@ -9,7 +9,7 @@ trait RemoveQueryTrait {
      * @Attention:  remove Object from Database
      * @return int|null
      */
-    public function remove(): int|null
+    public function removeQuery(): int|null
     {
         if(!isset($this->id))
         {
@@ -26,7 +26,7 @@ trait RemoveQueryTrait {
      * @Attention:  remove Object compleetly from Database
      */
 
-    public function removeConditional(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
+    public function removeConditionalQuery(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
     {
         $table = $this->setTable();
         if (!$table) {
@@ -43,8 +43,6 @@ trait RemoveQueryTrait {
         if ($secondWhereColumn) {
             $arrayBind[':'.$secondWhereColumn] = $secondWhereValue;
         }
-
         return $this->deleteQuery($query, $arrayBind);
     }
-
 }
