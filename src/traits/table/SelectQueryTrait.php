@@ -24,7 +24,7 @@ trait SelectQueryTrait
      * @return bool
      * Set $this value and return true if found, false otherwise
      */
-    public function selectById(int $id): bool
+    public function selectByIdQuery(int $id): bool
     {
         $table = $this->setTable();
         if (!$table) {
@@ -57,7 +57,7 @@ trait SelectQueryTrait
      * @return null|array<$this>
      * in case of failure return null
      */
-    public function selectByIds(array $ids): ?array
+    public function selectByIdsQuery(array $ids): ?array
     {
         $table = $this->setTable();
         if (!$table) {
@@ -100,7 +100,7 @@ trait SelectQueryTrait
      * @param string|null $orderByColumnName The name of the column to order the results by.
      * @return array|null An array of objects representing the selected rows, or null if the selection failed.
      */
-    public function selectFirstRows(
+    public function selectFirstRowsQuery(
         int $countRows,
         string $whereColumn,
         \SqlEnumCondition $whereCondition,
@@ -141,7 +141,7 @@ trait SelectQueryTrait
      * @param int|string|bool|null $whereValue The value to search for in the column.
      * @return array|null An array of objects representing the selected rows, or null if the selection failed.
      */
-    public function selectLastRows(
+    public function selectLastRowsQuery(
         int $countRows,
         string $orderByColumnName,
         ?string $whereColumn = null,
@@ -191,7 +191,7 @@ trait SelectQueryTrait
      * @param bool|null $actives Whether to include active rows in the results.
      * @return null|array<$this> An array of objects representing the selected rows, or null if the selection failed.
      */
-    public function selectByColumns(
+    public function selectByColumnsQuery(
         string $firstColumn,
         \SqlEnumCondition $firstCondition,
         mixed $firstValue,
