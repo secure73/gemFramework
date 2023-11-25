@@ -17,7 +17,7 @@ trait SafeDeleteQueryTrait
      * @description : if id = null then use $this->id
      * return 1 if successful and null if not
      */
-     public function safeDelete(int $id = null): int|null
+     public function safeDeleteQuery(int $id = null): int|null
     {
         $table = $this->setTable();
         if(!$table)
