@@ -1,10 +1,6 @@
 <?php
 
 namespace GemFramework\Core;
-
-use GemFramework\Traits\Table\InsertQueryTrait;
-use GemFramework\Traits\Table\SelectQueryTrait;
-use GemFramework\Traits\Table\UpdateQueryTrait;
 use GemLibrary\Database\PdoQuery;
 use GemLibrary\Helper\StringHelper;
 
@@ -21,10 +17,6 @@ class Table extends PdoQuery
     private array  $listBindValues;
     private string $sort;
     private string $where;
-
-    use InsertQueryTrait;
-    use UpdateQueryTrait;
-    use SelectQueryTrait;
 
     public function __construct()
     {
