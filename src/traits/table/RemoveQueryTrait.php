@@ -17,7 +17,7 @@ trait RemoveQueryTrait {
             return null;
         }
 
-        return $this->removeConditional('id', $this->id);
+        return $this->removeConditionalQuery('id', $this->id);
     }
 
     /**
