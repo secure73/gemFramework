@@ -17,7 +17,7 @@ trait RemoveTrait
             return $jsonResponse;
         }
         $this->id = $request->post['id'];
-        if($this->deleteSingleQuery())
+        if($this->removeQuery())
         {
             $jsonResponse->success(null,null,'deleted successfully');
         }
