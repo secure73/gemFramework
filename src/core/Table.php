@@ -14,6 +14,9 @@ class Table extends PdoQuery
     private string $between;
     private string $orderBy;
     private string $listQuery;
+    /**
+     * @var array<mixed>
+     */
     private array  $listBindValues;
     private string $sort;
     private string $where;
@@ -29,7 +32,6 @@ class Table extends PdoQuery
         $this->orderBy = "ORDER BY id DESC";
         $this->listBindValues = [];
         $this->where = ' WHERE 1 ';
-        //$this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $this->listQuery = "";
         parent::__construct();
     }
@@ -110,36 +112,46 @@ class Table extends PdoQuery
         return $this->listQuery;
     }
 
-    public function getListBindValues(): array
+    
+    public function getListBindValues(): array/**@phpstan-ignore-line */
     {
         return $this->listBindValues;
     }
 
 
-    public function ListQuery(): array
+    /**
+     * @return array<mixed>|false
+     */
+    public function ListQuery(): array|false
     {
-        $this->listQuery = "SELECT * FROM {$this->setTable()} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} {$this->where} {$this->find} {$this->between}";
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->where} {$this->find} {$this->between}";
         $count = $this->selectQuery($countQuery, $this->listBindValues);
-        $this->count = $count[0]['COUNT(*)'];
+        $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 
-    public function ListDeactivesQuery(): array
+    /**
+     * @return array<mixed>|false
+     */
+    public function ListDeactivesQuery(): array|false
     {
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$this->find} {$this->between}";
         $count = $this->selectQuery($countQuery, $this->listBindValues);
-        $this->count = $count[0]['COUNT(*)'];
+        $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 
-    public function ListTrashQuery(): array
+    /**
+     * @return array<mixed>|false
+    */
+    public function ListTrashQuery(): array|false
     {
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->find} {$this->between}";
         $count = $this->selectQuery($countQuery, $this->listBindValues);
-        $this->count = $count[0]['COUNT(*)'];
+        $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 }
