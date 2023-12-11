@@ -9,7 +9,7 @@ class Table extends PdoQuery
 
     private int    $pagination_limit;
     private string $page;
-    private int    $count;
+    private null|int    $count;
     private string $find;
     private string $between;
     private string $orderBy;
@@ -31,7 +31,7 @@ class Table extends PdoQuery
         $this->between = '';
         $this->orderBy = "ORDER BY id DESC";
         $this->listBindValues = [];
-        $this->where = ' WHERE 1 ';
+        $this->where = '';
         $this->listQuery = "";
         parent::__construct();
     }
@@ -97,12 +97,12 @@ class Table extends PdoQuery
         $where_item =  $res[0];
         $where_value = StringHelper::sanitizedString($res[1]);
         if (property_exists($this, $where_item)) {
-            $this->where = " WHERE {$where_item} = :list_where_value";
+            $this->where = " AND WHERE {$where_item} = :list_where_value";
             $this->listBindValues['list_where_value'] = $where_value;
         }
     }
 
-    public function getCount(): int
+    public function getCount(): null|int
     {
         return $this->count;
     }
@@ -124,9 +124,11 @@ class Table extends PdoQuery
      */
     public function ListQuery(): array|false
     {
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->where} {$this->find} {$this->between}";
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between}";
         $count = $this->selectQuery($countQuery, $this->listBindValues);
+        echo $countQuery;
+        var_dump($this->getError());
         $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
