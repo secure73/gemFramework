@@ -127,8 +127,6 @@ class Table extends PdoQuery
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between}";
         $count = $this->selectQuery($countQuery, $this->listBindValues);
-        echo $countQuery;
-        var_dump($this->getError());
         $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
