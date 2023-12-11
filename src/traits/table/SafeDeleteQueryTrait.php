@@ -33,7 +33,12 @@ trait SafeDeleteQueryTrait
             $this->setError('property id does existed or not setted in object');
             return null;
         }
-        $query = "UPDATE $table SET deleted_at = NOW() WHERE id = :id";
+        if($this->is_active)
+        {
+            $this->setError('this record is active and can not be deleted');
+            return null;
+        }
+        $query = "UPDATE $table SET deleted_at = NOW()  WHERE id = :id";
 
         return $this->updateQuery($query, [':id' => $id]);
     }
