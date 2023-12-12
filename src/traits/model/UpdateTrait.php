@@ -21,7 +21,7 @@ trait UpdateTrait
         }
         else
         {
-            $jsonResponse->badRequest($this->getError());
+            $jsonResponse->badRequest('nothing to update');
         }
         return $jsonResponse;
     }

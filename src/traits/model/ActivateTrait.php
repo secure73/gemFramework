@@ -23,7 +23,7 @@ trait ActivateTrait
         }
         else
         {
-            $jsonResponse->badRequest($this->getError());
+            $jsonResponse->badRequest('already is active');
         }
         return $jsonResponse;
     }

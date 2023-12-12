@@ -20,7 +20,7 @@ trait DeactivateTrait
         }
         else
         {
-            $jsonResponse->badRequest($this->getError());
+            $jsonResponse->badRequest('already is deactive');
         }
         return $jsonResponse;
     }
