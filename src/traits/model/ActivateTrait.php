@@ -23,7 +23,7 @@ trait ActivateTrait
         }
         else
         {
-            $jsonResponse->badRequest('already is active');
+            $jsonResponse->unprocessableEntity('already is active');
         }
         return $jsonResponse;
     }

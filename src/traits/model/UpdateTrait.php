@@ -21,7 +21,7 @@ trait UpdateTrait
         }
         else
         {
-            $jsonResponse->badRequest('nothing to update');
+            $jsonResponse->unprocessableEntity('nothing to update');
         }
         return $jsonResponse;
     }

@@ -20,7 +20,7 @@ trait DeactivateTrait
         }
         else
         {
-            $jsonResponse->badRequest('already is deactive');
+            $jsonResponse->unprocessableEntity('already is deactive');
         }
         return $jsonResponse;
     }
