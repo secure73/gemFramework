@@ -154,4 +154,19 @@ class Table extends PdoQuery
         $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
+
+    /**
+     * @param int $id
+     * @return object|false
+     */
+    public function selectById(int $id): object|false
+    {
+        $found = $this->selectQueryObjets("SELECT * FROM {$this->setTable()} WHERE id = :id LIMIT 1",[':id'=>$id]);
+        if(isset($found[0]))
+        {
+            /** @phpstan-ignore-next-line */
+            return $found[0];
+        }
+        return false;
+    }
 }
