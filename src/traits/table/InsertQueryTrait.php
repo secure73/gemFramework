@@ -1,52 +1,44 @@
 <?php
+
 namespace GemFramework\Traits\Table;
+
 /**
- * NOTE !! This trait will remove Permanently object into database
- * @method removeQuery()
- * @method removeConditionalQuery()
+ * This trait will insert object into database
+ * @method insertSingleQuery()
  */
-trait RemoveQueryTrait {
+trait InsertQueryTrait
+{
     /**
-     * 
-     * NOTE:  remove Object from Database.
-     * @ in case of success return count removed items
-     * @Attention:  remove Object from Database
-     * @return int|null
+     * Insert current instance into Database
+     *
+     * @return int|false Last inserted ID or false on failure
+     *
+     * @throws \Exception If insertQuery method throws an exception
      */
-    public function removeQuery(): int|null
-    {
-        if(!isset($this->id))
-        {
-            $this->setError('property id does not exist or is not set in object');
-            return null;
-        }
-
-        return $this->removeConditionalQuery('id', $this->id);
-    }
-
-    /**
-     * NOTE:  remove Object compleetly from Database.
-     * @ in case of success return count removed items
-     * @Attention:  remove Object compleetly from Database
-     */
-
-    public function removeConditionalQuery(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
+    public final function insertSingleQuery(): int|false
     {
         $table = $this->setTable();
         if (!$table) {
-            $this->setError('Table is not set in function setTable.');
-            return null;
+            $this->setError('Table is not set in function setTable');
+            return false;
         }
 
-        $query = "DELETE FROM {$table} WHERE {$whereColumn} = :{$whereColumn}";
-        if ($secondWhereColumn) {
-            $query .= " AND {$secondWhereColumn} = :{$secondWhereColumn}";
+        $columns = '';
+        $params = '';
+        $arrayBind = [];
+        $query = "INSERT INTO {$table} ";
+
+        foreach ((object) $this as $key => $value) {
+            $columns .= $key . ',';
+            $params .= ':' . $key . ',';
+            $arrayBind[':' . $key] = $value;
         }
 
-        $arrayBind = [':'.$whereColumn => $whereValue];
-        if ($secondWhereColumn) {
-            $arrayBind[':'.$secondWhereColumn] = $secondWhereValue;
-        }
-        return $this->deleteQuery($query, $arrayBind);
+        $columns = rtrim($columns, ',');
+        $params = rtrim($params, ',');
+
+        $query .= " ({$columns}) VALUES ({$params})";
+        return $this->insertQuery($query, $arrayBind);
     }
+
 }
