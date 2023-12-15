@@ -6,7 +6,8 @@ use GemLibrary\Helper\StringHelper;
 
 class Table extends PdoQuery
 {
-
+    public int          $is_active;
+    public ?string      $deleted_at;
     private int         $pagination_limit;
     private string      $page;
     private null|int    $count;
