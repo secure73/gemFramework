@@ -4,7 +4,7 @@ namespace GemFramework\Traits\Table;
 
 /**
  * This trait will insert object into database
- * @method insert()
+ * @method insertSingleQuery()
  */
 trait InsertQueryTrait
 {
