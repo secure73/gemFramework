@@ -136,23 +136,58 @@ class Table extends PdoQuery
 
 
     /**
+     * @param string|null $forignKey
+     * @param mixed|null $value
      * @return array<mixed>|false
      */
-    public function ListQuery(): array|false
+    public function ListQuery(string $forignKey = null , mixed $value = null): array|false
     {
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $whereForignKey = '';
+        if($forignKey)
+        {
+            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $this->listBindValues[':key_id'] = $value;
+        }
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$whereForignKey} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between}";
         $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 
     /**
+     * @param string|null $forignKey
+     * @param mixed|null $value
      * @return array<mixed>|false
      */
-    public function ListDeactivesQuery(): array|false
+    public function ListDeactivesQuery(string $forignKey = null , mixed $value = null): array|false
     {
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$this->find} {$this->between}";
+        $whereForignKey = '';
+        if($forignKey)
+        {
+            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $this->listBindValues[':key_id'] = $value;
+        }
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->find} {$this->between}";
+        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+    }
+
+    /**
+     * @param string|null $forignKey
+     * @param mixed|null $value
+     * @return array<mixed>|false
+     */
+    public function ListActivesQuery(string $forignKey = null , mixed $value = null): array|false
+    {
+        $whereForignKey = '';
+        if($forignKey)
+        {
+            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $this->listBindValues[':key_id'] = $value;
+        }
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between}";
         $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
@@ -160,10 +195,16 @@ class Table extends PdoQuery
     /**
      * @return array<mixed>|false
     */
-    public function ListTrashQuery(): array|false
+    public function ListTrashQuery(string $forignKey = null , mixed $value = null): array|false
     {
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->find} {$this->between}";
+        $whereForignKey = '';
+        if($forignKey)
+        {
+            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $this->listBindValues[':key_id'] = $value;
+        }
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL  {$whereForignKey} {$this->find} {$this->between}";
         $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
