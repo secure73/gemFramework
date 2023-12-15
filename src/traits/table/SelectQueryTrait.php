@@ -3,22 +3,15 @@
 namespace GemFramework\Traits\Table;
 
 /**
- * this trait deliver 5 methods
- * id():bool if true set property to current object
- * ids(array[ids]):array<this>|null
- * firstRows(conditions):array<this>|null
- * lastRows(conditions):array<this>|null
- * columnSelect(conditions):array<this>|null
- * @method selectById()
- * @method selectByIds()
- * @method selectFirstRows()
- * @method selectLastRows()
+ * @method selectByIdQuery()
+ * @method selectByIdsQuery()
+ * @method selectFirstRowsQuery()
+ * @method selectLastRowsQuery()
+ * @method selectByColumnsQuery()
  * select object with given id or array of objects by giving ids
  */
 trait SelectQueryTrait
 {
-
-
     /**
      * @param int $id
      * @return bool
