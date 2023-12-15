@@ -1,6 +1,13 @@
 <?php
 
 namespace GemFramework\Core;
+
+use GemFramework\Traits\Table\ActivateQueryTrait;
+use GemFramework\Traits\Table\InsertQueryTrait;
+use GemFramework\Traits\Table\RemoveQueryTrait;
+use GemFramework\Traits\Table\SafeDeleteQueryTrait;
+use GemFramework\Traits\Table\SelectQueryTrait;
+use GemFramework\Traits\Table\UpdateQueryTrait;
 use GemLibrary\Database\PdoQuery;
 use GemLibrary\Helper\StringHelper;
 
@@ -21,6 +28,13 @@ class Table extends PdoQuery
     private array  $listBindValues;
     private string $sort;
     private string $where;
+
+    use SelectQueryTrait;
+    use InsertQueryTrait;
+    use RemoveQueryTrait;
+    use UpdateQueryTrait;
+    use SafeDeleteQueryTrait;
+    use ActivateQueryTrait;
 
     public function __construct()
     {
