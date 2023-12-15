@@ -1,13 +1,10 @@
 <?php
-
 namespace GemFramework\Traits\Table;
 
 /**
- *this trait update single column with property id 
- *method : update():int|null;
- * @update current instance
- * @you can call affectedRows() and it shall be 1
- * @error: $this->getError();
+ * @method updateSingleQuery()
+ * @method setNullQuery()
+ * @method setTimeNowQuery()
  */
 trait UpdateQueryTrait
 {
