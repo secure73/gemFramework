@@ -7,13 +7,13 @@ use GemLibrary\Helper\StringHelper;
 class Table extends PdoQuery
 {
 
-    private int    $pagination_limit;
-    private string $page;
+    private int         $pagination_limit;
+    private string      $page;
     private null|int    $count;
-    private string $find;
-    private string $between;
-    private string $orderBy;
-    private string $listQuery;
+    private string      $find;
+    private string      $between;
+    private string      $orderBy;
+    private string      $listQuery;
     /**
      * @var array<mixed>
      */
@@ -43,7 +43,8 @@ class Table extends PdoQuery
 
     public function setPage(int $page): void
     {
-        $this->page = " LIMIT {$this->pagination_limit} OFFSET  $page";
+        $offset = $page * $this->pagination_limit;
+        $this->page = " LIMIT {$this->pagination_limit} OFFSET $offset";
     }
 
     public function setFind(string $find): void
@@ -126,8 +127,7 @@ class Table extends PdoQuery
     {
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between}";
-        $count = $this->selectQuery($countQuery, $this->listBindValues);
-        $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
+        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 
@@ -138,8 +138,7 @@ class Table extends PdoQuery
     {
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$this->find} {$this->between}";
-        $count = $this->selectQuery($countQuery, $this->listBindValues);
-        $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
+        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 
@@ -150,8 +149,7 @@ class Table extends PdoQuery
     {
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->find} {$this->between}";
-        $count = $this->selectQuery($countQuery, $this->listBindValues);
-        $this->count = $count[0]['COUNT(*)'];/**@phpstan-ignore-line */
+        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
         return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
     }
 
