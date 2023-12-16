@@ -25,7 +25,7 @@ trait RestoreTrait
             $jsonResponse->badRequest('property id does existed or not setted in object');
             return null;
         }
-        $query = "UPDATE {$this->table} SET deleted_at = NULL WHERE id = :id";
+        $query = "UPDATE $table SET deleted_at = NULL WHERE id = :id";
 
         if( $this->updateQuery($query, [':id' => $this->id]))
         {
