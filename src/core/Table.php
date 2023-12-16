@@ -17,7 +17,7 @@ class Table extends PdoQuery
     public ?string      $deleted_at;
     private int         $pagination_limit;
     private string      $page;
-    private null|int    $count;
+    private int         $count;
     private string      $find;
     private string      $between;
     private string      $orderBy;
@@ -150,8 +150,13 @@ class Table extends PdoQuery
         }
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$whereForignKey} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between}";
-        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        if($count !== false)
+        {
+            $this->count = $count;
+            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        }
+        return false;
     }
 
     /**
@@ -169,8 +174,13 @@ class Table extends PdoQuery
         }
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->find} {$this->between}";
-        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        if($count !== false)
+        {
+            $this->count = $count;
+            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        }
+        return false;
     }
 
     /**
@@ -188,8 +198,13 @@ class Table extends PdoQuery
         }
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between}";
-        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        if($count !== false)
+        {
+            $this->count = $count;
+            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        }
+        return false;
     }
 
     /**
@@ -205,8 +220,13 @@ class Table extends PdoQuery
         }
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
         $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL  {$whereForignKey} {$this->find} {$this->between}";
-        $this->count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        if($count !== false)
+        {
+            $this->count = $count;
+            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        }
+        return false;
     }
 
     /**
