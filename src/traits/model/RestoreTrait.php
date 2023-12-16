@@ -19,17 +19,23 @@ trait RestoreTrait
         if(!$table)
         {
             $jsonResponse->internalError('table is not setted in function setTable');
+            return $jsonResponse;
         }
         if(!$this->id || $this->id < 1)
         {
             $jsonResponse->badRequest('property id does existed or not setted in object');
-            return null;
+            return $jsonResponse;
         }
-        $query = "UPDATE $table SET deleted_at = NULL WHERE id = :id";
+        $query = "UPDATE {$this->setTable()} SET deleted_at = NULL WHERE id = :id";
 
-        if( $this->updateQuery($query, [':id' => $this->id]))
+        if($this->updateQuery($query, [':id' => $this->id]))
         {
-            $jsonResponse->success($this->id, 'restored');
+            $jsonResponse = new JsonResponse();
+            $jsonResponse->success($this->id, 1,'restored');
+        }
+        else
+        {
+            $jsonResponse->internalError($this->getError());
         }
         return $jsonResponse;
     }
