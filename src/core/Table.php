@@ -243,14 +243,4 @@ class Table extends PdoQuery
         }
         return false;
     }
-
-    /**
-     * @param string $forignKey
-     * @param mixed $value
-     * @return array<mixed>|false
-     */
-    public function selectByForignKey(string $forignKey, mixed $value): array|false
-    {
-        return $this->selectQueryObjets("SELECT * FROM {$this->setTable()} WHERE {$forignKey} = :key_id LIMIT 1",[':key_id'=>$value]);
-    }
 }
