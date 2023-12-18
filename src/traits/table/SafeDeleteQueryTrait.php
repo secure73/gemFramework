@@ -22,8 +22,8 @@ trait SafeDeleteQueryTrait
             $this->setError('table is not setted in function setTable');
             return null;
         }
-        if (!$id) {
-            $id = $this->id;
+        if ($id) {
+            $this->id = $id;
         }
         if(!$id || $id < 1)
         {
@@ -52,8 +52,8 @@ trait SafeDeleteQueryTrait
             $this->setError('table is not setted in function setTable');
             return null;
         }
-        if (!$id) {
-            $id = $this->id;
+        if ($id) {
+    	    $this->id = $id;
         }
         if(!$id || $id < 1)
         {
@@ -62,6 +62,6 @@ trait SafeDeleteQueryTrait
         }
         $query = "UPDATE {$this->table} SET deleted_at = NULL WHERE id = :id";
 
-        return $this->updateQuery($query, []);
+        return $this->updateQuery($query, [':id' => $id]);
     }
 }
