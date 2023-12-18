@@ -13,36 +13,41 @@ namespace GemFramework\Traits\Table;
 trait SelectQueryTrait
 {
     /**
-     * @param int $id
+     * @param int|null $id
      * @return bool
      * Set $this value and return true if found, false otherwise
      */
-    public function selectByIdQuery(int $id): bool
+    public function selectByIdQuery(?int $id = null): bool
     {
         $table = $this->setTable();
         if (!$table) {
             $this->setError('Table is not set in function setTable');
             return false;
         }
-
-        $query = "SELECT * FROM {$table} WHERE id = :id";
-        $statement = $this->prepareQuery($query);
-        $statement->bindValue(':id', $id, \PDO::PARAM_INT);
-
-        $queryResult = $this->executeQuery($statement);
-        if ($queryResult === false) {
-            $this->setError('Failed to select row from table');
+        if ($id) {
+            $this->id = $id;
+        }
+        if (!isset($this->id) || $this->id < 1) {
+            $this->setError('Property id does not exist or is not set in object');
             return false;
         }
 
-        $row = $this->fetchObject($queryResult);
-        if ($row) {
-            $this->fetchObject($row);
-            return true;
-        } else {
-            $this->setError('Object with given id does not exist');
+        $select_result =  $this->selectQuery("SELECT * FROM {$table} WHERE id = :id LIMIT 1", [':id' => $id]);
+        if($select_result == false)
+        {
+            $this->setError('Failed to select row from table:'.$this->getError());
             return false;
         }
+        if(count($select_result) == 0)
+        {
+            $this->setError('No row found with id:'.$id);
+            return false;
+        }
+        $select_result = $select_result[0];
+        foreach ($select_result as $key => $value) {
+            $this->$key = $value;
+        }
+        return true;
     }
 
     /**
@@ -57,28 +62,25 @@ trait SelectQueryTrait
             $this->setError('table is not set in function setTable');
             return null;
         }
+        if (count($ids) == 0) {
+            $this->setError('ids array is empty');
+            return null;
+        }
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-
         $query = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
-        $statement = $this->prepareQuery($query);
-        if (!$statement) {
-            $this->setError('Failed to prepare select statement');
+
+        $result = $this->selectQueryObjets($query, []);
+        if ($result === false) {
+            $this->setError('Failed to select rows from table:'. $this->getError());
             return null;
         }
-
-        if (!$this->bindValues($statement, $ids)) {
-            $this->setError('Failed to bind values to select statement');
+        if(count($result) < 1)
+        {
+            $this->setError('No rows found within ids:'.implode(',',$ids));
             return null;
         }
-
-        $queryResult = $this->executeQuery($statement);
-        if ($queryResult === false) {
-            $this->setError('Failed to execute select statement');
-            return null;
-        }
-
-        return $this->fetchAllObjects($queryResult);
+        return $result;
     }
 
 
