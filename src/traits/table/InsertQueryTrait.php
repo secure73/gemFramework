@@ -1,19 +1,16 @@
 <?php
-
 namespace GemFramework\Traits\Table;
 
 /**
- * This trait will insert object into database
  * @method insertSingleQuery()
+ * insert single row to table
  */
-trait InsertQueryTrait
+trait InsertSingleQueryTrait
 {
     /**
-     * Insert current instance into Database
-     *
      * @return int|false Last inserted ID or false on failure
-     *
-     * @throws \Exception If insertQuery method throws an exception
+     * @throws \Exception If failure also throws an exception
+     * insert single row to table
      */
     public final function insertSingleQuery(): int|false
     {
