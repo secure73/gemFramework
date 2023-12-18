@@ -1,19 +1,23 @@
 <?php
 namespace GemFramework\Traits\Table;
 /**
- * NOTE !! This trait will remove Permanently object into database
  * @method removeQuery()
  * @method removeConditionalQuery()
+ * NOTE !! This trait remove row from database
  */
 trait RemoveQueryTrait {
     /**
+     * @param int|null $id
+     * @return int|null
      * NOTE:  remove Object from Database.
      * @ in case of success return count removed items
-     * @Attention:  remove Object from Database
-     * @return int|null
      */
-    public function removeQuery(): int|null
+    public function removeQuery(?int $id = null): int|null
     {
+        if($id)
+        {
+            $this->id = $id;
+        }
         if(!isset($this->id))
         {
             $this->setError('property id does not exist or is not set in object');
