@@ -38,7 +38,7 @@ trait ActivateQueryTrait
             $this->setError('property is_active does existed or not setted in object');
             return null;
         }
-        return $this->updateQuery("UPDATE $table SET is_active = 1 WHERE id = :id", $arrayBind, [':id' => $this->id]);
+        return $this->updateQuery("UPDATE $table SET is_active = 1 WHERE id = :id", [':id' => $this->id]);
     }
 
     /**
