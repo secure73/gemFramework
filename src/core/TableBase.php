@@ -218,16 +218,20 @@ class TableBase extends PdoQuery
 
     /**
      * @param int $id
-     * @return object|false
+     * @return object|false|null
      */
-    public function selectById(int $id): object|false
+    public function selectById(int $id): object|false|null
     {
         $found = $this->selectQueryObjets("SELECT * FROM {$this->setTable()} WHERE id = :id LIMIT 1",[':id'=>$id]);
-        if(isset($found[0]))
+        if($found === false)
         {
-            /** @phpstan-ignore-next-line */
-            return $found[0];
+            return false;
         }
-        return false;
+        if(count($found) === 0)
+        {
+            return null;
+        }
+        /** @phpstan-ignore-next-line */
+        return $found[0];
     }
 }
