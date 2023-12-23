@@ -100,7 +100,7 @@ class TableBase extends PdoQuery
         $where_item =  $res[0];
         $where_value = StringHelper::sanitizedString($res[1]);
         if (property_exists($this, $where_item)) {
-            $this->where = " AND WHERE {$where_item} = :{$where_item}";
+            $this->where = " AND {$where_item} = :{$where_item}";
             $this->listBindValues[":{$where_item}"] = $where_value;
         }
     }
@@ -136,7 +136,7 @@ class TableBase extends PdoQuery
             $this->listBindValues[':key_id'] = $value;
         }
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$whereForignKey} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL  {$this->where} {$this->find} {$this->between}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL {$whereForignKey} {$this->where} {$this->find} {$this->between}";
         $count = $this->selectCountQuery($countQuery, $this->listBindValues);
         if($count !== false)
         {
@@ -156,11 +156,11 @@ class TableBase extends PdoQuery
         $whereForignKey = '';
         if($forignKey)
         {
-            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $whereForignKey = " AND {$forignKey} = :key_id";
             $this->listBindValues[':key_id'] = $value;
         }
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->find} {$this->between}";
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->where} {$this->find} {$this->between}";
         $count = $this->selectCountQuery($countQuery, $this->listBindValues);
         if($count !== false)
         {
@@ -180,7 +180,7 @@ class TableBase extends PdoQuery
         $whereForignKey = '';
         if($forignKey)
         {
-            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $whereForignKey = " AND {$forignKey} = :key_id";
             $this->listBindValues[':key_id'] = $value;
         }
         $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
@@ -202,11 +202,12 @@ class TableBase extends PdoQuery
         $whereForignKey = '';
         if($forignKey)
         {
-            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
+            $whereForignKey = " AND {$forignKey} = :key_id";
             $this->listBindValues[':key_id'] = $value;
         }
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL  {$whereForignKey} {$this->find} {$this->between}";
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$whereForignKey} {$this->where} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL  {$whereForignKey} {$this->where} {$this->where} {$this->find} {$this->between}";
         $count = $this->selectCountQuery($countQuery, $this->listBindValues);
         if($count !== false)
         {
