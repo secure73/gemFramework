@@ -3,6 +3,10 @@ namespace GemFramework\Traits\Controller;
 
 use GemLibrary\Http\JsonResponse;
 
+/**
+ * @method remove()
+ * @return JsonResponse
+ */
 trait RemoveTrait
 {
     public function remove(): JsonResponse

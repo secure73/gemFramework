@@ -3,6 +3,10 @@ namespace GemFramework\Traits\Controller;
 
 use GemLibrary\Http\JsonResponse;
 
+/**
+ * @method list()
+ * @return JsonResponse
+ */
 trait ListTrait{
 
     public function list():JsonResponse

@@ -3,6 +3,10 @@ namespace GemFramework\Traits\Controller;
 
 use GemLibrary\Http\JsonResponse;
 
+/**
+ * @method restore()
+ * @return JsonResponse
+ */
 trait RestoreTrait{
     public function restore(): JsonResponse
     {

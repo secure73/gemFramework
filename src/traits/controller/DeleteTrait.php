@@ -2,6 +2,10 @@
 namespace GemFramework\Traits\Controller;
 use GemLibrary\Http\JsonResponse;
 
+/**
+ * @method delete()
+ * @return JsonResponse
+ */
 trait DeleteTrait
 {
     public function delete(): JsonResponse
