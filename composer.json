@@ -18,7 +18,8 @@
             "App\\": "../../../app/",
             "App\\Controller\\": "../../../app/controller/",
             "App\\Model\\": "../../../app/model/",
-            "App\\Table\\": "../../../app/table/"
+            "App\\Table\\": "../../../app/table/",
+            "App\\Interface\\": "../../../app/interface/"
         },
         "files": [
             "../../../app/config.php"
