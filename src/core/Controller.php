@@ -6,7 +6,9 @@ use GemLibrary\Http\JsonResponse;
 class Controller {
     protected JsonResponse $response;
     protected GemRequest $request;
-    public object $model;
+    
+    public $model;/** @phpstan-ignore-line */
+
     public function __construct(GemRequest $request) {
         $this->request = $request;
         $this->response = new JsonResponse();
