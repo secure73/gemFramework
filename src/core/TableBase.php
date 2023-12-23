@@ -100,8 +100,8 @@ class TableBase extends PdoQuery
         $where_item =  $res[0];
         $where_value = StringHelper::sanitizedString($res[1]);
         if (property_exists($this, $where_item)) {
-            $this->where = " AND WHERE {$where_item} = :list_where_value";
-            $this->listBindValues['list_where_value'] = $where_value;
+            $this->where = " AND WHERE {$where_item} = :{$where_item}";
+            $this->listBindValues[":{$where_item}"] = $where_value;
         }
     }
 
