@@ -1,12 +1,13 @@
 <?php
 namespace GemFramework\Traits\Model;
 use GemLibrary\Http\GemRequest;
+/**
+ * @method trashObjects()
+ * @param GemRequest $request
+ * @return array<mixed>|false
+ */
 trait ListObjectTrashTrait
 {
-    /**
-     * @param GemRequest $request
-     * @return array<mixed>|false
-     */
     public function trashObjects(GemRequest $request):array|false
     {
         if(isset($request->post['page']))
