@@ -30,7 +30,8 @@ trait ListTrait
         $jsonResponse = new JsonResponse();
         if(!$this->getError())
         {
-            $jsonResponse->success( $this->listQuery());
+            $result = $this->listQuery();
+            $jsonResponse->success( $result,$result->count);
         }
         else
         {
