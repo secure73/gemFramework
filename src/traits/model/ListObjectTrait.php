@@ -1,12 +1,14 @@
 <?php
 namespace GemFramework\Traits\Model;
 use GemLibrary\Http\GemRequest;
+
+/**
+ * @method listObjects()
+ * @param GemRequest $request
+ * @return array<mixed>|false
+ */
 trait ListObjectTrait
 {
-    /**
-     * @param GemRequest $request
-     * @return array<mixed>|false
-     */
     public function listObjects(GemRequest $request):array|false
     {
         if(isset($request->post['page']))
