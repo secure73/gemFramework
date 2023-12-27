@@ -31,7 +31,7 @@ trait ListTrait
         if(!$this->getError())
         {
             $result = $this->listQuery();
-            $jsonResponse->success( $result,$result->count);
+            $jsonResponse->success( $result,$this->getCount());
         }
         else
         {
