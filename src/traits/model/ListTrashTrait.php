@@ -30,7 +30,7 @@ trait ListTrashTrait
         $jsonResponse = new JsonResponse();
         if(!$this->getError())
         {
-            $result = $this->listQuery();
+            $result = $this->ListTrashQuery();
             $jsonResponse->success( $result,$this->getCount());
         }
         else
