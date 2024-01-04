@@ -29,4 +29,30 @@ class Table extends TableBase
     {
         return '';
     }
+
+    /**
+     * @param int $id
+     * @return null|$this
+     * if found, set item values to this object and return this object
+     */
+    public function single(int $id):null|object
+    {
+        $res = $this->selectQuery("SELECT * FROM {$this->setTable()} WHERE id = :id LIMIT 1",[':id'=>$id]);
+        if($res === false)
+        {
+            $this->setError('Failed to select row from table:'.$this->getError());
+            return null;
+        }
+        if(count($res) == 0)
+        {
+            $this->setError('No row found with id:'.$id);
+            return null;
+        }
+        $res = $res[0];
+        /*@phpstan-ignore-next-line*/
+        foreach ($res as $key => $value) {
+            $this->$key = $value;
+        }
+        return $this;
+    }
 }
