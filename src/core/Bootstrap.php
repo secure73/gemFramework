@@ -8,54 +8,80 @@ use GemLibrary\Http\GemRequest;
 
 class Bootstrap
 {
-    public GemRequest   $gemRequest;
-    public ?object      $service;
-    public string       $controller ='Index';
-    public string       $method = 'index';
-    public ?string      $error;
+    //public ?object      $service;
+    public string        $service;
+    public string        $method;
+    private GemRequest   $gemRequest;
+    private ?string      $error;
+    private ?object      $instance;
 
     public function __construct(GemRequest $gemRequest)
     {
-        $this->gemRequest = $gemRequest;
-        $segments = explode('/',$this->gemRequest->requestedUrl);
-        if(isset($segments[$_ENV['URI_CONTROLLER_SEGMENT']]) && $segments[$_ENV['URI_CONTROLLER_SEGMENT']] !== "")
-        {
-            $this->controller = ucfirst(trim($segments[$_ENV['URI_CONTROLLER_SEGMENT']]));
-        }
-        if(isset($segments[$_ENV['URI_METHOD_SEGMENT']]) && $segments[$_ENV['URI_METHOD_SEGMENT']] !== "")
-        {
-            $this->method = $segments[$_ENV['URI_METHOD_SEGMENT']];
-        }
-        $this->runApp();
+        $this->error = null;
+        $this->service = 'Index';
+        $this->method = 'index';
+        $this->gemRequest = $gemRequest; 
+        $this->runApp()->show();
     }
 
-    public function runApp():void
+    public function runApp():JsonResponse
     {
-        if (!$this->makeInstanceService()) {     
-            $jsonResponse = new JsonResponse();
-            $jsonResponse->internalError($this->error);
-            $jsonResponse->show();
+        $jsonResponse = new JsonResponse();
+        $this->setService();
+        if(!$this->serviceFileExists())
+        {
+            return $jsonResponse->notFound(" requested service $this->service not found");	
         }
-        
+        if (!$this->createServiceInstance()) {       
+           return $jsonResponse->internalError($this->error);
+        }
+        if(!method_exists($this->instance,$this->method))
+        {
+            return $jsonResponse->notFound("requested method $this->method not found");
+        }
+        $method = $this->method;
+        $response = $this->instance->$method();
+        if(!is_a($response , 'JsonResponse'))
+        {
+            return $jsonResponse->internalError("method $this->method dose not provide JsonResponse as return value");
+        }
+        $jsonResponse = null;
+        return $response;
     }
 
-    private function makeInstanceService(): bool
+
+    private function serviceFileExists():bool
     {
-        try {
-            $controller = 'App\\Controller\\'.$this->controller.'Controller';
-            $method = $this->method;
-            $ins = new $controller($this->gemRequest);
-            $res = $ins->$method();
-            if (!$res instanceof JsonResponse) {
-                $this->error = 'Method ' . $this->controller . '/' . $this->method . 'dosent return Object of JsonResponse';
-            } else {
-                $res->show();
-                die;
-            }
-            return true;
-        } catch (\Throwable $e) {
+        return file_exists('../../../app/service/'.$this->service.'.php');
+    }
+
+    private function createServiceInstance():bool
+    {
+        $service = 'App\\Controller\\'.$this->service;
+        $instance = false;
+        try{
+          $instance = new $service($this->gemRequest);
+          $this->instance = $instance;
+          return true;
+        }
+        catch(\Exception $e)
+        {
             $this->error = $e->getMessage();
         }
-        return false;
+        return false; 
     }
+
+    private function setService():void
+    {
+        $segments = explode('/',$this->gemRequest->requestedUrl);
+        if(isset($segments[$_ENV['URI_SERVICE_SEGMENT']]) && $segments[$_ENV['URI_SERVICE_SEGMENT']] !== "")
+        {
+            $this->service = ucfirst(trim($segments[$_ENV['URI_SERVICE_SEGMENT']]));
+            if(isset($segments[$_ENV['URI_METHOD_SEGMENT']]) && $segments[$_ENV['URI_METHOD_SEGMENT']] !== "")
+            {
+                $this->method = $segments[$_ENV['URI_METHOD_SEGMENT']];
+            }
+        }
+    }
+
 }

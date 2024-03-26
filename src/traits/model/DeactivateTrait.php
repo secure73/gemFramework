@@ -1,27 +1,19 @@
 <?php
 namespace GemFramework\Traits\Model;
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
 
 trait DeactivateTrait
 {
-    public function deactivate(GemRequest $request):JsonResponse
+    public function deactivate(int $id = null):bool
     {
-        $jsonResponse = new JsonResponse();
-        if(!$request->setPostToObject($this))
+        if($id)
         {
-            $jsonResponse->badRequest($request->getError());
-            return $jsonResponse;
+            $this->id = $id;
         }
         
-        if($this->deactivateQuery())
+        if(!$this->deactivateQuery())
         {
-            $jsonResponse->updated($this,1,'dactivated');
+            return false;
         }
-        else
-        {
-            $jsonResponse->unprocessableEntity('already is deactive');
-        }
-        return $jsonResponse;
+        return true;
     }
 }

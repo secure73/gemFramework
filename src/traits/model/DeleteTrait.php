@@ -2,40 +2,20 @@
 namespace GemFramework\Traits\Model;
 
 use GemFramework\Traits\Table\UpdateQueryTrait;
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
 
 trait DeleteTrait
 {
     use UpdateQueryTrait;
-    public function delete(GemRequest $request):JsonResponse
+    public function delete(int $id=null):bool
     {
-        $jsonResponse = new JsonResponse();
-        if(!isset($request->post['id']))
+        if($id)
         {
-            $jsonResponse->badRequest('post id is not setted');
-            return $jsonResponse;
+            $this->id = $id;
         }
-        if(!is_numeric($request->post['id']) || $request->post['id'] < 1)
+        if(!$this->safeDeleteQuery($this->id))
         {
-            $jsonResponse->badRequest('id is not nummeric or less than 1');
-            return $jsonResponse;
+            return false;
         }
-        $jsonResponse = new JsonResponse();
-        if(!$request->setPostToObject($this))
-        {
-            $jsonResponse->badRequest($request->getError());
-            return $jsonResponse;
-        }
-        
-        if($this->safeDeleteQuery($this->id))
-        {
-            $jsonResponse->success($this,1,'deleted successfully');
-        }
-        else
-        {
-            $jsonResponse->badRequest($this->getError());
-        }
-        return $jsonResponse;
+        return true;
     }
 }

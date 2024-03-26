@@ -1,36 +1,20 @@
 <?php
 namespace GemFramework\Traits\Model;
 
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
-
 /**
- * @method id(GemRequest $request)
- * @return JsonResponse
+ * @method id(int $id)
+ * @return self|null
  */
 trait IdTrait
 {
-    public function id(GemRequest $request):JsonResponse
+    public function id(int $id):self|null
     {
-        $jsonResponse = new JsonResponse();
-        if(!isset($request->post['id']) || !is_numeric($request->post['id']) || $request->post['id'] < 1)
+        $found = $this->selectByIdQuery($id);
+        if(!$found)
         {
-            $jsonResponse->badRequest('id '.$request->post['id'].' is not valid');
-            return $jsonResponse;
+            $this->setError($this->getError());
+            return null;
         }
-        $id = (int)$request->post['id'];
-        $found = $this->selectById($id);
-        if($found === false)
-        {
-            $jsonResponse->internalError($this->getError());
-            return $jsonResponse;
-        }
-        if($found === null)
-        {
-            $jsonResponse->notFound('id '.$id.' is not found');
-            return $jsonResponse;
-        }
-        $jsonResponse->success($found);
-        return $jsonResponse;
+        return $this;
     }
 }

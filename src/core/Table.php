@@ -32,10 +32,10 @@ class Table extends TableBase
 
     /**
      * @param int $id
-     * @return null|$this
+     * @return null|self
      * if found, set item values to this object and return this object
      */
-    public function single(int $id):null|object
+    public function single(int $id):null|self
     {
         $res = $this->selectQuery("SELECT * FROM {$this->setTable()} WHERE id = :id LIMIT 1",[':id'=>$id]);
         if($res === false)

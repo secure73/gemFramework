@@ -1,28 +1,16 @@
 <?php
 namespace GemFramework\Traits\Model;
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
-use GemFramework\Traits\Table\UpdateQueryTrait;
+
 trait UpdateTrait
 {
 
-    public function update(GemRequest $request):JsonResponse
-    {
-        $jsonResponse = new JsonResponse();
-        if(!$request->setPostToObject($this))
-        {
-            $jsonResponse->badRequest($request->getError());
-            return $jsonResponse;
-        }
-        
+    public function update():self|null
+    {       
         if($this->updateSingleQuery())
         {
-            $jsonResponse->updated($this,1,'updated successfully');
+            return $this;
         }
-        else
-        {
-            $jsonResponse->unprocessableEntity('nothing to update');
-        }
-        return $jsonResponse;
+        return null;
+        
     }
 }

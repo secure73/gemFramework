@@ -16,6 +16,7 @@
             "GemFramework\\Traits\\Model\\" : "src/traits/model/",
             "GemFramework\\Traits\\Controller\\" : "src/traits/controller/",
             "App\\": "../../../app/",
+            "APP\\Service\\": "../../../app/service/",
             "App\\Controller\\": "../../../app/controller/",
             "App\\Model\\": "../../../app/model/",
             "App\\Table\\": "../../../app/table/",

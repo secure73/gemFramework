@@ -2,29 +2,22 @@
 namespace GemFramework\Traits\Model;
 
 use GemFramework\Traits\Table\ActivateQueryTrait;
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
 
 trait ActivateTrait
 {
     use ActivateQueryTrait;
-    public function activate(GemRequest $request):JsonResponse
+    public function activate(int $id = null):bool
     {
-        $jsonResponse = new JsonResponse();
-        if(!$request->setPostToObject($this))
+        if($id)
         {
-            $jsonResponse->badRequest($request->getError());
-            return $jsonResponse;
+            $this->id = $id;
         }
         
-        if($this->activateQuery())
+        if(!$this->activateQuery())
         {
-            $jsonResponse->updated($this,1,'activated successfully');
+            return false;
         }
-        else
-        {
-            $jsonResponse->unprocessableEntity('already is active');
-        }
-        return $jsonResponse;
+        
+        return true;
     }
 }

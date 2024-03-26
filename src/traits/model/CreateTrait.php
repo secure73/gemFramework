@@ -2,24 +2,15 @@
 
 namespace GemFramework\Traits\Model;
 
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
-
 trait CreateTrait
 {
-    public function create(GemRequest $request): JsonResponse
+    public function create(): self|false
     {
-        $jsonResponse = new JsonResponse();
-        if (!$request->setPostToObject($this)) {
-            $jsonResponse->badRequest($request->getError());
-            return $jsonResponse;
-        }
-
 
         $table = $this->setTable();
         if (!$table) {
-            $jsonResponse->internalError('Table is not set in function setTable');
-            return $jsonResponse;
+            $this->setError('Table is not set in function setTable');
+            return false;
         }
 
         $columns = '';
@@ -38,11 +29,10 @@ trait CreateTrait
         $query .= " ({$columns}) VALUES ({$params})";
         $id = $this->insertQuery($query, $arrayBind);
 
-        if ($id) {
-            $jsonResponse->success($id, null, 'created successfully');
-        } else {
-            $jsonResponse->badRequest($this->getError());
-        }
-        return $jsonResponse;
+        if (!$id) {
+          return false;
+        } 
+        $this->id = $id;
+        return $this;
     }
 }

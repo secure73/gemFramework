@@ -21,8 +21,8 @@ class Controller {
     {
         if(!$this->request->definePostSchema($postSchema))
         {
-                $this->response->badRequest($this->request->error);
-                return false;
+            $this->response->badRequest($this->request->error);
+            return false;
         }
         return true;
     }

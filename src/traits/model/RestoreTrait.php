@@ -1,42 +1,32 @@
 <?php
 namespace GemFramework\Traits\Model;
 
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
-
 trait RestoreTrait
 {
-    public function restore(GemRequest $request):JsonResponse
+    public function restore(int $id = null):bool
     {
-        $jsonResponse = new JsonResponse();
-        if(!$request->setPostToObject($this))
+        if($id)
         {
-            $jsonResponse->badRequest($request->getError());
-            return $jsonResponse;
+            $this->id = $id;
         }
-        
         $table = $this->setTable();
         if(!$table)
         {
-            $jsonResponse->internalError('table is not setted in function setTable');
-            return $jsonResponse;
+            $this->setError('table is not setted in function setTable');
+            return false;
         }
         if(!$this->id || $this->id < 1)
         {
-            $jsonResponse->badRequest('property id does existed or not setted in object');
-            return $jsonResponse;
+            $this->setError('property id does existed or not setted in object');
+            return false;
         }
-        $query = "UPDATE {$this->setTable()} SET deleted_at = NULL WHERE id = :id";
 
-        if($this->updateQuery($query, [':id' => $this->id]))
+        $query = "UPDATE {$this->setTable()} SET deleted_at = NULL WHERE id = :id";
+        if(!$this->updateQuery($query, [':id' => $this->id]))
         {
-            $jsonResponse = new JsonResponse();
-            $jsonResponse->success($this->id, 1,'restored');
+            $this->setError($this->getError());
+            return false;
         }
-        else
-        {
-            $jsonResponse->internalError($this->getError());
-        }
-        return $jsonResponse;
+        return true;
     }
 }
