@@ -8,7 +8,6 @@ use GemLibrary\Http\GemRequest;
 
 class Bootstrap
 {
-    //public ?object      $service;
     public string        $service;
     public string        $method;
     private GemRequest   $gemRequest;
@@ -41,12 +40,12 @@ class Bootstrap
         }
         $method = $this->method;
         $response = $this->instance->$method();
-        if(!is_a($response , 'JsonResponse'))
+        if($response instanceof JsonResponse)
         {
-            return $jsonResponse->internalError("method $this->method dose not provide JsonResponse as return value");
+            return $response;
+            
         }
-        $jsonResponse = null;
-        return $response;
+        return $jsonResponse->internalError("method $this->method dose not provide JsonResponse as return value");
     }
 
 
