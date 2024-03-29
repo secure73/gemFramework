@@ -16,6 +16,7 @@ class TableBase extends PdoQuery
     private string      $between;
     private string      $orderBy;
     private string      $listQuery;
+    private ?string     $parent_key;
     /**
      * @var array<mixed>
      */
@@ -35,6 +36,8 @@ class TableBase extends PdoQuery
         $this->listBindValues = [];
         $this->where = '';
         $this->listQuery = "";
+        $this->parent_key = '';
+
         parent::__construct();
     }
 
@@ -43,67 +46,64 @@ class TableBase extends PdoQuery
         return '';
     }
 
+    /**
+     * @param int $page
+     */
     public function setPage(int $page): void
     {
         $offset = $page * $this->pagination_limit;
         $this->page = " LIMIT {$this->pagination_limit} OFFSET $offset";
     }
 
-    public function setFind(string $find): void
+    /**
+     * @param string $column
+     * @param mixed $find_value
+     * @example setFind('first_name','Pet')
+     */
+    public function setFind(string $column , mixed $find_value): void
     {
-        $res = explode(':', $find);
-        $find_item =  $res[0];
-        $find_value = StringHelper::sanitizedString($res[1]);
-        if (property_exists($this, $find_item)) {
-            $this->find = " AND {$find_item} LIKE :list_find_value";
+        if (property_exists($this, $column)) {
+            $this->find = " AND {$column} LIKE :list_find_value";
             $this->listBindValues['list_find_value'] = $find_value . "%";
         }
     }
 
-    public function setBetween(string $between): void
-    {
-        $res = explode(':', $between);
-        $between_item =  $res[0];
-        $res_between = explode('-', $res[1]);
-        $between_low = StringHelper::sanitizedString($res_between[0]);
-        $between_high = StringHelper::sanitizedString($res_between[1]);
-        if (property_exists($this, $between_item)) {
-            $this->between = " AND {$between_item} BETWEEN :list_between_low AND :list_between_high";
-            $this->listBindValues[':list_between_low'] = $between_low;
-            $this->listBindValues[':list_between_high'] = $between_high;
-        }
-        $this->between = $between;
+    /**
+     * @param string $between
+     * @example setBetween('created_at', '2008' , '2020')
+     */
+    public function setBetween(string $column , int|float|string $lower_band , int|float|string $higher_band): void
+    {   
+        $this->between = " AND {$column} BETWEEN :list_between_low AND :list_between_high";
+        $this->listBindValues[':list_between_low'] = $lower_band;
+        $this->listBindValues[':list_between_high'] = $higher_band;
     }
 
     /**
      * @param string $orderBy
-     * @example $orderBy = 'id:asc'
+     * @param bool   $desc 
+     * @example setOrderBy('last_name')
      */
-    public function setOrderBy(string $orderBy): void
+    public function setOrderBy(string $orderBy, bool $desc = true): void
     {
-        $res = explode(':', $orderBy);
-        $order_item =  $res[0];
-
-        if (isset($res[1])) {
-            if ($res[1] == 'asc') {
-                $this->sort = 'ASC';
-            }
-        }
-        if (property_exists($this, $order_item)) {
-            $this->orderBy = " ORDER BY {$order_item} {$this->sort} ";
+        $this->sort = $desc ? 'DESC' : 'ASC';
+        if (property_exists($this, $orderBy)) {
+            $this->orderBy = " ORDER BY {$orderBy} {$this->sort} ";
         }
     }
 
-    public function setWhere(string $where): void
+    /**
+     * @param string $where
+     * @example setWhere('city_id',583)
+     */
+    public function setWhere(string $whereColumn , mixed $value): void
     {
-        $res = explode(':', $where);
-        $where_item =  $res[0];
-        $where_value = StringHelper::sanitizedString($res[1]);
-        if (property_exists($this, $where_item)) {
-            $this->where = " AND {$where_item} = :{$where_item}";
-            $this->listBindValues[":{$where_item}"] = $where_value;
+        if (property_exists($this, $whereColumn)) {
+            $this->where = " AND $whereColumn = :{$whereColumn}";
+            $this->listBindValues[":{$whereColumn}"] = $value;
         }
     }
+
 
     public function getCount(): null|int
     {
@@ -115,79 +115,35 @@ class TableBase extends PdoQuery
         return $this->listQuery;
     }
 
-    
-    public function getListBindValues(): array/**@phpstan-ignore-line */
+    /**
+     * @return array<mixed>
+     */
+    public function getListBindValues(): array
     {
         return $this->listBindValues;
     }
 
-
     /**
-     * @param string|null $forignKey
-     * @param mixed|null $value
-     * @return array<mixed>|false
+     * @param string $parentKey
+     * @param int    $parentValue
+     * it will affect query on listQuery() to select rows where parent key = value
      */
-    public function ListQuery(string $forignKey = null , mixed $value = null): array|false
+    public function setParentKey(string $parentKey, int $parentValue): void
     {
-        $whereForignKey = '';
-        if($forignKey)
-        {
-            $whereForignKey = " AND WHERE {$forignKey} = :key_id";
-            $this->listBindValues[':key_id'] = $value;
-        }
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$whereForignKey} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL {$whereForignKey} {$this->where} {$this->find} {$this->between}";
-        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        if($count !== false)
-        {
-            $this->count = $count;
-            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
-        }
-        return false;
+        $this->parent_key = " AND WHERE {$parentKey} = :parent_key_id ";
+        $this->listBindValues[':parent_key_id'] = $parentValue;
     }
 
     /**
-     * @param string|null $forignKey
-     * @param mixed|null $value
      * @return array<mixed>|false
      */
-    public function ListDeactivesQuery(string $forignKey = null , mixed $value = null): array|false
+    public function ListQuery(): array|false
     {
-        $whereForignKey = '';
-        if($forignKey)
-        {
-            $whereForignKey = " AND {$forignKey} = :key_id";
-            $this->listBindValues[':key_id'] = $value;
-        }
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$whereForignKey} {$this->where} {$this->find} {$this->between}";
-        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        if($count !== false)
-        {
-            $this->count = $count;
-            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
-        }
-        return false;
-    }
 
-    /**
-     * @param string|null $forignKey
-     * @param mixed|null $value
-     * @return array<mixed>|false
-     */
-    public function ListActivesQuery(string $forignKey = null , mixed $value = null): array|false
-    {
-        $whereForignKey = '';
-        if($forignKey)
-        {
-            $whereForignKey = " AND {$forignKey} = :key_id";
-            $this->listBindValues[':key_id'] = $value;
-        }
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 1 {$whereForignKey} {$this->find} {$this->between}";
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->parent_key} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NULL {$this->parent_key} {$this->where} {$this->find} {$this->between}";
         $count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        if($count !== false)
-        {
+        if ($count !== false) {
             $this->count = $count;
             return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
         }
@@ -196,21 +152,46 @@ class TableBase extends PdoQuery
 
     /**
      * @return array<mixed>|false
-    */
-    public function ListTrashQuery(string $forignKey = null , mixed $value = null): array|false
+     */
+    public function ListDeactivesQuery(): array|false
     {
-        $whereForignKey = '';
-        if($forignKey)
-        {
-            $whereForignKey = " AND {$forignKey} = :key_id";
-            $this->listBindValues[':key_id'] = $value;
-        }
-        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$whereForignKey} {$this->where} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
-        
-        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL  {$whereForignKey} {$this->where} {$this->where} {$this->find} {$this->between}";
+
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 0 {$this->parent_key} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 0 {$this->parent_key} {$this->where} {$this->find} {$this->between}";
         $count = $this->selectCountQuery($countQuery, $this->listBindValues);
-        if($count !== false)
-        {
+        if ($count !== false) {
+            $this->count = $count;
+            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        }
+        return false;
+    }
+
+    /**
+     * @return array<mixed>|false
+     */
+    public function ListActivesQuery(): array|false
+    {
+
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE is_active = 1 {$this->parent_key} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE is_active = 1 {$this->parent_key} {$this->find} {$this->between}";
+        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        if ($count !== false) {
+            $this->count = $count;
+            return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
+        }
+        return false;
+    }
+
+    /**
+     * @return array<mixed>|false
+     */
+    public function ListTrashQuery(): array|false
+    {
+        $this->listQuery = "SELECT * FROM {$this->setTable()} WHERE deleted_at IS NOT NULL {$this->parent_key} {$this->where} {$this->where} {$this->find} {$this->between} {$this->orderBy} {$this->page}";
+
+        $countQuery = "SELECT COUNT(*) FROM {$this->setTable()} WHERE deleted_at IS NOT NULL  {$this->parent_key} {$this->where} {$this->where} {$this->find} {$this->between}";
+        $count = $this->selectCountQuery($countQuery, $this->listBindValues);
+        if ($count !== false) {
             $this->count = $count;
             return $this->selectQueryObjets($this->listQuery, $this->listBindValues);
         }
@@ -223,13 +204,11 @@ class TableBase extends PdoQuery
      */
     public function selectById(int $id): object|false|null
     {
-        $found = $this->selectQueryObjets("SELECT * FROM {$this->setTable()} WHERE id = :id LIMIT 1",[':id'=>$id]);
-        if($found === false)
-        {
+        $found = $this->selectQueryObjets("SELECT * FROM {$this->setTable()} WHERE id = :id LIMIT 1", [':id' => $id]);
+        if ($found === false) {
             return false;
         }
-        if(count($found) === 0)
-        {
+        if (count($found) === 0) {
             return null;
         }
         /** @phpstan-ignore-next-line */
