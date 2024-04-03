@@ -3,7 +3,6 @@
 namespace GemFramework\Core;
 
 use GemLibrary\Database\PdoQuery;
-use GemLibrary\Helper\StringHelper;
 
 class TableBase extends PdoQuery
 {
