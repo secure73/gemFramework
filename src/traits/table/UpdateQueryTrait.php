@@ -17,11 +17,11 @@ trait UpdateQueryTrait
     {
         $table = $this->setTable();
         if (!$table) {
-            $this->setError('table is not setted in function setTable');
+            $this->setError('table is not set in function setTable');
             return null;
         }
         if (!isset($this->id) || $this->id < 1) {
-            $this->setError('property id does existed or not setted in object');
+            $this->setError('property id does existed or not set in object');
             return null;
         }
         $arrayBind = [];
@@ -53,7 +53,7 @@ trait UpdateQueryTrait
     {
         $table = $this->setTable();
         if (!$table) {
-            $this->setError('table is not setted in function setTable');
+            $this->setError('table is not set in function setTable');
             return null;
         }
         $query = "UPDATE {$table}  SET  {$columnNameSetToNull} = NULL  WHERE  {$whereColumn}  = :whereValue";
@@ -72,7 +72,7 @@ trait UpdateQueryTrait
     {
         $table = $this->setTable();
         if (!$table) {
-            $this->setError('table is not setted in function setTable');
+            $this->setError('table is not set in function setTable');
             return null;
         }
         $query = "UPDATE {$table}  SET  {$columnNameSetToNowTomeStamp} = NOW()  WHERE  {$whereColumn}  = :whereValue";

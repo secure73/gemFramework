@@ -28,9 +28,9 @@ trait RemoveQueryTrait {
     }
 
     /**
-     * NOTE:  remove Object compleetly from Database.
+     * NOTE:  remove Object completely from Database.
      * @ in case of success return count removed items
-     * @Attention:  remove Object compleetly from Database
+     * @Attention:  remove Object completely from Database
      */
     public function removeConditionalQuery(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
     {

@@ -2,85 +2,73 @@
 
 namespace GemFramework\Core;
 
+use GemLibrary\Http\Request;
 use GemLibrary\Http\JsonResponse;
-use GemLibrary\Http\GemRequest;
-
+use GemLibrary\Http\Response;
 
 class Bootstrap
 {
-    public string        $service;
-    public string        $method;
-    private GemRequest   $gemRequest;
-    private ?string      $error;
-    private ?object      $instance;
+    private Request $request;
+    private string $requested_service;
+    private string $requested_method;
 
-    public function __construct(GemRequest $gemRequest)
+    public function __construct(Request $request)
     {
-        $this->error = null;
-        $this->service = 'Index';
-        $this->method = 'index';
-        $this->gemRequest = $gemRequest; 
-        $this->runApp()->show();
+        $this->request = $request;
+        $this->setRequestedService();
+        $this->runApp();
     }
 
-    public function runApp():JsonResponse
+    private function runApp(): void
+    {
+        if (!file_exists('../../../app/service/'.$this->requested_service.'.php')) {
+            $this->showNotFound("the service path for so called $this->requested_service does not exists , check your service name if properly typed");
+            die;
+        }
+        $serviceInstance = false;
+        try {
+            $service = 'App\\Service\\' . $this->requested_service;
+            $serviceInstance = new $service($this->request);
+        } catch (\Throwable $e) {
+            $this->showNotFound($e->getMessage());
+            die;
+        }
+        if (!method_exists($serviceInstance, $this->requested_method)) {
+            $this->showNotFound("requested method  $this->requested_method does not exist in service, check if you type it correctly");
+            die;
+        }
+        $method = $this->requested_method;
+        $response = $this->$method();
+        if(!$response instanceof JsonResponse)
+        {
+            Response::internalError("method $method dose not provide JsonResponse as return value")->show();
+            die;
+        }
+        else
+        {
+            $serviceInstance->$method()->show();  
+            die;
+        }
+    }
+
+
+    private function setRequestedService(): void
+    {
+        $method = "index";
+
+        $segments = explode('/', $this->request->requestedUrl);
+        $service = $segments[$_ENV["SERVICE_IN_URL_SECTION"]] ? ucfirst($segments[$_ENV["SERVICE_IN_URL_SECTION"]]) : "Index";
+        if (isset($segments[$_ENV["METHOD_IN_URL_SECTION"]]) && $segments[$_ENV["METHOD_IN_URL_SECTION"]]) {
+            $method = $segments[$_ENV["METHOD_IN_URL_SECTION"]];
+        }
+        $this->requested_service = $service;
+        $this->requested_method = $method;
+    }
+
+    private function showNotFound(string $message): void
     {
         $jsonResponse = new JsonResponse();
-        $this->setService();
-        if(!$this->serviceFileExists())
-        {
-            return $jsonResponse->notFound(" requested service $this->service not found");	
-        }
-        if (!$this->createServiceInstance()) {       
-           return $jsonResponse->internalError($this->error);
-        }
-        if(!method_exists($this->instance,$this->method))
-        {
-            return $jsonResponse->notFound("requested method $this->method not found");
-        }
-        $method = $this->method;
-        $response = $this->instance->$method();
-        if($response instanceof JsonResponse)
-        {
-            return $response;
-            
-        }
-        return $jsonResponse->internalError("method $this->method dose not provide JsonResponse as return value");
+        $jsonResponse->notFound($message);
+        $jsonResponse->show();
     }
-
-
-    private function serviceFileExists():bool
-    {
-        return file_exists('../../../app/service/'.$this->service.'.php');
-    }
-
-    private function createServiceInstance():bool
-    {
-        $service = 'App\\Controller\\'.$this->service;
-        $instance = false;
-        try{
-          $instance = new $service($this->gemRequest);
-          $this->instance = $instance;
-          return true;
-        }
-        catch(\Exception $e)
-        {
-            $this->error = $e->getMessage();
-        }
-        return false; 
-    }
-
-    private function setService():void
-    {
-        $segments = explode('/',$this->gemRequest->requestedUrl);
-        if(isset($segments[$_ENV['URI_SERVICE_SEGMENT']]) && $segments[$_ENV['URI_SERVICE_SEGMENT']] !== "")
-        {
-            $this->service = ucfirst(trim($segments[$_ENV['URI_SERVICE_SEGMENT']]));
-            if(isset($segments[$_ENV['URI_METHOD_SEGMENT']]) && $segments[$_ENV['URI_METHOD_SEGMENT']] !== "")
-            {
-                $this->method = $segments[$_ENV['URI_METHOD_SEGMENT']];
-            }
-        }
-    }
-
 }

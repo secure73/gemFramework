@@ -19,7 +19,7 @@ trait SafeDeleteQueryTrait
         $table = $this->setTable();
         if(!$table)
         {
-            $this->setError('table is not setted in function setTable');
+            $this->setError('table is not set in function setTable');
             return null;
         }
         if ($id) {
@@ -27,7 +27,7 @@ trait SafeDeleteQueryTrait
         }
         if(!$id || $id < 1)
         {
-            $this->setError('property id does existed or not setted in object');
+            $this->setError('property id does existed or not set in object');
             return null;
         }
         $query = "UPDATE $table SET deleted_at = NOW()  WHERE id = :id";
@@ -49,7 +49,7 @@ trait SafeDeleteQueryTrait
         $table = $this->setTable();
         if(!$table)
         {
-            $this->setError('table is not setted in function setTable');
+            $this->setError('table is not set in function setTable');
             return null;
         }
         if ($id) {
@@ -57,7 +57,7 @@ trait SafeDeleteQueryTrait
         }
         if(!$id || $id < 1)
         {
-            $this->setError('property id does existed or not setted in object');
+            $this->setError('property id does existed or not set in object');
             return null;
         }
         $query = "UPDATE {$this->table} SET deleted_at = NULL WHERE id = :id";

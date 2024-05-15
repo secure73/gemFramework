@@ -1,30 +1,54 @@
 <?php
+
 namespace GemFramework\Core;
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
 
-class Controller {
-    protected JsonResponse $response;
-    protected GemRequest $request;
-    
-    public $model;/** @phpstan-ignore-line */
+use GemLibrary\Http\Request;
 
-    public function __construct(GemRequest $request) {
+/**
+ * @protected  GemLibrary\Http\Request $request
+ * @protected  null|string  $error
+ * @function   validatePosts(array $post_schema):bool
+ */
+class Controller
+{
+    protected Request $request;
+    protected ?string $error;
+
+
+    public function __construct(Request $request)
+    {
+        $this->error = null;
         $this->request = $request;
-        $this->response = new JsonResponse();
+    }
+
+
+    /**
+     * @param array<string> $post_schema  Define Post Schema to validation
+     * @return bool
+     * validatePosts(['email'=>'email' , 'id'=>'int' , '?name' => 'string'])
+     * @help : ?name means it is optional
+     */
+    protected function validatePosts(array $post_schema): bool
+    {
+        if (!$this->request->definePostSchema($post_schema)) {
+            $this->error = $this->request->error;
+            return false;
+        }
+        return true;
     }
 
     /**
-     * @param array<string> $postSchema
+     * Validates string lengths in a dictionary against min and max constraints.
+     *
+     * @param array<string> $post_schema A dictionary where keys are strings and values are strings in the format "key:min-value|max-value" (optional).
+     * @return bool True if all strings pass validation, False otherwise.
      */
-    public function checkPosts(array $postSchema):bool
+    protected function validateStringPosts(array $post_schema): bool
     {
-        if(!$this->request->definePostSchema($postSchema))
-        {
-            $this->response->badRequest($this->request->error);
+        if (!$this->request->validateStringPosts($post_schema)) {
+            $this->error = $this->request->error;
             return false;
         }
         return true;
     }
 }
-?>
