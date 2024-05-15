@@ -3,14 +3,13 @@
     "description": "Super light Framework based on Gemvc Library",
     "type": "library",
     "require": {
-        "gemvc/library": "^2"
+        "gemvc/library": "^3"
     },
     "license": "Apache-2.0",
     "autoload": {
         "psr-4": {
             "GemFramework\\": "src/",
             "GemFramework\\Core\\": "src/core/",
-            "GemFramework\\Interfaces\\" : "src/interfaces/",
             "GemFramework\\Traits\\" : "src/traits/",
             "GemFramework\\Traits\\Table\\" : "src/traits/table/",
             "GemFramework\\Traits\\Model\\" : "src/traits/model/",
@@ -19,21 +18,13 @@
             "APP\\Service\\": "../../../app/service/",
             "App\\Controller\\": "../../../app/controller/",
             "App\\Model\\": "../../../app/model/",
-            "App\\Table\\": "../../../app/table/",
-            "App\\Interface\\": "../../../app/interface/"
-        },
-        "files": [
-            "../../../app/config.php"
-        ]
+            "App\\Table\\": "../../../app/table/"
+        }
     },
     "authors": [
         {
             "name": "Ali Khorsandfard",
-            "email": "secure73@gmail.com"
-        },
-        {
-            "name": "Roboxon",
-            "email": "roboxon@roboxon.com"
+            "email": "ali.khorsandfard@gmail.com"
         }
     ],
     "minimum-stability": "stable"
