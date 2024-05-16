@@ -14,9 +14,9 @@ trait InsertSingleQueryTrait
      */
     public final function insertSingleQuery(): int|false
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('Table is not set in function setTable');
+            $this->setError('Table is not set in function getTable');
             return false;
         }
 

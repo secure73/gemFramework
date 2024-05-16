@@ -11,10 +11,10 @@ trait ActivateQueryTrait
 {
     public function activateQuery(?int $id = null):int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if(!$table)
         {
-            $this->setError('table is not setted in function setTable');
+            $this->setError('table is not setted in function getTable');
             return null;
         }
         if($id)

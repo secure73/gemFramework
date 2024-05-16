@@ -2,22 +2,26 @@
 namespace GemFramework\Traits\Model;
 
 use GemFramework\Traits\Table\ActivateQueryTrait;
+use GemLibrary\Http\JsonResponse;
+use GemLibrary\Http\Response;
+use GemFramework\Core\Table;
 
 trait ActivateTrait
 {
     use ActivateQueryTrait;
-    public function activate(int $id = null):bool
+    public function activate(Table $instanceTable):JsonResponse
     {
-        if($id)
+        if(!isset($this->request->post['id'])|| !$this->request->post['id'] || !is_integer( $this->request->post['id']))
         {
-            $this->id = $id;
+            return Response::unprocessableEntity('post id not found or contain none numeric inhalt');
+        }
+        $instanceTable->id = $this->request->post['id'];
+        
+        if(!$instanceTable->activateQuery())
+        {
+            return Response::internalError($instanceTable->getError());
         }
         
-        if(!$this->activateQuery())
-        {
-            return false;
-        }
-        
-        return true;
+        return Response::success($instanceTable,1);
     }
 }

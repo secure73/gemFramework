@@ -34,9 +34,9 @@ trait RemoveQueryTrait {
      */
     public function removeConditionalQuery(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('Table is not set in function setTable.');
+            $this->setError('Table is not set in function getTable.');
             return null;
         }
 

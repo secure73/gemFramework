@@ -15,9 +15,9 @@ trait UpdateQueryTrait
      */
     public function updateSingleQuery(): int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
         if (!isset($this->id) || $this->id < 1) {
@@ -25,7 +25,7 @@ trait UpdateQueryTrait
             return null;
         }
         $arrayBind = [];
-        $table = $this->setTable();
+        $table = $this->getTable();
         if ($this->id > 0) {
             $query = "UPDATE $table SET ";
             // @phpstan-ignore-next-line
@@ -51,9 +51,9 @@ trait UpdateQueryTrait
      */
     public function setNullQuery(string $columnNameSetToNull, string $whereColumn, mixed $whereValue): int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
         $query = "UPDATE {$table}  SET  {$columnNameSetToNull} = NULL  WHERE  {$whereColumn}  = :whereValue";
@@ -70,9 +70,9 @@ trait UpdateQueryTrait
      */
     public function setTimeNowQuery(string $columnNameSetToNowTomeStamp, string $whereColumn, mixed $whereValue): int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
         $query = "UPDATE {$table}  SET  {$columnNameSetToNowTomeStamp} = NOW()  WHERE  {$whereColumn}  = :whereValue";

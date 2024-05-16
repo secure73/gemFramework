@@ -18,10 +18,10 @@ trait DeactivateQueryTrait
      */
     public function deactivateQuery(?int $id = null):int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if(!$table)
         {
-            $this->setError('ActivateQueryTrait: table is not set in function setTable');
+            $this->setError('ActivateQueryTrait: table is not set in function getTable');
             return null;
         }
         if($id)

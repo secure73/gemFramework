@@ -16,10 +16,10 @@ trait SafeDeleteQueryTrait
      */
      public function safeDeleteQuery(int $id = null): int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if(!$table)
         {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
         if ($id) {
@@ -46,10 +46,10 @@ trait SafeDeleteQueryTrait
      */
     public function restoreQuery(int $id = null): int|null
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if(!$table)
         {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
         if ($id) {

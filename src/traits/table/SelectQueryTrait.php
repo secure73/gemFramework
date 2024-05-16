@@ -19,9 +19,9 @@ trait SelectQueryTrait
      */
     public function selectByIdQuery(?int $id = null): bool
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('Table is not set in function setTable');
+            $this->setError('Table is not set in function getTable');
             return false;
         }
         if ($id) {
@@ -57,9 +57,9 @@ trait SelectQueryTrait
      */
     public function selectByIdsQuery(array $ids): ?array
     {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
         if (count($ids) == 0) {
@@ -102,9 +102,9 @@ trait SelectQueryTrait
         mixed $whereValue,
         ?string $orderByColumnName = null
     ): ?array {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('Table is not set in function setTable');
+            $this->setError('Table is not set in function getTable');
             return null;
         }
 
@@ -143,9 +143,9 @@ trait SelectQueryTrait
         ?\SqlEnumCondition $whereCondition = null,
         int|string|bool|null $whereValue = null
     ): ?array {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
 
@@ -201,9 +201,9 @@ trait SelectQueryTrait
         ?bool $deactives = null,
         ?bool $actives = null
     ): null|array {
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
-            $this->setError('table is not set in function setTable');
+            $this->setError('table is not set in function getTable');
             return null;
         }
 
