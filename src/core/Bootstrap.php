@@ -1,10 +1,10 @@
 <?php
 
-namespace GemFramework\Core;
+namespace Gemvc\Core;
 
-use GemLibrary\Http\Request;
-use GemLibrary\Http\JsonResponse;
-use GemLibrary\Http\Response;
+use Gemvc\Http\Request;
+use Gemvc\Http\JsonResponse;
+use Gemvc\Http\Response;
 
 class Bootstrap
 {

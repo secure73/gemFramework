@@ -1,6 +1,6 @@
 <?php
-namespace GemFramework\Traits\Controller;
-use GemLibrary\Http\JsonResponse;
+namespace Gemvc\Traits\Controller;
+use Gemvc\Http\JsonResponse;
 
 /**
  * @method delete()

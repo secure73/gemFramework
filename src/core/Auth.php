@@ -1,9 +1,9 @@
 <?php
 
-namespace GemFramework\Core;
+namespace Gemvc\Core;
 
-use GemLibrary\Http\JWTToken;
-use GemLibrary\Http\Request;
+use Gemvc\Http\JWTToken;
+use Gemvc\Http\Request;
 
 /**
  * @function success()

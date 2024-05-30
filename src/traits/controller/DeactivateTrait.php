@@ -1,7 +1,7 @@
 <?php
-namespace GemFramework\Traits\Controller;
+namespace Gemvc\Traits\Controller;
 
-use GemLibrary\Http\JsonResponse;
+use Gemvc\Http\JsonResponse;
 
 /**
  * @method deactivate()

@@ -1,8 +1,8 @@
 <?php
 
-namespace GemFramework\Core;
+namespace Gemvc\Core;
 
-use GemLibrary\Http\Request;
+use Gemvc\Http\Request;
 
 /**
  * @protected  GemLibrary\Http\Request $request

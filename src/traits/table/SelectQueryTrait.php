@@ -1,6 +1,6 @@
 <?php
 
-namespace GemFramework\Traits\Table;
+namespace Gemvc\Traits\Table;
 
 /**
  * @method selectByIdQuery()
@@ -182,7 +182,7 @@ trait SelectQueryTrait
      * @param int|null $limit_count The maximum number of rows to return.
      * @param int|null $limit_offset The number of rows to skip before starting to return results.
      * @param bool|null $isDel Whether to include deleted rows in the results.
-     * @param bool|null $deactives Whether to include inactive rows in the results.
+     * @param bool|null $deactivates Whether to include inactive rows in the results.
      * @param bool|null $actives Whether to include active rows in the results.
      * @return null|array<$this> An array of objects representing the selected rows, or null if the selection failed.
      */
@@ -198,7 +198,7 @@ trait SelectQueryTrait
         ?int $limit_count = null,
         ?int $limit_offset = null,
         ?bool $isDel = null,
-        ?bool $deactives = null,
+        ?bool $deactivates = null,
         ?bool $actives = null
     ): null|array {
         $table = $this->getTable();
@@ -227,7 +227,7 @@ trait SelectQueryTrait
             $where .= ' AND is_active = 1';
         }
 
-        if ($deactives) {
+        if ($deactivates) {
             $where .= ' AND is_active = 0';
         }
 

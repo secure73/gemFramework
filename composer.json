@@ -9,11 +9,11 @@
     "autoload": {
         "psr-4": {
             "GemFramework\\": "src/",
-            "GemFramework\\Core\\": "src/core/",
-            "GemFramework\\Traits\\" : "src/traits/",
-            "GemFramework\\Traits\\Table\\" : "src/traits/table/",
-            "GemFramework\\Traits\\Model\\" : "src/traits/model/",
-            "GemFramework\\Traits\\Controller\\" : "src/traits/controller/",
+            "Gemvc\\Core\\": "src/core/",
+            "Gemvc\\Traits\\" : "src/traits/",
+            "Gemvc\\Traits\\Table\\" : "src/traits/table/",
+            "Gemvc\\Traits\\Model\\" : "src/traits/model/",
+            "Gemvc\\Traits\\Controller\\" : "src/traits/controller/",
             "App\\": "../../../app/",
             "APP\\Service\\": "../../../app/service/",
             "App\\Controller\\": "../../../app/controller/",

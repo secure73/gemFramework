@@ -1,7 +1,7 @@
 <?php
-namespace GemFramework\Traits\Model;
-use GemLibrary\Http\GemRequest;
-use GemLibrary\Http\JsonResponse;
+namespace Gemvc\Traits\Model;
+use Gemvc\Http\GemRequest;
+use Gemvc\Http\JsonResponse;
 trait ListTrashTrait
 {
 

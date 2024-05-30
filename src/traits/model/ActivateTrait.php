@@ -1,9 +1,9 @@
 <?php
-namespace GemFramework\Traits\Model;
+namespace Gemvc\Traits\Model;
 
 use GemFramework\Traits\Table\ActivateQueryTrait;
-use GemLibrary\Http\JsonResponse;
-use GemLibrary\Http\Response;
+use Gemvc\Http\JsonResponse;
+use Gemvc\Http\Response;
 use GemFramework\Core\Table;
 
 trait ActivateTrait

@@ -1,10 +1,10 @@
 <?php
 
-namespace GemFramework\Core;
+namespace Gemvc\Core;
 
-use GemLibrary\Http\Request;
-use GemLibrary\Http\Response;
-use GemLibrary\Http\JsonResponse;
+use Gemvc\Http\Request;
+use Gemvc\Http\Response;
+use Gemvc\Http\JsonResponse;
 
 
 /**

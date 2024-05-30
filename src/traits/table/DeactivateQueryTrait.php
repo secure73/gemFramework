@@ -1,6 +1,6 @@
 <?php
 
-namespace GemFramework\Traits\Table;
+namespace Gemvc\Traits\Table;
 
 /**
  * @method deactivateQuery()

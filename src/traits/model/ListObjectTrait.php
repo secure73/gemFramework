@@ -1,6 +1,6 @@
 <?php
-namespace GemFramework\Traits\Model;
-use GemLibrary\Http\GemRequest;
+namespace Gemvc\Traits\Model;
+use Gemvc\Http\GemRequest;
 
 /**
  * @method listObjects()

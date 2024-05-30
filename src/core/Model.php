@@ -1,9 +1,9 @@
 <?php
 
-namespace GemFramework\Core;
+namespace Gemvc\Core;
 
 use Exception;
-use GemLibrary\Http\Request;
+use Gemvc\Http\Request;
 
 class Model
 {

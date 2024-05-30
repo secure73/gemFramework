@@ -1,8 +1,8 @@
 <?php
 
-namespace GemFramework\Core;
+namespace Gemvc\Core;
 
-use GemLibrary\Database\PdoQuery;
+use Gemvc\Database\PdoQuery;
 
 class Table extends PdoQuery
 {

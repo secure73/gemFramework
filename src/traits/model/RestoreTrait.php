@@ -1,5 +1,5 @@
 <?php
-namespace GemFramework\Traits\Model;
+namespace Gemvc\Traits\Model;
 
 trait RestoreTrait
 {
