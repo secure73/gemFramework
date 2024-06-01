@@ -21,7 +21,7 @@ class Bootstrap
 
     private function runApp(): void
     {
-        if (!file_exists('../../../app/service/'.$this->requested_service.'.php')) {
+        if (!file_exists('./app/service/'.$this->requested_service.'.php')) {
             $this->showNotFound("the service path for so called $this->requested_service does not exists , check your service name if properly typed");
             die;
         }
@@ -38,7 +38,7 @@ class Bootstrap
             die;
         }
         $method = $this->requested_method;
-        $response = $this->$method();
+        $response = $serviceInstance->$method();
         if(!$response instanceof JsonResponse)
         {
             Response::internalError("method $method dose not provide JsonResponse as return value")->show();
