@@ -44,7 +44,7 @@ class Bootstrap
             Response::internalError("method $method dose not provide JsonResponse as return value")->show();
             die;
         }
-        $response()->show();  
+        $response->show();  
         die;
     }
 
