@@ -29,7 +29,6 @@
     ],
     "minimum-stability": "stable",
     "require-dev": {
-        "phpstan/phpstan": "^1.11",
         "pestphp/pest": "^2.34"
     },
     "config": {

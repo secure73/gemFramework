@@ -18,12 +18,13 @@ class Auth
     public ?string $error;
     public function __construct(Request $request)
     {
+        $this->request = $request;
         $this->isAuthenticated = false;
         $this->user_id = 0;
         $this->request = $request;
         $this->token = null;
         $this->error = null;
-        $this->authenticate($request);
+        $this->authenticate();
     }
 
     /**
@@ -58,12 +59,12 @@ class Auth
         return true;
     }
 
-    private function authenticate(Request $request): bool
+    private function authenticate(): bool
     {
         $jwt = new JWTToken();
         if (!$this->checkExistedProcessedRequest()) {
             
-            if(!$jwt->extractToken($request))
+            if(!$jwt->extractToken($this->request))
             {
                 return false;
             }
@@ -72,8 +73,7 @@ class Auth
             }
             $this->token = $jwt;
             $this->isAuthenticated = true;
-            $request->__set('token', $jwt);
-            $this->request = $request;
+            $this->request->__set('token', $jwt);
             $this->user_id = $jwt->user_id;
             return true;
         }
@@ -84,6 +84,6 @@ class Auth
         $this->token = $this->request->token;
         $this->isAuthenticated = true;
         $this->user_id = $this->request->token->user_id;
-        return $this->isAuthenticated;
+        return true;
     }
 }
