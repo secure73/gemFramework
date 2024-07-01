@@ -11,6 +11,7 @@ class Table extends PdoQuery
     /**
      * @var array<mixed> $_binds
      */
+    private bool $_no_limit;
     private array $_binds;
     private int $_limit;
     private int $_offset;
@@ -29,6 +30,7 @@ class Table extends PdoQuery
         $this->_orderBy = '';
         $this->_isSelectSet = false;
         $this->_limit = $_ENV['QUERY_LIMIT'];
+        $this->_no_limit = false;
         $this->_offset = 0;
         $this->_query = null;
         $this->_binds = [];
@@ -113,6 +115,12 @@ class Table extends PdoQuery
     public function limit(int $limit): self
     {
         $this->_limit = $limit;
+        return $this;
+    }
+
+    public function noLimit():self
+    {
+        $this->_no_limit = true;
         return $this;
     }
 
@@ -211,7 +219,15 @@ class Table extends PdoQuery
         $this->_query = $this->_query .
         " , (SELECT COUNT(*) FROM {$this->getTable()} {$this->whereMaker()} ) AS _total_count FROM {$this->getTable()} {$this->whereMaker()} ";
 
-        $this->_query .= $this->_orderBy . " LIMIT $this->_limit OFFSET $this->_offset ";
+        if($this->_no_limit)
+        {
+            $this->_query .= $this->_orderBy . " LIMIT $this->_limit OFFSET $this->_offset ";
+        }
+        else
+        {
+            $this->_query .= $this->_orderBy;
+        }
+
         $this->_query = trim($this->_query);
         $this->_query = preg_replace('/\s+/', ' ', $this->_query);
         if (!$this->_query) {
