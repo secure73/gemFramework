@@ -73,7 +73,7 @@ class Auth
             }
             $this->token = $jwt;
             $this->isAuthenticated = true;
-            $this->request->__set('token', $jwt);
+            $this->request->token = $jwt;
             $this->user_id = $jwt->user_id;
             return true;
         }
