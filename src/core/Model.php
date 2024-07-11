@@ -109,12 +109,13 @@ class Model
         {
             return Response::notFound('there is no object found with given id');
         }
-        $this->mapPost($object);
+        $find_object = $find_object[0];
+        $this->mapPost($find_object);
         /**@phpstan-ignore-next-line*/
-        if(!$object->updateSingleQuery())
+        if(!$find_object->updateSingleQuery())
         {
-            return Response::unprocessableEntity($object->getError());
+            return Response::unprocessableEntity('nothing to update');
         }
-        return Response::updated($object,1);
+        return Response::success($find_object,1,'updated successfully');
     }
 }
