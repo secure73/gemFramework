@@ -90,4 +90,31 @@ class Model
         $object->id = $result_id;
         return Response::created($object,1,'created successfully');
     }
+
+    /**
+     * depends on UpdateSingleQueryTrait on Table!
+     * @param \Gemvc\Core\Table $object
+     * @return \Gemvc\Http\JsonResponse
+     */
+    public function updateSingle(Table $object):JsonResponse
+    {
+        if(!isset($this->request->post['id']))
+        {
+            return Response::notAcceptable('post id is required');
+        }
+        $id = (int)$this->request->post['id'];
+        /**@phpstan-ignore-next-line*/
+        $find_object = $object->select()->where('id',$id)->limit(1)->run();
+        if(!is_array($find_object) || count($find_object) !== 1)
+        {
+            return Response::notFound('there is no object found with given id');
+        }
+        $this->mapPost($object);
+        /**@phpstan-ignore-next-line*/
+        if(!$object->updateSingleQuery())
+        {
+            return Response::unprocessableEntity($object->getError());
+        }
+        return Response::updated($object,1,'updated successfully');
+    }
 }
