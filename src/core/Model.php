@@ -115,6 +115,6 @@ class Model
         {
             return Response::unprocessableEntity($object->getError());
         }
-        return Response::updated($object,1,'updated successfully');
+        return Response::updated($object,1);
     }
 }
