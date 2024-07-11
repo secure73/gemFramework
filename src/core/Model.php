@@ -4,6 +4,8 @@ namespace Gemvc\Core;
 
 use Exception;
 use Gemvc\Http\Request;
+use Gemvc\Http\JsonResponse;
+use Gemvc\Http\Response;
 
 class Model
 {
@@ -70,5 +72,22 @@ class Model
             }
         }
         return true;
+    }
+    /**
+     * depends on InsertSingleQueryTrait on Table!
+     * @param \Gemvc\Core\Table $object
+     * @return \Gemvc\Http\JsonResponse
+     */
+    public function createSingle(Table $object):JsonResponse
+    {
+        $this->mapPost($object);
+        /**@phpstan-ignore-next-line*/
+        $result_id = $object->insertSingleQuery();
+        if(!$result_id)
+        {
+            return Response::internalError($object->getError());
+        }
+        $object->id = $result_id;
+        return Response::created($object,1,'created successfully');
     }
 }
