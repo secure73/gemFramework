@@ -13,12 +13,7 @@
             "Gemvc\\Traits\\" : "src/traits/",
             "Gemvc\\Traits\\Table\\" : "src/traits/table/",
             "Gemvc\\Traits\\Model\\" : "src/traits/model/",
-            "Gemvc\\Traits\\Controller\\" : "src/traits/controller/",
-            "App\\": "../../../app/",
-            "APP\\Service\\": "../../../app/service/",
-            "App\\Controller\\": "../../../app/controller/",
-            "App\\Model\\": "../../../app/model/",
-            "App\\Table\\": "../../../app/table/"
+            "Gemvc\\Traits\\Controller\\" : "src/traits/controller/"
         }
     },
     "authors": [
