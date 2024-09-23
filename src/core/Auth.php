@@ -14,13 +14,13 @@ class Auth
     private Request $request;
     public ?JWTToken $token;
     public bool $isAuthenticated;
-    public int $user_id;
+    public ?int $user_id;
     public ?string $error;
     public function __construct(Request $request)
     {
         $this->request = $request;
         $this->isAuthenticated = false;
-        $this->user_id = 0;
+        $this->user_id = null;
         $this->request = $request;
         $this->token = null;
         $this->error = null;
