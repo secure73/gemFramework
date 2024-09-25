@@ -4,6 +4,7 @@ namespace Gemvc\Core;
 
 use Gemvc\Http\JWTToken;
 use Gemvc\Http\Request;
+use Gemvc\Http\Response;
 
 /**
  * @function success()
@@ -13,10 +14,15 @@ class Auth
 {
     private Request $request;
     public ?JWTToken $token;
-    public bool $isAuthenticated;
-    public ?int $user_id;
+    private bool $isAuthenticated;
+    private ?int $user_id;
     public ?string $error;
-    public function __construct(Request $request)
+    /**
+     * Summary of __construct
+     * @param \Gemvc\Http\Request $request
+     * @param array<string>|null $arrayRolesToAuthorize
+     */
+    public function __construct(Request $request,array $arrayRolesToAuthorize = null)
     {
         $this->request = $request;
         $this->isAuthenticated = false;
@@ -24,7 +30,20 @@ class Auth
         $this->request = $request;
         $this->token = null;
         $this->error = null;
-        $this->authenticate();
+        if(!$this->authenticate())
+        {
+            Response::forbidden($this->error)->show();
+            die;
+        }
+        if(is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize))
+        {
+            if(!$this->authorize($arrayRolesToAuthorize))
+            {
+                Response::unauthorized("your role {$this->token->role} is not allowed to perform this action")->show();
+                die;
+            }
+        }
+        $this->isAuthenticated = true;
     }
 
     /**
@@ -36,15 +55,17 @@ class Auth
         return $this->isAuthenticated;
     }
 
+    public function getUserId():int|null
+    {
+        return $this->user_id;
+    }
+
     /**
      * @param array<string> $roles
      * @return bool
      */
-    public function authorize(array $roles): bool
+    private function authorize(array $roles): bool
     {
-        if (!$this->isAuthenticated || !$this->token) {
-            return false;
-        }
         if (!in_array($this->token->role, $roles)) {
             return false;
         }
@@ -61,14 +82,15 @@ class Auth
 
     private function authenticate(): bool
     {
-        $jwt = new JWTToken();
+       
         if (!$this->checkExistedProcessedRequest()) {
-            
+            $jwt = new JWTToken();
             if(!$jwt->extractToken($this->request))
             {
                 return false;
             }
             if (!$jwt->verify()) {
+                $this->error = $jwt->error;
                 return false;
             }
             $this->token = $jwt;
@@ -77,13 +99,14 @@ class Auth
             $this->user_id = $jwt->user_id;
             return true;
         }
+        $existed_token = $this->request->getJwtToken();
 
-        if (!isset($this->request->token) || !$this->request->token->isTokenValid) {
+        if (!$existed_token->verify()) {
             return false;
         }
-        $this->token = $this->request->token;
+        $this->token = $existed_token;
         $this->isAuthenticated = true;
-        $this->user_id = $this->request->token->user_id;
+        $this->user_id = $existed_token->user_id;
         return true;
     }
 }
