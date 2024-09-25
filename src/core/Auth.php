@@ -53,7 +53,7 @@ class Auth
 
     private function checkExistedProcessedRequest(): bool
     {
-        if (!isset($this->request->token) || ! $this->request->token instanceof JWTToken) {
+        if (!$this->request->getJwtToken()) {
             return false;
         }
         return true;
@@ -73,7 +73,7 @@ class Auth
             }
             $this->token = $jwt;
             $this->isAuthenticated = true;
-            $this->request->token = $jwt;
+            $this->request->setJwtToken($jwt);
             $this->user_id = $jwt->user_id;
             return true;
         }
