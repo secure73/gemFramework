@@ -35,11 +35,16 @@ class Auth
             Response::forbidden($this->error)->show();
             die;
         }
-        if(is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize))
+        if(is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize) )
         {
-            if(!$this->authorize($arrayRolesToAuthorize))
+            if(!$this->token)
             {
-                Response::unauthorized("your role {$this->token->role} is not allowed to perform this action")->show();
+                Response::forbidden("there is no valid Token or Token does not exists in header")->show();
+                die;
+            }
+            if(!$this->authorize($arrayRolesToAuthorize) || !$this->token)
+            {
+                Response::unauthorized("role {$this->token->role} is not allowed to perform this action")->show();
                 die;
             }
         }
