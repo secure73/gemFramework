@@ -8,10 +8,11 @@ class Table extends PdoQuery
 {
     private ?string $_query;
     private bool $_isSelectSet;
+
+    private bool $_no_limit;
     /**
      * @var array<mixed> $_binds
      */
-    private bool $_no_limit;
     private array $_binds;
     private int $_limit;
     private int $_offset;
@@ -242,12 +243,10 @@ class Table extends PdoQuery
             return [];
         }
         $object_result = [];
-        /**@phpstan-ignore-next-line */
         $this->_total_count = $queryResult[0]['_total_count'];
         /**@phpstan-ignore-next-line */
         $this->_count_pages = round($this->_total_count / $this->_limit);
         foreach ($queryResult as $item) {
-            /**@phpstan-ignore-next-line */
             unset($item['_total_count']);
             $instance = new $this();
             if (is_array($item)) {

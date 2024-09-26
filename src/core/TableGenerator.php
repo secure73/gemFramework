@@ -62,7 +62,13 @@ class TableGenerator extends QueryExecuter{
         return false;
     }
 
-    private function getPropertyType($object, $property) {
+    /**
+     * Summary of getPropertyType
+     * @param mixed $object
+     * @param string $property
+     * @return string
+     */
+    private function getPropertyType($object, $property):string {
         $type = gettype($object->$property);
         if ($type === 'object' && get_class($object->$property) === 'DateTime') {
             return 'DateTime';

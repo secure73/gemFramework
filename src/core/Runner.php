@@ -3,6 +3,9 @@ namespace Gemvc\Core;
 
 class GemvcRunner
 {
+    /**
+     * @var array<mixed> $commands
+     */
     private $commands = [];
 
     public function __construct()
@@ -10,12 +13,12 @@ class GemvcRunner
         $this->registerDefaultCommands();
     }
 
-    private function registerDefaultCommands()
+    private function registerDefaultCommands():void
     {
         $this->commands['Migrate'] = [$this, 'handleMigrate'];
     }
 
-    public function run($argv)
+    public function run($argv):void
     {
         if (count($argv) < 3) {
             echo "Usage: Gemvc <Command> <ClassName>\n";
@@ -33,8 +36,12 @@ class GemvcRunner
 
         call_user_func($this->commands[$command], $className);
     }
-
-    private function handleMigrate($className)
+    /**
+     * Summary of handleMigrate
+     * @param string $className
+     * @return void
+     */
+    private function handleMigrate($className):void
     {
         if (!class_exists($className)) {
             echo "Class '$className' not found.\n";
@@ -53,7 +60,7 @@ class GemvcRunner
         }
     }
 
-    private function printAvailableCommands()
+    private function printAvailableCommands():void
     {
         echo "Available commands:\n";
         foreach (array_keys($this->commands) as $command) {

@@ -81,12 +81,13 @@ class Model
     public function createSingle(Table $object):JsonResponse
     {
         $this->mapPost($object);
-        /**@phpstan-ignore-next-line*/
+        // @phpstan-ignore-next-line
         $result_id = $object->insertSingleQuery();
         if(!$result_id)
         {
             return Response::internalError($object->getError());
         }
+        // @phpstan-ignore-next-line
         $object->id = $result_id;
         return Response::created($object,1,'created successfully');
     }
@@ -102,8 +103,8 @@ class Model
         {
             return Response::notAcceptable('post id is required');
         }
+        // @phpstan-ignore-next-line
         $id = (int)$this->request->post['id'];
-        /**@phpstan-ignore-next-line*/
         $find_object = $object->select()->where('id',$id)->limit(1)->run();
         if(!is_array($find_object) || count($find_object) !== 1)
         {

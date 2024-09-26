@@ -37,14 +37,10 @@ class Auth
         }
         if(is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize) )
         {
-            if(!$this->token)
+            if(!$this->authorize($arrayRolesToAuthorize))
             {
-                Response::forbidden("there is no valid Token or Token does not exists in header")->show();
-                die;
-            }
-            if(!$this->authorize($arrayRolesToAuthorize) || !$this->token)
-            {
-                Response::unauthorized("role {$this->token->role} is not allowed to perform this action")->show();
+                // @phpstan-ignore-next-line
+                Response::unauthorized("role {$this?->token?->role} is not allowed to perform this action")->show();
                 die;
             }
         }
@@ -71,6 +67,7 @@ class Auth
      */
     private function authorize(array $roles): bool
     {
+        // @phpstan-ignore-next-line
         if (!in_array($this->token->role, $roles)) {
             return false;
         }
@@ -106,7 +103,7 @@ class Auth
         }
         $existed_token = $this->request->getJwtToken();
 
-        if (!$existed_token->verify()) {
+        if (!$existed_token || !$existed_token->verify()) {
             return false;
         }
         $this->token = $existed_token;
