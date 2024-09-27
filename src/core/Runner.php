@@ -17,8 +17,12 @@ class GemvcRunner
     {
         $this->commands['Migrate'] = [$this, 'handleMigrate'];
     }
-
-    public function run($argv):void
+    /**
+     * Summary of run
+     * @param array<string> $argv
+     * @return void
+     */
+    public function run(array $argv):void
     {
         if (count($argv) < 3) {
             echo "Usage: Gemvc <Command> <ClassName>\n";
@@ -33,15 +37,15 @@ class GemvcRunner
             $this->printAvailableCommands();
             exit(1);
         }
-
-        call_user_func($this->commands[$command], $className);
+        // @phpstan-ignore-next-line
+        call_user_func($this->commands[$command], args: $className);
     }
     /**
      * Summary of handleMigrate
      * @param string $className
-     * @return void
+     * @return bool
      */
-    private function handleMigrate($className):void
+    private function handleMigrate(string $className):bool
     {
         if (!class_exists($className)) {
             echo "Class '$className' not found.\n";
@@ -50,14 +54,15 @@ class GemvcRunner
 
         // Create instance of the class
         $object = new $className();
+        if(!$object instanceof Table)
+        {
+            echo "The provided object is not a valid table instance.";
+            return false;
+        }
 
         // Generate the table
         $tableGenerator = new TableGenerator();
-        $result = $tableGenerator->createTableFromObject($object);
-
-        if ($result === false) {
-            echo "The provided object is not a valid table instance.";
-        }
+        return $tableGenerator->createTableFromObject($object);
     }
 
     private function printAvailableCommands():void
@@ -68,4 +73,3 @@ class GemvcRunner
         }
     }
 }
-?>
