@@ -81,7 +81,10 @@ class Model
     public function createSingle(Table $object):JsonResponse
     {
         $this->mapPost($object);
-        // @phpstan-ignore-next-line
+        if(!method_exists($object,'insertSingleQuery'))
+        {
+            return Response::internalError('there is no use InsertSingleQuery Traits defined');
+        }
         $result_id = $object->insertSingleQuery();
         if(!$result_id)
         {
@@ -112,6 +115,11 @@ class Model
         }
         $find_object = $find_object[0];
         $this->mapPost($find_object);
+
+        if(!method_exists($object,'updateSingleQuery'))
+        {
+            return Response::internalError('there is no use updateSingleQuery Traits defined');
+        }
         /**@phpstan-ignore-next-line*/
         if(!$find_object->updateSingleQuery())
         {

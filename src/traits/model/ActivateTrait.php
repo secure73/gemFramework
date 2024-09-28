@@ -1,10 +1,10 @@
 <?php
 namespace Gemvc\Traits\Model;
 
-use GemFramework\Traits\Table\ActivateQueryTrait;
+use Gemvc\Traits\Table\ActivateQueryTrait;
 use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Response;
-use GemFramework\Core\Table;
+use Gemvc\Core\Table;
 
 trait ActivateTrait
 {
