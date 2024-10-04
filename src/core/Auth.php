@@ -22,7 +22,7 @@ class Auth
      * @param \Gemvc\Http\Request $request
      * @param array<string>|null $arrayRolesToAuthorize
      */
-    public function __construct(Request $request,array $arrayRolesToAuthorize = null)
+    public function __construct(Request $request, array $arrayRolesToAuthorize = null)
     {
         $this->request = $request;
         $this->isAuthenticated = false;
@@ -30,15 +30,12 @@ class Auth
         $this->request = $request;
         $this->token = null;
         $this->error = null;
-        if(!$this->authenticate())
-        {
+        if (!$this->authenticate()) {
             Response::forbidden($this->error)->show();
             die;
         }
-        if(is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize) )
-        {
-            if(!$this->authorize($arrayRolesToAuthorize))
-            {
+        if (is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize)) {
+            if (!$this->authorize($arrayRolesToAuthorize)) {
                 // @phpstan-ignore-next-line
                 Response::unauthorized("role {$this?->token?->role} is not allowed to perform this action")->show();
                 die;
@@ -56,22 +53,26 @@ class Auth
         return $this->isAuthenticated;
     }
 
-    public function getUserId():int|null
+    public function getUserId(): int|null
     {
         return $this->user_id;
     }
 
     /**
-     * @param array<string> $roles
+     * @param array<string> $allowedRoles
      * @return bool
      */
-    private function authorize(array $roles): bool
+    private function authorize(array $allowedRoles): bool
     {
-        // @phpstan-ignore-next-line
-        if (!in_array($this->token->role, $roles)) {
-            return false;
+        $userRoles = array_map('trim', explode(',', $this->token->role));
+
+        foreach ($userRoles as $role) {
+            if (in_array($role, $allowedRoles, true)) {
+                return true;
+            }
         }
-        return true;
+
+        return false;
     }
 
     private function checkExistedProcessedRequest(): bool
@@ -84,11 +85,10 @@ class Auth
 
     private function authenticate(): bool
     {
-       
+
         if (!$this->checkExistedProcessedRequest()) {
             $jwt = new JWTToken();
-            if(!$jwt->extractToken($this->request))
-            {
+            if (!$jwt->extractToken($this->request)) {
                 return false;
             }
             if (!$jwt->verify()) {
