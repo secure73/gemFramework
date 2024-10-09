@@ -8,7 +8,6 @@ class Table extends PdoQuery
 {
     private ?string $_query;
     private bool $_isSelectSet;
-
     private bool $_no_limit;
     /**
      * @var array<mixed> $_binds
@@ -23,9 +22,15 @@ class Table extends PdoQuery
      * @var array<string> $_arr_where;
      */
     private array $_arr_where;
+    /**
+     * @var array<string> $_joins;
+     */
+    private array $_joins;
+
     public function __construct()
     {
         $this->_arr_where = [];
+        $this->_joins = [];
         $this->_total_count = 0;
         $this->_count_pages = 0;
         $this->_orderBy = '';
@@ -92,7 +97,6 @@ class Table extends PdoQuery
         return $this->_query;
     }
 
-
     /**
      * @param null|string $columns
      * @return $this
@@ -100,12 +104,25 @@ class Table extends PdoQuery
      */
     public function select(string $columns = null): self
     {
-        if ($this->_isSelectSet) {
-            $this->setError('chaining select is not valid, you can only one time use select() in chain');
-            return $this;
+        if (!$this->_isSelectSet) {
+            $this->_query = $columns ? "SELECT $columns " : "SELECT * ";
+            $this->_isSelectSet = true;
+        } else {
+            // If select is called again, append the new columns
+            $this->_query .= $columns ? ", $columns" : "";
         }
-        $this->_query =  $columns ? "SELECT $columns " : "SELECT * ";
-        $this->_isSelectSet = true;
+        return $this;
+    }
+
+      /**
+     * @param string $table
+     * @param string $condition
+     * @param string $type
+     * @return $this
+     */
+    public function join(string $table, string $condition, string $type = 'INNER'): self
+    {
+        $this->_joins[] = strtoupper($type) . " JOIN $table ON $condition";
         return $this;
     }
 
@@ -213,19 +230,20 @@ class Table extends PdoQuery
             return false;
         }
 
-
         if ($this->getError()) {
             return false;
         }
-        $this->_query = $this->_query .
-        " , (SELECT COUNT(*) FROM {$this->getTable()} {$this->whereMaker()} ) AS _total_count FROM {$this->getTable()} {$this->whereMaker()} ";
 
-        if($this->_no_limit)
-        {
+        $joinClause = implode(' ', $this->_joins);
+        $whereClause = $this->whereMaker();
+
+        $this->_query = $this->_query .
+            " , (SELECT COUNT(*) FROM {$this->getTable()} $joinClause $whereClause) AS _total_count " .
+            "FROM {$this->getTable()} $joinClause $whereClause ";
+
+        if ($this->_no_limit) {
             $this->_query .= $this->_orderBy . " LIMIT $this->_limit OFFSET $this->_offset ";
-        }
-        else
-        {
+        } else {
             $this->_query .= $this->_orderBy;
         }
 
