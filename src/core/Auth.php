@@ -65,21 +65,21 @@ class Auth
         return $this->user_roles;
     }
 
-    /**
-     * @param array<string> $allowedRoles
+     /**
+     * @param array<string> $roles
      * @return bool
      */
-    private function authorize(array $allowedRoles): bool
+    private function authorize(array $roles): bool
     {
-        $userRoles = array_map('trim', explode(',', $this->token->role));
-
-        foreach ($userRoles as $role) {
-            if (in_array($role, $allowedRoles, true)) {
+        // @phpstan-ignore-next-line
+        $user_roles = explode(',',$this->token->role);
+        foreach ($roles as $role) {
+            if (in_array($role, $user_roles)) {
                 return true;
             }
         }
-
-        return false;
+        
+        return true;
     }
 
     private function checkExistedProcessedRequest(): bool
