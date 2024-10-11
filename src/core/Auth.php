@@ -29,8 +29,8 @@ class Auth
         $this->request = $request;
         $this->isAuthenticated = false;
         $this->user_id = null;
-        $this->user_roles = [];
-        $this->user_permissions = [];
+        $this->user_roles = null;
+        $this->user_permissions = null;
         $this->request = $request;
         $this->token = null;
         $this->error = null;
