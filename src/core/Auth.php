@@ -17,7 +17,6 @@ class Auth
     private bool $isAuthenticated;
     private ?int $user_id;
     private ?array $user_roles;
-    private ?array $user_permissions;
     public ?string $error;
     /**
      * Summary of __construct
@@ -30,7 +29,6 @@ class Auth
         $this->isAuthenticated = false;
         $this->user_id = null;
         $this->user_roles = null;
-        $this->user_permissions = null;
         $this->request = $request;
         $this->token = null;
         $this->error = null;
@@ -65,11 +63,6 @@ class Auth
     public function getUserRoles(): array|null
     {
         return $this->user_roles;
-    }
-
-    public function getUserPermissions(): array|null
-    {
-        return $this->user_permissions;
     }
 
      /**
@@ -114,7 +107,6 @@ class Auth
             $this->request->setJwtToken($jwt);
             $this->user_id = $jwt->user_id;
             $this->user_roles = explode(',', $jwt->role);
-            $this->user_permissions = $jwt->permissions;
             return true;
         }
         $existed_token = $this->request->getJwtToken();
@@ -126,7 +118,6 @@ class Auth
         $this->isAuthenticated = true;
         $this->user_id = $existed_token->user_id;
         $this->user_roles = explode(',', $existed_token->role);
-        $this->user_permissions = $existed_token->permissions;
         return true;
     }
 }
