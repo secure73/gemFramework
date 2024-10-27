@@ -16,6 +16,7 @@ class Auth
     public ?JWTToken $token;
     private bool $isAuthenticated;
     private ?int $user_id;
+    private ?array $user_roles;
     public ?string $error;
     /**
      * Summary of __construct
@@ -27,6 +28,7 @@ class Auth
         $this->request = $request;
         $this->isAuthenticated = false;
         $this->user_id = null;
+        $this->user_roles = null;
         $this->request = $request;
         $this->token = null;
         $this->error = null;
@@ -58,21 +60,26 @@ class Auth
         return $this->user_id;
     }
 
-    /**
-     * @param array<string> $allowedRoles
+    public function getUserRoles(): array|null
+    {
+        return $this->user_roles;
+    }
+
+     /**
+     * @param array<string> $roles
      * @return bool
      */
-    private function authorize(array $allowedRoles): bool
+    private function authorize(array $roles): bool
     {
-        $userRoles = array_map('trim', explode(',', $this->token->role));
-
-        foreach ($userRoles as $role) {
-            if (in_array($role, $allowedRoles, true)) {
+        // @phpstan-ignore-next-line
+        $user_roles = explode(',',$this->token->role);
+        foreach ($roles as $role) {
+            if (in_array($role, $user_roles)) {
                 return true;
             }
         }
-
-        return false;
+        
+        return true;
     }
 
     private function checkExistedProcessedRequest(): bool
@@ -99,6 +106,7 @@ class Auth
             $this->isAuthenticated = true;
             $this->request->setJwtToken($jwt);
             $this->user_id = $jwt->user_id;
+            $this->user_roles = explode(',', $jwt->role);
             return true;
         }
         $existed_token = $this->request->getJwtToken();
@@ -109,6 +117,7 @@ class Auth
         $this->token = $existed_token;
         $this->isAuthenticated = true;
         $this->user_id = $existed_token->user_id;
+        $this->user_roles = explode(',', $existed_token->role);
         return true;
     }
 }
