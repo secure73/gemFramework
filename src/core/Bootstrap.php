@@ -21,13 +21,13 @@ class Bootstrap
 
     private function runApp(): void
     {
-        if (!file_exists('./app/service/'.$this->requested_service.'.php')) {
+        if (!file_exists('./app/api/'.$this->requested_service.'.php')) {
             $this->showNotFound("the service path for so called $this->requested_service does not exists , check your service name if properly typed");
             die;
         }
         $serviceInstance = false;
         try {
-            $service = 'App\\Service\\' . $this->requested_service;
+            $service = 'App\\Api\\' . $this->requested_service;
             $serviceInstance = new $service($this->request);
         } catch (\Throwable $e) {
             $this->showNotFound($e->getMessage());

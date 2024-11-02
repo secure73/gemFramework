@@ -53,6 +53,7 @@ class Table extends PdoQuery
         }
     }
 
+    
     public function getTable(): string
     {
         return '';
@@ -75,7 +76,10 @@ class Table extends PdoQuery
     {
         return $this->_count_pages;
     }
-
+    /**
+     * return total count of executed Select Query
+     * @return int
+     */
     public function getTotalCounts(): int
     {
         return $this->_total_count;
@@ -135,7 +139,10 @@ class Table extends PdoQuery
         $this->_limit = $limit;
         return $this;
     }
-
+    /**
+     * remove limit and return all select query
+     * @return \Gemvc\Core\Table
+     */
     public function noLimit():self
     {
         $this->_no_limit = true;

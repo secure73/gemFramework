@@ -12,7 +12,7 @@ use Gemvc\Http\JsonResponse;
  * @property Request $request
  * public service is suitable for all service without need of Authentication, like Login , Register etc...
  */
-class Service
+class ApiService
 {
     protected Request $request;
     public ?string $error;
