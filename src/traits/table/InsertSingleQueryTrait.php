@@ -1,6 +1,6 @@
 <?php
 namespace Gemvc\Traits\Table;
-
+use Gemvc\Http\Response;
 /**
  * @method insertSingleQuery()
  * insert single row to table
@@ -8,16 +8,15 @@ namespace Gemvc\Traits\Table;
 trait InsertSingleQueryTrait
 {
     /**
-     * @return int|false Last inserted ID or false on failure
-     * @throws \Exception If failure also throws an exception
-     * insert single row to table
+     * @return object<$this> created Object or Show Internal Error and die
+     * insert single object into  table
      */
-    public final function insertSingleQuery(): int|false
+    public final function insertSingleQuery(): object
     {
         $table = $this->getTable();
         if (!$table) {
-            $this->setError('Table is not set in function getTable');
-            return false;
+            Response::internalError($this->getError())->show();
+            die();
         }
 
         $columns = '';
@@ -35,7 +34,13 @@ trait InsertSingleQueryTrait
         $params = rtrim($params, ',');
 
         $query .= " ({$columns}) VALUES ({$params})";
-        return $this->insertQuery($query, $arrayBind);
+        $result = $this->insertQuery($query, $arrayBind);
+        if( $this->getError() || $result === false) {
+            Response::internalError("error in insert Query: $this->getTable(): ".$this->getError())->show();
+            die();
+        }
+        $this->id = $result;
+        return $this;
     }
 
 }
