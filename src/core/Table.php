@@ -3,6 +3,7 @@
 namespace Gemvc\Core;
 
 use Gemvc\Database\PdoQuery;
+use Gemvc\Http\Response;
 
 class Table extends PdoQuery
 {
@@ -230,15 +231,18 @@ class Table extends PdoQuery
     /**
      * @return false|array<$this>
      */
-    public function run(): false|array
+    public function run(): array
     {
+        $objectName= get_class($this);
         if (!$this->_isSelectSet) {
             $this->setError('before any chain function you shall first use select()');
-            return false;
+            Response::internalError('before any chain function you shall first use select()')->show();
+            die();
         }
 
         if ($this->getError()) {
-            return false;
+            Response::internalError("error in table class for $objectName " . $this->getError())->show();
+            die();
         }
 
         $joinClause = implode(' ', $this->_joins);
@@ -258,11 +262,13 @@ class Table extends PdoQuery
         $this->_query = preg_replace('/\s+/', ' ', $this->_query);
         if (!$this->_query) {
             $this->setError('given query-string is not acceptable ');
-            return false;
+            Response::internalError("given query-string is not acceptable for $objectName " . $this->getError())->show();
+            die();
         }
         $queryResult = $this->selectQuery($this->_query, $this->_binds);
         if (!is_array($queryResult)) {
-            return false;
+            Response::internalError("error in table class for $objectName " . $this->getError())->show();
+            die();
         }
         if (!count($queryResult)) {
             return [];
