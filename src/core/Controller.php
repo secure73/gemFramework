@@ -22,39 +22,64 @@ class Controller
         $this->request = $request;
     }
 
-
     /**
-     * @param array<string> $post_schema  Define Post Schema to validation
-     * @return void
-     * validatePosts(['email'=>'email' , 'id'=>'int' , '?name' => 'string'])
-     * if not validated , automatic show response and die;
-     * @help : ?name means it is optional
+     * @param Model $object The object to map the POST data to
+     * @info: automatically use $this->request->post to map to Model instance
      */
-    protected function validatePosts(array $post_schema): void
+    public function mapPost(Model $object): void
     {
-        if (!$this->request->definePostSchema($post_schema)) {
-            Response::badRequest($this->request->error)->show();
-            die;
+        $name = get_class($object);
+        if (!is_array($this->request->post) || !count($this->request->post)) {
+            $this->error = 'there is no incoming post detected';
+            Response::badRequest("there is no incoming post detected for mappping to $name")->show();
+            die();
+        }
+        foreach ($this->request->post as $postName => $value) {
+            try {
+                if (property_exists($object, $postName)) {
+                    $object->$postName = $value;
+                }
+            } catch (\Exception $e) {
+                $this->error = "post $postName cannot be set because " . $e->getMessage();
+                Response::unprocessableEntity("post $postName cannot be set to $name because " . $e->getMessage())->show();
+                die();
+            }
         }
     }
 
     /**
-     * Validates string lengths in a dictionary against min and max constraints.
-     * if not validated , automatic show response and die;
-     * A dictionary where keys are strings and values are strings in the format "key:min-value|max-value" (optional).
-     * @param array<string> $post_schema an Array where keys are post name and values are strings in the format "key:min-value|max-value" (optional).
-     * validateStringPosts([
-     *     'username' => '3|15',  // Min length 3, max length 15
-     *     'password' => '8|',    // Min length 8, no max limit
-     *     'nickname' => '|20',   // No min limit, max length 20
-     *     'bio' => '',           // No min or max limit
-     * ]);
+     * @param array<string> $postNames  array of incoming post for mapping to Table Object
+     * @param Model $object The object to map the POST data to
+     * @set $this->error type of ?string in case of exception
+     * @info: automatically use $this->request->post map to  Model instance
      */
-    protected function validateStringPosts(array $post_string_schema): void
+    public function mapPostManuel(array $postNames , Model $object): void
     {
-        if (!$this->request->validateStringPosts($post_string_schema)) {
-            Response::badRequest($this->request->error)->show();
-            die;
+        $objectClassName = get_class($object);
+        foreach($postNames as $name)
+        {
+            if(!isset($this->request->post[$name]))
+            {
+                $this->error = "there is no post found in incoming request with given name $name";
+                Response::badRequest("post $name not setted on incoming request to set on $objectClassName")->show();
+                die();
+            }
+            try {
+                if (property_exists($object, $name)) {
+                    $object->$name =$this->request->post[$name];
+                }
+                else
+                {
+                    $this->error = "object $objectClassName has no such property with name $name";
+                    Response::unprocessableEntity("object $objectClassName has no such property with name $name")->show();
+                    die();
+                }
+            } catch (\Exception $e) {
+                $this->error = "post $name cannot be set to $objectClassName because " . $e->getMessage();
+                Response::unprocessableEntity("post $name cannot be set to $objectClassName because " . $e->getMessage())->show();
+                die();
+            }
         }
     }
+
 }
