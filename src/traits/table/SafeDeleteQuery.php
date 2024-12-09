@@ -6,7 +6,7 @@ namespace Gemvc\Traits\Table;
  * @method restoreQuery()
  * method update deleted_at to null or timestamp
  */
-trait SafeDeleteQueryTrait
+trait SafeDeleteQuery
 {  
     /**
      * @param int|null $id

@@ -7,7 +7,7 @@ use Gemvc\Http\Response;
  * @method setNullQuery()
  * @method setTimeNowQuery()
  */
-trait UpdateQueryTrait
+trait UpdateQuery
 {
     /**
      * @return object<$this> updated Object or Show Internal Error and die

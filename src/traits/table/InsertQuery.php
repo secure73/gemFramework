@@ -5,7 +5,7 @@ use Gemvc\Http\Response;
  * @method insertSingleQuery()
  * insert single row to table
  */
-trait InsertSingleQueryTrait
+trait InsertQuery
 {
     /**
      * @return object<$this> created Object or Show Internal Error and die

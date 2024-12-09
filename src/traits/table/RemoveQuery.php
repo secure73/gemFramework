@@ -5,7 +5,7 @@ namespace Gemvc\Traits\Table;
  * @method removeConditionalQuery()
  * NOTE !! This trait remove row from database
  */
-trait RemoveQueryTrait {
+trait RemoveQuery {
     /**
      * @param int|null $id
      * @return int|null

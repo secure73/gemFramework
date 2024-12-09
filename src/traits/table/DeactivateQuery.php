@@ -7,7 +7,7 @@ namespace Gemvc\Traits\Table;
  * it need column is_active in Database 
  * also public int $is_active in extended class of Table 
  */
-trait DeactivateQueryTrait
+trait DeactivateQuery
 {
     /**
      * @param ?int $id

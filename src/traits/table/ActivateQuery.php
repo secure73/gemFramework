@@ -7,7 +7,7 @@ namespace Gemvc\Traits\Table;
  * it need column is_active in Database also  
  * public int $is_active in extended class of Table 
  */
-trait ActivateQueryTrait
+trait ActivateQuery
 {
     public function activateQuery(?int $id = null):int|null
     {
