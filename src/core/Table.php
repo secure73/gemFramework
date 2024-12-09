@@ -288,23 +288,39 @@ class Table extends PdoQuery
         return $object_result;
     }
 
-    /**
-     * @return null|object<$this>
+     /**
+     * @return null|self null in case not found and self otherwise
+     * insert single row to table
      */
-    public function selectById(int $id):null|object{
-        $this->id = $id;
-        $result = $this->select()->where('id',$id)->limit(1)->run();
-        if($this->getError()){
-            Response::internalError($this->getError())->show();
+    public final function selectById(int $id): null|self
+    {
+        $table = $this->getTable();
+        if (!$table) {
+            $this->setError('Table is not set in function getTable');
+            Response::internalError("Table is not set in class ".get_class($this))->show();
             die();
         }
-        if(!count($result)){
+        $result = $this->select()->where('id',$id)->limit(1)->run();
+        if(!is_array($result))
+        {
+            $this->setError($this->getError());
+            Response::internalError(get_class($this).": Failed to select:". $this->getError())->show();
+            die();
+        }
+        if(count($result) == 0)
+        {
+            $this->setError('nothing found');
             return null;
         }
-        return $result[0];
+        $result = $result[0];
+        foreach($result as $key=>$value)
+        {
+            $this->$key = $value;
+        }
+        return $result;
     }
 
-      /**
+     /**
      * @param array<int> $ids
      * @return null|array<$this>
      */
@@ -333,10 +349,19 @@ class Table extends PdoQuery
         }
         if(count($result) < 1)
         {
-            $this->setError('No rows found within ids:'.implode(',',$ids));
             return [];
         }
-        return $result;
+        $finalResult = [];
+        foreach($result as $item){
+            $instance = new $this();
+            foreach($item as $key=>$value){
+                    if(property_exists($instance,$key)){
+                    $instance->$key = $value;
+                }
+            }
+            $finalResult[] = $instance;
+        }
+        return $finalResult;
     }
 
     private function whereMaker(): string
