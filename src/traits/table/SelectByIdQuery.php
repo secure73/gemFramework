@@ -5,11 +5,11 @@ use Gemvc\Http\Response;
 trait SelectByIdQuery
 {
     
-     /**
-     * @return null|<$this> null in case not found and self otherwise
-     * insert single row to table
+    /**
+     * @return object<$this>|null
+     * @error: $this->getError();
      */
-    public function selectById(int $id): null|object
+    public final function selectById(int $id): null|object
     {
         $table = $this->getTable();
         if (!$table) {

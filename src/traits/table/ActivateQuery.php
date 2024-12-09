@@ -9,7 +9,7 @@ namespace Gemvc\Traits\Table;
  */
 trait ActivateQuery
 {
-    public function activateQuery(?int $id = null):int|null
+    public final function activateQuery(int $id):int|null
     {
         $table = $this->getTable();
         if(!$table)
@@ -17,10 +17,7 @@ trait ActivateQuery
             $this->setError('table is not setted in function getTable');
             return null;
         }
-        if($id)
-        {
-            $this->id = $id;
-        }
+        $this->id = $id;
         if(!isset($this->id) || $this->id < 1)
         {
             $this->setError('property id does existed or not setted in object');

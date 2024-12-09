@@ -16,7 +16,7 @@ trait DeactivateQuery
      * @you can call affectedRows() and it shall be 1
      * @error: $this->getError();
      */
-    public function deactivateQuery(?int $id = null):int|null
+    public final function deactivateQuery(int $id):int|null
     {
         $table = $this->getTable();
         if(!$table)
@@ -24,10 +24,7 @@ trait DeactivateQuery
             $this->setError('ActivateQueryTrait: table is not set in function getTable');
             return null;
         }
-        if($id)
-        {
-            $this->id = $id;
-        }
+        $this->id = $id;
         if(!isset($this->id) || $this->id < 1)
         {
             $this->setError('property id does existed or not set in object');

@@ -10,10 +10,10 @@ use Gemvc\Http\Response;
 trait UpdateQuery
 {
     /**
-     * @return object<$this> updated Object or Show Internal Error and die
+     * @return object<$this>
      * @error: $this->getError();
      */
-    public function updateSingleQuery(): object
+    public final function updateSingleQuery(): object
     {
         $result = false;
         $table = $this->getTable();

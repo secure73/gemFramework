@@ -14,7 +14,7 @@ trait SafeDeleteQuery
      * @description : if id = null then use $this->id
      * return 1 if successful and null if not
      */
-     public function safeDeleteQuery(int $id = null): int|null
+     public final function safeDeleteQuery(int $id): int|null
     {
         $table = $this->getTable();
         if(!$table)
@@ -22,9 +22,9 @@ trait SafeDeleteQuery
             $this->setError('table is not set in function getTable');
             return null;
         }
-        if ($id) {
-            $this->id = $id;
-        }
+
+        $this->id = $id;
+        
         if(!$id || $id < 1)
         {
             $this->setError('property id does existed or not set in object');

@@ -12,12 +12,10 @@ trait RemoveQuery {
      * NOTE:  remove Object from Database.
      * @ in case of success return count removed items
      */
-    public function removeQuery(?int $id = null): int|null
+    public final function removeQuery(int $id): int|null
     {
-        if($id)
-        {
-            $this->id = $id;
-        }
+        $this->id = $id;
+
         if(!isset($this->id))
         {
             $this->setError('property id does not exist or is not set in object');

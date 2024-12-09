@@ -1,17 +1,18 @@
 <?php
 namespace Gemvc\Traits\Table;
+use Gemv\Core\Table;
 use Gemvc\Http\Response;
 /**
  * @method insertSingleQuery()
  * insert single row to table
  */
-trait InsertQuery
+trait InsertSingleQuery
 {
     /**
-     * @return object<$this> created Object or Show Internal Error and die
-     * insert single object into  table
+     * @return object<$this>
+     * @error: $this->getError();
      */
-    public final function insertSingleQuery(): object
+    public final function insertSingle(): object
     {
         $table = $this->getTable();
         if (!$table) {
@@ -24,7 +25,7 @@ trait InsertQuery
         $arrayBind = [];
         $query = "INSERT INTO {$table} ";
 
-        foreach ((object) $this as $key => $value) {
+        foreach ($this as $key => $value) {
             $columns .= $key . ',';
             $params .= ':' . $key . ',';
             $arrayBind[':' . $key] = $value;
