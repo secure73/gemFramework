@@ -73,7 +73,7 @@ class Table extends PdoQuery
         $query .= " ({$columns}) VALUES ({$params})";
         $result = $this->insertQuery($query, $arrayBind);
         if( $this->getError() || $result === false) {
-            Response::internalError("error in insert Query: $this->getTable(): ".$this->getError())->show();
+            Response::internalError("error in insert Query: ".$this->getError())->show();
             die();
         }
         $this->id = $result;
@@ -325,10 +325,10 @@ class Table extends PdoQuery
     }
 
      /**
-     * @return null|self null in case not found and self otherwise
+     * @return null|<$this> null in case not found and self otherwise
      * insert single row to table
      */
-    public final function selectById(int $id): null|self
+    public final function selectById(int $id): null|object
     {
         $table = $this->getTable();
         if (!$table) {
@@ -348,56 +348,7 @@ class Table extends PdoQuery
             $this->setError('nothing found');
             return null;
         }
-        $result = $result[0];
-        foreach($result as $key=>$value)
-        {
-            $this->$key = $value;
-        }
-        return $result;
-    }
-
-     /**
-     * @param array<int> $ids
-     * @return null|array<$this>
-     */
-    public function selectByIdsQuery(array $ids): array
-    {
-        $table = $this->getTable();
-        if (!$table) {
-            $this->setError('table is not set in function getTable');
-            Response::internalError($this->getError())->show();
-            die();
-        }
-        if (count($ids) == 0) {
-            $this->setError('ids array is empty');
-            Response::internalError($this->getError())->show();
-            die();
-        }
-
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $query = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
-
-        $result = $this->selectQuery($query, []);
-        if ($this->getError() || $result === false) {
-            $this->setError($this->getTable().": Failed to select rows from table:". $this->getError());
-            Response::internalError($this->getError())->show();
-            die();
-        }
-        if(count($result) < 1)
-        {
-            return [];
-        }
-        $finalResult = [];
-        foreach($result as $item){
-            $instance = new $this();
-            foreach($item as $key=>$value){
-                    if(property_exists($instance,$key)){
-                    $instance->$key = $value;
-                }
-            }
-            $finalResult[] = $instance;
-        }
-        return $finalResult;
+        return $result[0];
     }
 
     private function whereMaker(): string
