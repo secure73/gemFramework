@@ -23,10 +23,10 @@ class Controller
     }
 
     /**
-     * @param Model $object The object to map the POST data to
+     * @param Table $object The object to map the POST data to
      * @info: automatically use $this->request->post to map to Model instance
      */
-    public function mapPost(Model $object): void
+    public function mapPost(Table $object): void
     {
         $name = get_class($object);
         if (!is_array($this->request->post) || !count($this->request->post)) {
@@ -49,11 +49,11 @@ class Controller
 
     /**
      * @param array<string> $postNames  array of incoming post for mapping to Table Object
-     * @param Model $object The object to map the POST data to
+     * @param Table $object The object to map the POST data to
      * @set $this->error type of ?string in case of exception
      * @info: automatically use $this->request->post map to  Model instance
      */
-    public function mapPostManuel(array $postNames , Model $object): void
+    public function mapPostManuel(array $postNames , Table $object): void
     {
         $objectClassName = get_class($object);
         foreach($postNames as $name)
