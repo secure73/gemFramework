@@ -7,13 +7,15 @@ use Gemvc\Http\Request;
 use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Response;
 
-class Model
+class CRUDModel
 {
     public Request $request;
     public ?string $error;
-    public function __construct(Request $request)
+    public Table $table;
+    public function __construct(Request $request, Table $table)
     {
         $this->request = $request;
+        $this->table = $table;
     }
 
     /**
