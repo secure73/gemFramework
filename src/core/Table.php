@@ -288,6 +288,57 @@ class Table extends PdoQuery
         return $object_result;
     }
 
+    /**
+     * @return null|object<$this>
+     */
+    public function selectById(int $id):null|object{
+        $this->id = $id;
+        $result = $this->select()->where('id',$id)->limit(1)->run();
+        if($this->getError()){
+            Response::internalError($this->getError())->show();
+            die();
+        }
+        if(!count($result)){
+            return null;
+        }
+        return $result[0];
+    }
+
+      /**
+     * @param array<int> $ids
+     * @return null|array<$this>
+     */
+    public function selectByIdsQuery(array $ids): array
+    {
+        $table = $this->getTable();
+        if (!$table) {
+            $this->setError('table is not set in function getTable');
+            Response::internalError($this->getError())->show();
+            die();
+        }
+        if (count($ids) == 0) {
+            $this->setError('ids array is empty');
+            Response::internalError($this->getError())->show();
+            die();
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $query = "SELECT * FROM {$table} WHERE id IN ({$placeholders})";
+
+        $result = $this->selectQuery($query, []);
+        if ($this->getError() || $result === false) {
+            $this->setError($this->getTable().": Failed to select rows from table:". $this->getError());
+            Response::internalError($this->getError())->show();
+            die();
+        }
+        if(count($result) < 1)
+        {
+            $this->setError('No rows found within ids:'.implode(',',$ids));
+            return [];
+        }
+        return $result;
+    }
+
     private function whereMaker(): string
     {
         if (!count($this->_arr_where)) {
