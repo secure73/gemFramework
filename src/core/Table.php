@@ -48,7 +48,7 @@ class Table extends PdoQuery
      * @return object<$this> created Object or Show Internal Error and die
      * insert single object into  table
      */
-    public final function insertSingle(): self
+    public  function insertSingle(): self
     {
         $table = $this->getTable();
         if (!$table) {
@@ -328,7 +328,7 @@ class Table extends PdoQuery
      * @return null|<$this> null in case not found and self otherwise
      * insert single row to table
      */
-    public final function selectById(int $id): null|object
+    public function selectById(int $id): null|object
     {
         $table = $this->getTable();
         if (!$table) {
