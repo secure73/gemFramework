@@ -29,20 +29,19 @@ class Auth
         $this->isAuthenticated = false;
         $this->user_id = null;
         $this->user_roles = null;
-        $this->request = $request;
         $this->token = null;
         $this->error = null;
+
         if (!$this->authenticate()) {
-            Response::forbidden($this->error)->show();
+            Response::forbidden($this->error ?? 'Authentication failed')->show();
             die;
         }
-        if (is_array($arrayRolesToAuthorize) && count($arrayRolesToAuthorize)) {
-            if (!$this->authorize($arrayRolesToAuthorize)) {
-                // @phpstan-ignore-next-line
-                Response::unauthorized("role {$this?->token?->role} is not allowed to perform this action")->show();
-                die;
-            }
+
+        if ($arrayRolesToAuthorize && !$this->authorize($arrayRolesToAuthorize)) {
+            Response::unauthorized("Role(s) {$this->token->role} not authorized for this action")->show();
+            die;
         }
+
         $this->isAuthenticated = true;
     }
 
@@ -94,35 +93,33 @@ class Auth
 
     private function authenticate(): bool
     {
-
-        if (!$this->checkExistedProcessedRequest()) {
-            $jwt = new JWTToken();
-            if (!$jwt->extractToken($this->request)) {
-                return false;
-            }
-            if (!$jwt->verify()) {
-                $this->error = $jwt->error;
-                return false;
-            }
-            $this->token = $jwt;
-            $this->isAuthenticated = true;
-            $this->request->setJwtToken($jwt);
-            $this->user_id = $jwt->user_id;
-            if($jwt->role && strlen($jwt->role) > 1) {
-            {
-                $this->user_roles = explode(',', $jwt->role);
-            }
-            return true;
-        }
         $existed_token = $this->request->getJwtToken();
 
-        if (!$existed_token || !$existed_token->verify()) {
+        if ($existed_token && $existed_token->verify()) {
+            $this->token = $existed_token;
+            $this->isAuthenticated = true;
+            $this->user_id = $existed_token->user_id;
+            $this->user_roles = $existed_token->role ? explode(',', $existed_token->role) : null;
+            return true;
+        }
+
+        $jwt = new JWTToken();
+        if (!$jwt->extractToken($this->request)) {
+            $this->error = 'Failed to extract token';
             return false;
         }
-        $this->token = $existed_token;
+        
+        if (!$jwt->verify()) {
+            $this->error = $jwt->error;
+            return false;
+        }
+
+        $this->token = $jwt;
         $this->isAuthenticated = true;
-        $this->user_id = $existed_token->user_id;
-        $this->user_roles = explode(',', $existed_token->role);
+        $this->request->setJwtToken($jwt);
+        $this->user_id = $jwt->user_id;
+        $this->user_roles = $jwt->role ? explode(',', $jwt->role) : null;
+        
         return true;
     }
 }
