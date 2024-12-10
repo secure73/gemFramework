@@ -71,15 +71,17 @@ class Auth
      */
     private function authorize(array $roles): bool
     {
-        // @phpstan-ignore-next-line
-        $user_roles = explode(',',$this->token->role);
-        foreach ($roles as $role) {
-            if (in_array($role, $user_roles)) {
-                return true;
+        if($this->token->role && strlen($this->token->role) > 1){
+
+            $user_roles = explode(',',$this->token->role);
+            foreach ($roles as $role) {
+                if (in_array($role, $user_roles)) {
+                    return true;
+                }
             }
         }
         
-        return true;
+        return false;
     }
 
     private function checkExistedProcessedRequest(): bool
@@ -106,7 +108,10 @@ class Auth
             $this->isAuthenticated = true;
             $this->request->setJwtToken($jwt);
             $this->user_id = $jwt->user_id;
-            $this->user_roles = explode(',', $jwt->role);
+            if($jwt->role && strlen($jwt->role) > 1) {
+            {
+                $this->user_roles = explode(',', $jwt->role);
+            }
             return true;
         }
         $existed_token = $this->request->getJwtToken();
