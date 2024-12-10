@@ -1,6 +1,5 @@
 <?php
 namespace Gemvc\Traits\Table;
-use Gemv\Core\Table;
 use Gemvc\Http\Response;
 /**
  * @method insertSingleQuery()
