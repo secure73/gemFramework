@@ -8,10 +8,10 @@ use Gemvc\Http\Response;
 trait InsertSingleQuery
 {
     /**
-     * @return object<$this>
+     * @return self
      * @error: $this->getError();
      */
-    public final function insertSingle(): object
+    public final function insertSingle(): self
     {
         $table = $this->getTable();
         if (!$table) {
