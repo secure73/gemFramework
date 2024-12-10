@@ -6,10 +6,11 @@ trait SelectByIdQuery
 {
     
     /**
-     * @return object<$this>|null
-     * @error: $this->getError();
+     * Inserts a single row into the database table
+     * 
+     * @return null|static The current instance with updated ID
      */
-    public final function selectById(int $id): null|object
+    public final function selectById(int $id): null|static
     {
         $table = $this->getTable();
         if (!$table) {
