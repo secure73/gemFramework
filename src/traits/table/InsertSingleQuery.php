@@ -8,10 +8,12 @@ use Gemvc\Http\Response;
 trait InsertSingleQuery
 {
     /**
-     * @return self
-     * @error: $this->getError();
+     * Inserts a single row into the database table
+     * 
+     * @return static The current instance with updated ID
+     * @throws \RuntimeException When insert operation fails
      */
-    public final function insertSingle(): self
+    public final function insertSingle(): static
     {
         $table = $this->getTable();
         if (!$table) {
