@@ -1,11 +1,11 @@
 <?php
 namespace Gemvc\Traits\Model;
-use Gemvc\Http\GemRequest;
+use Gemvc\Http\Request;
 use Gemvc\Http\JsonResponse;
 trait ListTrashTrait
 {
 
-    public function trash(GemRequest $request):JsonResponse
+    public function trash(Request $request):JsonResponse
     {
         if(isset($request->post['page']))
         {

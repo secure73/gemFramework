@@ -1,11 +1,11 @@
 <?php
 namespace Gemvc\Traits\Model;
-use Gemvc\Http\GemRequest;
+use Gemvc\Http\Request;
 use Gemvc\Http\JsonResponse;
 trait ListTrait
 {
 
-    public function list(GemRequest $request):JsonResponse
+    public function list(Request $request):JsonResponse
     {
         if(isset($request->post['page']))
         {

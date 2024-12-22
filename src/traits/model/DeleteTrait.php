@@ -1,11 +1,11 @@
 <?php
 namespace Gemvc\Traits\Model;
 
-use GemFramework\Traits\Table\UpdateQueryTrait;
+use Gemvc\Traits\Table\UpdateQuery;
 
 trait DeleteTrait
 {
-    use UpdateQueryTrait;
+    use UpdateQuery;
     public function delete(int $id=null):bool
     {
         if($id)

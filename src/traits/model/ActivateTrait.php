@@ -1,23 +1,23 @@
 <?php
 namespace Gemvc\Traits\Model;
 
-use Gemvc\Traits\Table\ActivateQueryTrait;
+use Gemvc\Traits\Table\ActivateQuery;
 use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Response;
 use Gemvc\Core\Table;
 
 trait ActivateTrait
 {
-    use ActivateQueryTrait;
+    use ActivateQuery;
     public function activate(Table $instanceTable):JsonResponse
     {
         if(!isset($this->request->post['id'])|| !$this->request->post['id'] || !is_integer( $this->request->post['id']))
         {
             return Response::unprocessableEntity('post id not found or contain none numeric inhalt');
         }
-        $instanceTable->id = $this->request->post['id'];
+         $this->request->post['id'];
         
-        if(!$instanceTable->activateQuery())
+        if(!$this->activateQuery($this->request->post['id']))
         {
             return Response::internalError($instanceTable->getError());
         }

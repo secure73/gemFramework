@@ -1,18 +1,18 @@
 <?php
 namespace Gemvc\Traits\Model;
 
-use GemFramework\Traits\Table\RemoveQueryTrait;
+use Gemvc\Traits\Table\RemoveQuery;
 
 trait RemoveTrait
 {
-    use RemoveQueryTrait;
+    use RemoveQuery;
     public function remove(int $id = null):bool
     {
         if($id)
         {
             $this->id = $id;
         }
-        if(!$this->removeQuery())
+        if(!$this->removeQuery($this->id))
         {
            return false;
         }

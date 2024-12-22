@@ -1,15 +1,15 @@
 <?php
 namespace Gemvc\Traits\Model;
-use Gemvc\Http\GemRequest;
+use Gemvc\Http\Request;
 
 /**
  * @method listObjects()
- * @param GemRequest $request
+ * @param Request $request
  * @return array<mixed>|false
  */
 trait ListObjectTrait
 {
-    public function listObjects(GemRequest $request):array|false
+    public function listObjects(Request $request):array|false
     {
         if(isset($request->post['page']))
         {

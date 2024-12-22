@@ -1,14 +1,14 @@
 <?php
 namespace Gemvc\Traits\Model;
-use Gemvc\Http\GemRequest;
+use Gemvc\Http\Request;
 /**
  * @method trashObjects()
- * @param GemRequest $request
+ * @param Request $request
  * @return array<mixed>|false
  */
 trait ListObjectTrashTrait
 {
-    public function trashObjects(GemRequest $request):array|false
+    public function trashObjects(Request $request):array|false
     {
         if(isset($request->post['page']))
         {
