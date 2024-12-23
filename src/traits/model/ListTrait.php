@@ -69,7 +69,7 @@ trait ListTrait
                 Response::badRequest($this->getError())->show();
                 die();
             }
-            return $this->select->run();
+            return $this->select()->run();
 
         } catch (\Exception $e) {
             Response::internalError('An error occurred while processing the list request: ' . $e->getMessage())->show();
