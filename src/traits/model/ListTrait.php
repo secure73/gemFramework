@@ -2,41 +2,65 @@
 namespace Gemvc\Traits\Model;
 use Gemvc\Http\Request;
 use Gemvc\Http\JsonResponse;
+use Gemvc\Http\Response;
 trait ListTrait
 {
 
     public function list(Request $request):JsonResponse
     {
-        if(isset($request->post['page']))
-        {
-            $this->setPage((int)$request->post['page']);
+        // Handle pagination
+        if (isset($request->get['page'])) {
+            $this->setPage((int)$request->get['page']);
         }
-        if(isset($request->post['orderby']))
-        {
-            $this->setOrderBy($request->post['orderby']);
+
+        // Handle ordering
+        if (isset($request->get['orderby'])) {
+            $orderParts = explode(',', $request->get['orderby']);
+            foreach ($orderParts as $order) {
+                $parts = explode(':', $order);
+                $column = $parts[0];
+                $direction = $parts[1] ?? null;
+                $this->orderBy($column, $direction === 'asc');
+            }
         }
-        if(isset($request->post['find']))
-        {
-            $this->setFind($request->post['find']);
+
+        // Handle search/filter
+        if (isset($request->get['search'])) {
+            foreach ($request->get['search'] as $column => $value) {
+                $this->whereLike($column, $value);
+            }
         }
-        if(isset($request->post['between']))
-        {
-            $this->setBetween($request->post['between']);
+
+        // Handle between filters
+        if (isset($request->get['between'])) {
+            foreach ($request->get['between'] as $column => $range) {
+                $values = explode(',', $range);
+                if (count($values) === 2) {
+                    $this->whereBetween($column, $values[0], $values[1]);
+                }
+            }
         }
-        if(isset($request->post['where']))
-        {
-            $this->setWhere($request->post['where']);
+
+        // Handle exact matches
+        if (isset($request->get['where'])) {
+            foreach ($request->get['where'] as $column => $value) {
+                if ($value === 'null') {
+                    $this->whereNull($column);
+                } elseif ($value === 'not_null') {
+                    $this->whereNotNull($column);
+                } else {
+                    $this->where($column, $value);
+                }
+            }
         }
+
+        // Execute query and return response
         $jsonResponse = new JsonResponse();
-        if(!$this->getError())
-        {
-            $result = $this->listQuery();
-            $jsonResponse->success( $result,$this->getCount());
-        }
-        else
-        {
-            $jsonResponse->badRequest($this->getError());
-        }
-        return $jsonResponse;
+        
+        if (!$this->getError()) {
+            $result = $this->select()->limit($_ENV['QUERY_LIMIT'])->run();
+           return Response::success($result, $this->getTotalCount());
+        } 
+        return Response::badRequest($this->getError());
     }
 }
