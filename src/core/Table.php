@@ -60,6 +60,14 @@ class Table extends PdoQuery
         return '';
     }
 
+    public function getLimit():int  {
+        return $this->_limit;
+    }
+    public function setLimit(int $limit)
+    {
+        $this->_limit = $limit;
+    }
+
     public function getQuery(): string|null
     {
         return $this->_query;
