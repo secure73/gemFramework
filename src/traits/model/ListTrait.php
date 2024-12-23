@@ -46,8 +46,8 @@ trait ListTrait
             $this->validateRequiredProperties();
 
             // Set default limit if not set
-            if (!isset($this->_limit)) {
-                $this->limit($this->defaultPageSize);
+            if (!$this->getLimit()) {
+                $this->setLimit($this->defaultPageSize);
             }
 
             // Handle pagination with validation
@@ -67,8 +67,8 @@ trait ListTrait
                     'meta' => [
                         'total' => $this->getTotalCounts(),
                         'page' => $this->getCurrentPage(),
-                        'per_page' => $this->_limit,
-                        'total_pages' => ceil($this->getTotalCounts() / $this->_limit)
+                        'per_page' => $this->getLimit(),
+                        'total_pages' => ceil($this->getTotalCounts() / $this->setLimit())
                     ]
                 ]);
             }
