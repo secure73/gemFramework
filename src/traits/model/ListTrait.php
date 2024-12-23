@@ -68,7 +68,7 @@ trait ListTrait
                         'total' => $this->getTotalCounts(),
                         'page' => $this->getCurrentPage(),
                         'per_page' => $this->getLimit(),
-                        'total_pages' => ceil($this->getTotalCounts() / $this->setLimit())
+                        'total_pages' => ceil($this->getTotalCounts() / $this->getLimit())
                     ]
                 ]);
             }
