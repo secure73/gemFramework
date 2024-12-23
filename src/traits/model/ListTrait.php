@@ -65,10 +65,10 @@ trait ListTrait
                 return Response::success([
                     'data' => $result,
                     'meta' => [
-                        'total' => $this->getTotalCount(),
+                        'total' => $this->getTotalCounts(),
                         'page' => $this->getCurrentPage(),
                         'per_page' => $this->_limit,
-                        'total_pages' => ceil($this->getTotalCount() / $this->_limit)
+                        'total_pages' => ceil($this->getTotalCounts() / $this->_limit)
                     ]
                 ]);
             }
