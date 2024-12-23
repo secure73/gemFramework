@@ -39,7 +39,12 @@ trait ListTrait
      */
     protected int $defaultPageSize = 20;
 
-    public function list(Request $request):JsonResponse
+    /**
+     * Summary of list
+     * @param \Gemvc\Http\Request $request
+     * @return array<static>
+     */
+    public function list(Request $request):array
     {
         try {
             // Validate required properties
@@ -60,22 +65,15 @@ trait ListTrait
             $this->handleFilters($request);
 
             // Execute query and return response
-            if (!$this->getError()) {
-                $result = $this->select()->run();
-                return Response::success([
-                    'data' => $result,
-                    'meta' => [
-                        'total' => $this->getTotalCounts(),
-                        'page' => $this->getCurrentPage(),
-                        'per_page' => $this->getLimit(),
-                        'total_pages' => ceil($this->getTotalCounts() / $this->getLimit())
-                    ]
-                ]);
+            if ($this->getError()) {
+                Response::badRequest($this->getError())->show();
+                die();
             }
+            return $this->select->run();
 
-            return Response::badRequest($this->getError());
         } catch (\Exception $e) {
-            return Response::badRequest('An error occurred while processing the list request: ' . $e->getMessage());
+            Response::internalError('An error occurred while processing the list request: ' . $e->getMessage())->show();
+            die();
         }
     }
 
