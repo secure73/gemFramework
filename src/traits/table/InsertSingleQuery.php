@@ -38,7 +38,7 @@ trait InsertSingleQuery
         $query .= " ({$columns}) VALUES ({$params})";
         $result = $this->insertQuery($query, $arrayBind);
         if( $this->getError() || $result === false) {
-            Response::internalError("error in insert Query: $this->getTable(): ".$this->getError())->show();
+            Response::internalError("error in insert Query:". $this->getTable() ".": ". .$this->getError())->show();
             die();
         }
         $this->id = $result;
