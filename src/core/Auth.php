@@ -68,7 +68,7 @@ class Auth
      * @param array<string> $roles
      * @return bool
      */
-    private function authorize(array $roles): bool
+    public function authorize(array $roles): bool
     {
         if($this->token->role && strlen($this->token->role) > 1){
 
