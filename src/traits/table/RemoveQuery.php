@@ -7,22 +7,14 @@ namespace Gemvc\Traits\Table;
  */
 trait RemoveQuery {
     /**
-     * @param int|null $id
+     * @param int $id
      * @return int|null
      * NOTE:  remove Object from Database.
      * @ in case of success return count removed items
      */
     public final function removeQuery(int $id): int|null
     {
-        $this->id = $id;
-
-        if(!isset($this->id))
-        {
-            $this->setError('property id does not exist or is not set in object');
-            return null;
-        }
-
-        return $this->removeConditionalQuery('id', $this->id);
+        return $this->removeConditionalQuery('id', $id);
     }
 
     /**
