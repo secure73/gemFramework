@@ -1,5 +1,7 @@
 <?php
 namespace Gemvc\Traits\Table;
+use Gemvc\Http\Response;
+
 /**
  * @method removeQuery()
  * @method removeConditionalQuery()
@@ -22,12 +24,12 @@ trait RemoveQuery {
      * @ in case of success return count removed items
      * @Attention:  remove Object completely from Database
      */
-    public function removeConditionalQuery(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int|null
+    public function removeConditionalQuery(string $whereColumn, mixed $whereValue, ?string $secondWhereColumn = null, mixed $secondWhereValue = null): int
     {
         $table = $this->getTable();
         if (!$table) {
-            $this->setError('Table is not set in function getTable.');
-            return null;
+            Response::internalError('Table is not set in function getTable.')->show();
+           die();
         }
 
         $query = "DELETE FROM {$table} WHERE {$whereColumn} = :{$whereColumn}";
@@ -39,6 +41,11 @@ trait RemoveQuery {
         if ($secondWhereColumn) {
             $arrayBind[':'.$secondWhereColumn] = $secondWhereValue;
         }
-        return $this->deleteQuery($query, $arrayBind);
+        $result = $this->deleteQuery($query, $arrayBind);
+        if($result === false) {
+            Response::internalError("error in delete Query:". $this->getTable() .",".$this->getError())->show();
+            die();
+        }
+        return $result;
     }
 }
