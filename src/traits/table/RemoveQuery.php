@@ -10,11 +10,11 @@ use Gemvc\Http\Response;
 trait RemoveQuery {
     /**
      * @param int $id
-     * @return int|null
+     * @return int
      * NOTE:  remove Object from Database.
      * @ in case of success return count removed items.
      */
-    public final function removeQuery(int $id): int|null
+    public final function removeQuery(int $id): int
     {
         return $this->removeConditionalQuery('id', $id);
     }
