@@ -10,7 +10,7 @@ trait RemoveQuery {
      * @param int $id
      * @return int|null
      * NOTE:  remove Object from Database.
-     * @ in case of success return count removed items
+     * @ in case of success return count removed items.
      */
     public final function removeQuery(int $id): int|null
     {
