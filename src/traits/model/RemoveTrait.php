@@ -5,6 +5,13 @@ use Gemvc\Traits\Table\RemoveQuery;
 use Gemvc\Http\Request;
 use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Response;
+
+/**
+ * 
+ * @method removeById()
+ * @method removeJsonResponse()
+ * @method removeByPostRequest()
+ */
 trait RemoveTrait
 {
     use RemoveQuery;
