@@ -6,10 +6,6 @@ use Gemvc\Traits\Table\UpdateQuery;
 
 /**
  * Summary of UpdateTrait
- * @method updateSingleQuery()
- * @method setNullQuery()
- * @method setTimeNowQuery()
- * @method updateQuery()
  * @method update()
  * @method updateJsonResponse()
  */
