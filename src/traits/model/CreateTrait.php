@@ -3,6 +3,7 @@
 namespace Gemvc\Traits\Model;
 
 use Gemvc\Http\JsonResponse;
+use Gemvc\Http\Response;
 
 trait CreateTrait
 {
@@ -42,9 +43,9 @@ trait CreateTrait
     {
         $result = $this->create();
         if ($result === false) {
-            return JsonResponse::internalError('Error in create query: ' . $this->getError());
+            return Response::internalError('Error in create query: ' . $this->getError());
         }
-        return JsonResponse::created($result,1, 'Object created successfully');
+        return Response::created($result,1, 'Object created successfully');
     }
 
     
