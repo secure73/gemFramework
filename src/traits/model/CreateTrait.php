@@ -9,7 +9,7 @@ trait CreateTrait
     public function create(): self|false
     {
 
-        $table = $this->setTable();
+        $table = $this->getTable();
         if (!$table) {
             $this->setError('Table is not set in function setTable');
             return false;
