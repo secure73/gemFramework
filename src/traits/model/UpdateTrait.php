@@ -2,8 +2,6 @@
 namespace Gemvc\Traits\Model;
 use Gemvc\Http\Response;
 use Gemvc\Http\JsonResponse;
-use Gemvc\Traits\Table\UpdateQuery;
-
 /**
  * Summary of UpdateTrait
  * @method update()
@@ -11,8 +9,6 @@ use Gemvc\Traits\Table\UpdateQuery;
  */
 trait UpdateTrait
 {
-    use UpdateQuery;
-
 
     public function updateJsonResponse():JsonResponse
     {
