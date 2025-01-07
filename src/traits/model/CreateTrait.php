@@ -2,6 +2,8 @@
 
 namespace Gemvc\Traits\Model;
 
+use Gemvc\Http\JsonResponse;
+
 trait CreateTrait
 {
     public function create(): self|false
@@ -34,6 +36,15 @@ trait CreateTrait
         } 
         $this->id = $id;
         return $this;
+    }
+
+    public function createWithJsonResponse():JsonResponse
+    {
+        $result = $this->create();
+        if ($result === false) {
+            return JsonResponse::internalError('Error in create query: ' . $this->getError());
+        }
+        return JsonResponse::created($result,1, 'Object created successfully');
     }
 
     

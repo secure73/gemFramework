@@ -17,6 +17,15 @@ trait RemoveTrait
         return true;
     }
 
+    public function removeJsonResponse(int $id):JsonResponse
+    {
+        if(!$this->removeById($id))
+        {
+            return Response::internalError("error in remove query: ".$this->getTable()." , ".$this->getError());
+        }
+        return Response::deleted($id,1,"removed successfully");
+    }
+
     public function removeByPostRequest(Request $request):JsonResponse
     {
         if(!$request->definePostSchema(['id' => 'int']))

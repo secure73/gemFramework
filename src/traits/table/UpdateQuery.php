@@ -10,10 +10,10 @@ use Gemvc\Http\Response;
 trait UpdateQuery
 {
     /**
-     * @return object<$this>
+     * @return static
      * @error: $this->getError();
      */
-    public final function updateSingleQuery(): object
+    public final function updateSingleQuery(): static
     {
         $result = false;
         $table = $this->getTable();
