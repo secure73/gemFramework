@@ -13,15 +13,6 @@ trait UpdateTrait
 {
     use UpdateQuery;
 
-    public function update():static|null
-    {       
-        if($this->updateSingleQuery())
-        {
-            return $this;
-        }
-        return null;
-        
-    }
 
     public function updateJsonResponse():JsonResponse
     {
