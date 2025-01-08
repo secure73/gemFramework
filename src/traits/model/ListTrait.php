@@ -9,35 +9,35 @@ trait ListTrait
      * Define which fields are allowed for searching
      * @var array<string>
      */
-    protected array $searchable = [];
+    private array $searchable = [];
 
     /**
      * Define which fields are allowed for exact matching
      * @var array<string>
      */
-    protected array $filterable = [];
+    private array $filterable = [];
 
     /**
      * Define which fields are allowed for between queries
      * @var array<string>
      */
-    protected array $rangeable = [];
+    private array $rangeable = [];
 
     /**
      * Define which fields are allowed for ordering
      * @var array<string>
      */
-    protected array $orderable = [];
+    private array $orderable = [];
 
     /**
      * Maximum allowed page size
      */
-    protected int $maxPageSize = 100;
+    private int $maxPageSize = 100;
 
     /**
      * Default page size if not specified
      */
-    protected int $defaultPageSize = 20;
+    private int $defaultPageSize = 20;
 
     /**
      * Summary of list
