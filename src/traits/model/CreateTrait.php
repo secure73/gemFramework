@@ -9,6 +9,30 @@ trait CreateTrait
 {
     public function create(): self|false
     {
+        if(isset($this->searchable)){
+           unset($this->searchable);
+        }
+        if(isset($this->rangeable)){
+           unset($this->rangeable);
+        }
+        if(isset($this->orderable)){
+           unset($this->orderable);
+        }
+        if(isset($this->rangeable)){
+           unset($this->rangeable);
+        }
+        if(isset($this->defaultPageSize)){  
+           unset($this->defaultPageSize);
+        }
+        if(isset($this->maxPageSize)){
+           unset($this->maxPageSize);
+        }
+        if(isset($this->filterable)){
+           unset($this->filterable);
+        }
+        if(isset($this->orderable)){
+           unset($this->orderable);
+        }
 
         $table = $this->getTable();
         if (!$table) {
