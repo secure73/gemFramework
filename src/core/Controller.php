@@ -2,6 +2,8 @@
 
 namespace Gemvc\Core;
 
+use Gemvc\Helper\TypeHelper;
+use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Request;
 use Gemvc\Http\Response;
 
@@ -14,6 +16,10 @@ class Controller
 {
     protected Request $request;
     protected ?string $error;
+
+    
+
+    private Table $_model;
 
 
     public function __construct(Request $request)
@@ -82,4 +88,169 @@ class Controller
         }
     }
 
+    public function createList(Table $model):JsonResponse
+    {
+        $model = $this->_handleSearchable($model);
+        $model = $this->_handleOrdering($model);
+        $model = $this->_handleFilterable($model);
+        $model = $this->_handlePagination($model);
+        return Response::success($model->select()->run(),$this->_model->getTotalCounts(),'list of '.$this->_model->getTable().' fetched successfully');
+    }
+
+
+
+    /**
+     * Validates that required properties are set
+     * @throws \RuntimeException
+     */
+    protected function validateRequiredProperties(): void
+    {
+        if (!method_exists($this, 'getTable') || empty($this->getTable())) {
+            throw new \RuntimeException('Table name must be defined in the model');
+        }
+    }
+
+    /**
+     * Handles pagination parameters
+     */
+    private function _handlePagination(Table $model): Table
+    {
+        // Handle page number
+        $page = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
+        $page = max(1, $page); // Ensure page is at least 1
+        $model->setPage($page);
+
+        // Handle page size
+        if (isset($this->request->get['per_page'])) {
+            $perPage = (int)$this->request->get['per_page'];
+            $perPage = min($perPage, $this->request->_maxPageSize); // Limit maximum page size
+            $perPage = max(1, $perPage); // Ensure at least 1
+            $model->limit($perPage);
+        }
+        return $model;
+    }
+
+
+    /**
+     * Handles ordering parameters
+     */
+    private function _handleOrdering(Table $model): Table
+    {
+        $array_orderby = $this->request->getOrderableArray();
+        if(count($array_orderby) == 0)
+        {
+            return $model;
+        }
+        foreach($array_orderby as $key => $value)
+        {
+            $array_orderby[$key] = $this->_sanitizeInput($value);
+        }
+
+        $array_exited_object_properties = get_class_vars(get_class($model));
+        foreach($array_exited_object_properties as $key => $value)
+        {
+            if(!array_key_exists($key,$array_exited_object_properties))
+            {
+                Response::badRequest("orderby key $key not found in object properties")->show();
+                die();
+            }
+        }
+        foreach($array_orderby as $key => $value)
+        {
+            $as_ds = $value  ? true : null; 
+            $model->orderBy($key,$as_ds);
+        }
+        return $model;
+    }
+
+
+    
+    private function _handleFilterable(Table $model): Table
+    {
+        $array_orderby = $this->request->getFilterableArray();
+        if(count($array_orderby) == 0)
+        {
+            return $model;
+        }
+        foreach($array_orderby as $key => $value)
+        {
+            $array_orderby[$key] = $this->_sanitizeInput($value);
+        }
+        $array_exited_object_properties = get_class_vars(get_class($model));
+        foreach($array_orderby as $key => $value)
+        {
+            if(!array_key_exists($key,$array_exited_object_properties))
+            {
+                Response::badRequest("filterable key $key not found in object properties")->show();
+                die();
+            }
+        }
+        foreach($array_orderby as $key => $value)
+        {
+            $model->whereLike($key,$value);
+        }
+        return $model;
+    }
+
+
+    /**
+     * Handles all filter types (create where)
+     */
+    private function _handleSearchable(Table $model): Table
+    {
+        $arr_errors = null;
+        $array_searchable = $this->request->getSearchableArray();
+        if(count( $array_searchable) == 0)
+        {
+            return $model;
+        }
+        foreach($array_searchable as $key => $value)
+        {
+            $array_searchable[$key] = $this->_sanitizeInput($value);
+        }
+        $array_exited_object_properties = get_class_vars(get_class($model));
+        foreach($array_searchable as $key => $value)
+        {
+            if(!array_key_exists($key,$array_exited_object_properties))
+            {
+                Response::badRequest("searchable key $key not found in object properties")->show();
+                die();
+            }
+        }
+
+        foreach($array_searchable as $key => $value)
+        {
+           try {
+                $model->$key = $value;
+           } catch (\Exception $e) {
+               $arr_errors .= $e->getMessage().",";
+           }
+        }
+
+        if($arr_errors)
+        {
+            Response::badRequest($arr_errors)->show();
+            die();
+        }
+        foreach($array_searchable as $key => $value)
+        {
+            $model->where($key,$value);
+        }
+      return $model;
+    }
+
+    
+    /**
+     * Basic input sanitization
+     */
+    private function _sanitizeInput(mixed $input): mixed
+    {
+        if (is_string($input)) {
+            // Remove any null bytes
+            $input = str_replace(chr(0), '', $input);
+            // Convert special characters to HTML entities
+            return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+        }
+        return $input;
+    }
 }
