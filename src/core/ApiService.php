@@ -32,7 +32,7 @@ class ApiService
         return Response::success("welcome to $name service");
     }
 
-        /**
+    /**
      * @param array<string> $post_schema  Define Post Schema to validation
      * @return void
      * validatePosts(['email'=>'email' , 'id'=>'int' , '?name' => 'string'])
@@ -66,4 +66,6 @@ class ApiService
             die;
         }
     }
+
+
 }
