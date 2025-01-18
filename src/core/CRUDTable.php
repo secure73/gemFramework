@@ -75,7 +75,9 @@ class CRUDTable extends PdoQuery
             Response::internalError("error in insert Query:". $this->getTable() .",".$this->getError())->show();
             die();
         }
-        $this->id = $result;
+        if(property_exists($this, 'id')) {
+            $this->id = $result;
+        }
         return $this;
     }
 
