@@ -91,8 +91,8 @@ class Controller
     public function createList(Table $model):JsonResponse
     {
         $model = $this->_handleSearchable($model);
-        $model = $this->_handleOrdering($model);
-        $model = $this->_handleFilterable($model);
+        $model = $this->_handleFindable($model);
+        $model = $this->_handleSortable($model);
         $model = $this->_handlePagination($model);
         return Response::success($model->select()->run(),$this->_model->getTotalCounts(),'list of '.$this->_model->getTable().' fetched successfully');
     }
@@ -115,28 +115,18 @@ class Controller
      */
     private function _handlePagination(Table $model): Table
     {
-        // Handle page number
-        $page = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
-        $page = max(1, $page); // Ensure page is at least 1
-        $model->setPage($page);
-
-        // Handle page size
-        if (isset($this->request->get['per_page'])) {
-            $perPage = (int)$this->request->get['per_page'];
-            $perPage = min($perPage, $this->request->_maxPageSize); // Limit maximum page size
-            $perPage = max(1, $perPage); // Ensure at least 1
-            $model->limit($perPage);
-        }
+        $model->setPage($this->request->getPageNumber() -1);
+        $model->limit($this->request->getPerPage());
         return $model;
     }
 
 
     /**
-     * Handles ordering parameters
+     * Handles sorting/ordering parameters
      */
-    private function _handleOrdering(Table $model): Table
+    private function _handleSortable(Table $model): Table
     {
-        $array_orderby = $this->request->getOrderableArray();
+        $array_orderby = $this->request->getSortable();
         if(count($array_orderby) == 0)
         {
             return $model;
@@ -164,10 +154,9 @@ class Controller
     }
 
 
-    
-    private function _handleFilterable(Table $model): Table
+    private function _handleFindable(Table $model): Table
     {
-        $array_orderby = $this->request->getFilterableArray();
+        $array_orderby = $this->request->getFindable();
         if(count($array_orderby) == 0)
         {
             return $model;
@@ -199,7 +188,7 @@ class Controller
     private function _handleSearchable(Table $model): Table
     {
         $arr_errors = null;
-        $array_searchable = $this->request->getSearchableArray();
+        $array_searchable = $this->request->getFilterable();
         if(count( $array_searchable) == 0)
         {
             return $model;
