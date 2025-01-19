@@ -17,11 +17,6 @@ class Controller
     protected Request $request;
     protected ?string $error;
 
-    
-
-    private Table $_model;
-
-
     public function __construct(Request $request)
     {
         $this->error = null;
@@ -94,7 +89,7 @@ class Controller
         $model = $this->_handleFindable($model);
         $model = $this->_handleSortable($model);
         $model = $this->_handlePagination($model);
-        return Response::success($model->select()->run(),$this->_model->getTotalCounts(),'list of '.$this->_model->getTable().' fetched successfully');
+        return Response::success($model->select()->run(),$model->getTotalCounts(),'list of '.$model->getTable().' fetched successfully');
     }
 
 
