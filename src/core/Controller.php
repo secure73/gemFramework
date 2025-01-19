@@ -2,7 +2,6 @@
 
 namespace Gemvc\Core;
 
-use Gemvc\Helper\TypeHelper;
 use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Request;
 use Gemvc\Http\Response;
