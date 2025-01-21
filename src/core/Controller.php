@@ -29,7 +29,7 @@ class Controller
     public function mapPost(Table $object): void
     {
         $name = get_class($object);
-        if (!is_array($this->request->post) || !count($this->request->post)) {
+        if (!count($this->request->post)) {
             $this->error = 'there is no incoming post detected';
             Response::badRequest("there is no incoming post detected for mappping to $name")->show();
             die();
@@ -120,29 +120,14 @@ class Controller
      */
     private function _handleSortable(Table $model): Table
     {
-        $array_orderby = $this->request->getSortable();
-        if(count($array_orderby) == 0)
+        $sort_des = $this->request->getSortable();
+        $sort_asc = $this->request->getSortableAsc();
+        if($sort_des)
         {
-            return $model;
+            $model->orderBy($sort_des);
         }
-        foreach($array_orderby as $key => $value)
-        {
-            $array_orderby[$key] = $this->_sanitizeInput($value);
-        }
-
-        $array_exited_object_properties = get_class_vars(get_class($model));
-        foreach($array_exited_object_properties as $key => $value)
-        {
-            if(!array_key_exists($key,$array_exited_object_properties))
-            {
-                Response::badRequest("orderby key $key not found in object properties")->show();
-                die();
-            }
-        }
-        foreach($array_orderby as $key => $value)
-        {
-            $as_ds = $value  ? true : null; 
-            $model->orderBy($key,$as_ds);
+        if($sort_asc){
+            $model->orderBy($sort_asc,true);
         }
         return $model;
     }
