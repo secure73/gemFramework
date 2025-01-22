@@ -36,7 +36,14 @@ class Table extends PdoQuery
         $this->_count_pages = 0;
         $this->_orderBy = '';
         $this->_isSelectSet = false;
-        $this->_limit = $_ENV['QUERY_LIMIT'];
+        
+        if(isset($_ENV['QUERY_LIMIT']) && is_numeric($_ENV['QUERY_LIMIT']))
+        {
+            $this->_limit = (int)$_ENV['QUERY_LIMIT'];
+        }
+        else{
+            $this->_limit = 10;
+        }
         $this->_no_limit = false;
         $this->_offset = 0;
         $this->_query = null;
@@ -63,7 +70,7 @@ class Table extends PdoQuery
     public function getLimit():int  {
         return $this->_limit;
     }
-    public function setLimit(int $limit)
+    public function setLimit(int $limit):void
     {
         $this->_limit = $limit;
     }
@@ -172,17 +179,17 @@ class Table extends PdoQuery
 
     /**
      * @param string $column
-     * @param mixed $value
+     * @param string $value
      * @return $this
      */
-    public function whereLike(string $column, mixed $value): self
+    public function whereLike(string $column, string $value): self
     {
         $this->_arr_where[] = count($this->_arr_where) ? " AND  $column LIKE :$column " : " WHERE $column LIKE :$column ";
         $this->_binds[':' . $column] = $value . '%';
         return $this;
     }
 
-    public function whereLikeLast(string $column, mixed $value): self
+    public function whereLikeLast(string $column, string $value): self
     {
         $this->_arr_where[] = count($this->_arr_where) ? " AND  $column LIKE :$column " : " WHERE $column LIKE :$column ";
         $this->_binds[':' . $column] = '%' . $value;
@@ -282,10 +289,11 @@ class Table extends PdoQuery
             return [];
         }
         $object_result = [];
-        $this->_total_count = $queryResult[0]['_total_count'];
         /**@phpstan-ignore-next-line */
-        $this->_count_pages = round($this->_total_count / $this->_limit);
+        $this->_total_count = (int)$queryResult[0]['_total_count'];
+        $this->_count_pages = (int)($this->_total_count / $this->_limit);
         foreach ($queryResult as $item) {
+            /**@phpstan-ignore-next-line */
             unset($item['_total_count']);
             $instance = new $this();
             if (is_array($item)) {
