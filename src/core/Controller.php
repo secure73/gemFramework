@@ -109,8 +109,24 @@ class Controller
      */
     private function _handlePagination(Table $model): Table
     {
-        $model->setPage($this->request->getPageNumber() -1);
-        $model->limit($this->request->getPerPage());
+        if(isset($this->request->get["page_number"]))
+        {
+            if(!is_numeric(trim($this->request->get["page_number"])))
+            {
+                Response::badRequest("page_number shall be type if integer or number")->show();
+                die();
+            }
+            $page_number = (int) $this->request->get["page_number"];
+            if($page_number < 1)
+            {
+                Response::badRequest("page_number shall be positive int")->show();
+                die();
+            }
+
+            $model->setPage($page_number);
+            return $model;
+        }
+        $model->setPage(1);
         return $model;
     }
 
