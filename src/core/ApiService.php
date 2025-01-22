@@ -51,7 +51,7 @@ class ApiService
      * Validates string lengths in a dictionary against min and max constraints.
      * if not validated , automatic show response and die;
      * A dictionary where keys are strings and values are strings in the format "key:min-value|max-value" (optional).
-     * @param array<string> $post_schema an Array where keys are post name and values are strings in the format "key:min-value|max-value" (optional).
+     * @param array<string> $post_string_schema an Array where keys are post name and values are strings in the format "key:min-value|max-value" (optional).
      * validateStringPosts([
      *     'username' => '3|15',  // Min length 3, max length 15
      *     'password' => '8|',    // Min length 8, no max limit
