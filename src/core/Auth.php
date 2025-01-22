@@ -16,6 +16,10 @@ class Auth
     public ?JWTToken $token;
     private bool $isAuthenticated;
     private ?int $user_id;
+    /**
+     * Summary of user_roles
+     * @var array<string> $user_roles
+     */
     private ?array $user_roles;
     public ?string $error;
     /**
@@ -37,11 +41,9 @@ class Auth
             die;
         }
 
-        if ($arrayRolesToAuthorize && !$this->authorize($arrayRolesToAuthorize)) {
-            Response::unauthorized("Role(s) {$this->token->role} not authorized for this action")->show();
-            die;
+        if ($arrayRolesToAuthorize){
+            $this->authorize($arrayRolesToAuthorize);
         }
-
         $this->isAuthenticated = true;
     }
 
@@ -59,6 +61,10 @@ class Auth
         return $this->user_id;
     }
 
+    /**
+     * Summary of getUserRoles
+     * @return array<string>|null
+     */
     public function getUserRoles(): array|null
     {
         return $this->user_roles;
@@ -70,7 +76,13 @@ class Auth
      */
     public function authorize(array $roles): bool
     {
-        if($this->token->role && strlen($this->token->role) > 1){
+        if(!$this->token )
+        {
+            Response::forbidden("contain no token ")->show();
+            die;
+        }
+
+      if($this->token->role && strlen($this->token->role) > 1){
 
             $user_roles = explode(',',$this->token->role);
             foreach ($roles as $role) {
@@ -79,8 +91,8 @@ class Auth
                 }
             }
         }
-        
-        return false;
+        Response::unauthorized("role $user_roles not allowed to perform this action")->show();
+        die();
     }
 
     private function checkExistedProcessedRequest(): bool
