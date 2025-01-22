@@ -91,16 +91,9 @@ class Auth
                 }
             }
         }
-        Response::unauthorized("role $user_roles not allowed to perform this action")->show();
+        $roleText = $this->token->role;
+        Response::unauthorized("role $roleText  not allowed to perform this action")->show();
         die();
-    }
-
-    private function checkExistedProcessedRequest(): bool
-    {
-        if (!$this->request->getJwtToken()) {
-            return false;
-        }
-        return true;
     }
 
     private function authenticate(): bool
