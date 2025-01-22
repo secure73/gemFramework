@@ -36,7 +36,7 @@ class CRUDTable extends PdoQuery
         $this->_count_pages = 0;
         $this->_orderBy = '';
         $this->_isSelectSet = false;
-        $this->_limit = $_ENV['QUERY_LIMIT'];
+        $this->_limit = (isset($_ENV['QUERY_LIMIT']) && is_numeric($_ENV['QUERY_LIMIT'])) ? (int)$_ENV['QUERY_LIMIT'] :10;
         $this->_no_limit = false;
         $this->_offset = 0;
         $this->_query = null;
@@ -59,7 +59,7 @@ class CRUDTable extends PdoQuery
         $params = '';
         $arrayBind = [];
         $query = "INSERT INTO {$table} ";
-
+        /**  @phpstan-ignore-next-line */
         foreach ($this as $key => $value) {
             $columns .= $key . ',';
             $params .= ':' . $key . ',';
@@ -82,13 +82,12 @@ class CRUDTable extends PdoQuery
     }
 
     /**
-     * @param string $whereKey
-     * @param mixed $whereValue
+     * @param string $idWhereKey
+     * @param mixed $idWhereValue
      * @return static
      */
     public function update(string $idWhereKey , mixed $idWhereValue):static
     {
-        $result = false;
         $table = $this->getTable();
         if (!$table) {
             $this->setError('table is not set in function getTable');
@@ -98,7 +97,7 @@ class CRUDTable extends PdoQuery
         }
         $query = "UPDATE $table SET ";
         $arrayBind = [];          
-        // @phpstan-ignore-next-line
+        /**  @phpstan-ignore-next-line */
         foreach ($this as $key => $value) {
             $query .= " {$key} = :{$key},";
             $arrayBind[":{$key}"] = $value;
@@ -106,8 +105,8 @@ class CRUDTable extends PdoQuery
         $query = rtrim($query, ',');
         $query .= " WHERE {$idWhereKey} = :{$idWhereKey} ";
         $arrayBind[":{$idWhereKey}"] = $idWhereValue;
-        $result = $this->updateQuery($query, $arrayBind);
-        if($result === false) {
+        $this->updateQuery($query, $arrayBind);
+        if($this->getError()) {
             Response::internalError("error in update Query: ".$this->getTable()." , ".$this->getError())->show();
             die();
         }
@@ -154,11 +153,6 @@ class CRUDTable extends PdoQuery
     public function getLimit():int  {
         return $this->_limit;
     }
-    public function setLimit(int $limit)
-    {
-        $this->_limit = $limit;
-    }
-
     public function getQuery(): string|null
     {
         return $this->_query;
@@ -188,7 +182,7 @@ class CRUDTable extends PdoQuery
     public function setPage(int $page): void
     {
         $page =  $page < 1 ? 0 :  $page - 1 ;
-        $this->_offset = ($page - 1) * $this->_limit;
+        $this->_offset = ($page) * $this->_limit;
     }
 
     public function getCurrentPage(): int
@@ -239,11 +233,14 @@ class CRUDTable extends PdoQuery
         $this->_limit = $limit;
         return $this;
     }
-    /**
-     * remove limit and return all select query
-     * @return \Gemvc\Core\Table
-     */
+
     public function noLimit():self
+    {
+        $this->_no_limit = true;
+        return $this;
+    }
+
+    public function all(): self
     {
         $this->_no_limit = true;
         return $this;
@@ -263,17 +260,17 @@ class CRUDTable extends PdoQuery
 
     /**
      * @param string $column
-     * @param mixed $value
+     * @param string $value
      * @return $this
      */
-    public function whereLike(string $column, mixed $value): self
+    public function whereLike(string $column, string $value): self
     {
         $this->_arr_where[] = count($this->_arr_where) ? " AND  $column LIKE :$column " : " WHERE $column LIKE :$column ";
         $this->_binds[':' . $column] = $value . '%';
         return $this;
     }
 
-    public function whereLikeLast(string $column, mixed $value): self
+    public function whereLikeLast(string $column, string $value): self
     {
         $this->_arr_where[] = count($this->_arr_where) ? " AND  $column LIKE :$column " : " WHERE $column LIKE :$column ";
         $this->_binds[':' . $column] = '%' . $value;
@@ -351,7 +348,7 @@ class CRUDTable extends PdoQuery
             " , (SELECT COUNT(*) FROM {$this->getTable()} $joinClause $whereClause) AS _total_count " .
             "FROM {$this->getTable()} $joinClause $whereClause ";
 
-        if ($this->_no_limit) {
+        if (!$this->_no_limit) {
             $this->_query .= $this->_orderBy . " LIMIT $this->_limit OFFSET $this->_offset ";
         } else {
             $this->_query .= $this->_orderBy;
@@ -373,10 +370,12 @@ class CRUDTable extends PdoQuery
             return [];
         }
         $object_result = [];
-        $this->_total_count = $queryResult[0]['_total_count'];
-        /**@phpstan-ignore-next-line */
+        /** @phpstan-ignore-next-line  */
+        $this->_total_count = (int)$queryResult[0]['_total_count'];
+        /** @phpstan-ignore-next-line */
         $this->_count_pages = round($this->_total_count / $this->_limit);
         foreach ($queryResult as $item) {
+            /** @phpstan-ignore-next-line */
             unset($item['_total_count']);
             $instance = new $this();
             if (is_array($item)) {
