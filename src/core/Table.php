@@ -45,7 +45,6 @@ class Table extends PdoQuery
             $this->_limit = 10;
         }
         $this->_no_limit = false;
-        $this->_offset = 0;
         $this->_query = null;
         $this->_binds = [];
         parent::__construct();
@@ -69,10 +68,6 @@ class Table extends PdoQuery
 
     public function getLimit():int  {
         return $this->_limit;
-    }
-    public function setLimit(int $limit):void
-    {
-        $this->_limit = $limit;
     }
 
     public function getQuery(): string|null
@@ -104,12 +99,7 @@ class Table extends PdoQuery
     public function setPage(int $page): void
     {
         $page =  $page < 1 ? 0 :  $page - 1 ;
-        $this->_offset = ($page - 1) * $this->_limit;
-    }
-
-    public function getCurrentPage(): int
-    {
-        return $this->_offset + 1;
+        $this->_offset = ($page ) * $this->_limit;
     }
 
     public function getSelectQueryString(): null|string
@@ -266,8 +256,7 @@ class Table extends PdoQuery
         $this->_query = $this->_query .
             " , (SELECT COUNT(*) FROM {$this->getTable()} $joinClause $whereClause) AS _total_count " .
             "FROM {$this->getTable()} $joinClause $whereClause ";
-
-        if ($this->_no_limit) {
+            if (!$this->_no_limit) {
             $this->_query .= $this->_orderBy . " LIMIT $this->_limit OFFSET $this->_offset ";
         } else {
             $this->_query .= $this->_orderBy;
@@ -280,6 +269,7 @@ class Table extends PdoQuery
             Response::internalError("given query-string is not acceptable for $objectName " . $this->getError())->show();
             die();
         }
+        
         $queryResult = $this->selectQuery($this->_query, $this->_binds);
         if (!is_array($queryResult)) {
             Response::internalError("error in table class for $objectName " . $this->getError())->show();
