@@ -257,6 +257,7 @@ class Table extends PdoQuery
             " , (SELECT COUNT(*) FROM {$this->getTable()} $joinClause $whereClause) AS _total_count " .
             "FROM {$this->getTable()} $joinClause $whereClause ";
             if (!$this->_no_limit) {
+            $this->_offset ?? $this->_offset = 0;
             $this->_query .= $this->_orderBy . " LIMIT $this->_limit OFFSET $this->_offset ";
         } else {
             $this->_query .= $this->_orderBy;
