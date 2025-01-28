@@ -49,6 +49,21 @@ class CRUDTable extends PdoQuery
      */
     public function insert():static
     {
+        unset($this->_query);
+        unset($this->_isSelectSet);
+        unset($this->_no_limit);
+        unset($this->_offset);
+        unset($this->_orderBy);
+        unset($this->_total_count);
+        unset($this->_count_pages);
+        unset($this->_binds);
+        unset($this->_arr_where);
+        unset($this->_joins);
+        unset($this->_arr_where);
+        unset($this->_limit);
+        unset($this->_isSelectSet);
+        
+        
         $table = $this->getTable();
         if (!$table) {
             Response::internalError($this->getError())->show();
@@ -88,6 +103,19 @@ class CRUDTable extends PdoQuery
      */
     public function update(string $idWhereKey , mixed $idWhereValue):static
     {
+        unset($this->_query);
+        unset($this->_isSelectSet);
+        unset($this->_no_limit);
+        unset($this->_offset);
+        unset($this->_orderBy);
+        unset($this->_total_count);
+        unset($this->_count_pages);
+        unset($this->_binds);
+        unset($this->_arr_where);
+        unset($this->_joins);
+        unset($this->_arr_where);
+        unset($this->_limit);
+        unset($this->_isSelectSet);
         $table = $this->getTable();
         if (!$table) {
             $this->setError('table is not set in function getTable');
