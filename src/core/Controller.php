@@ -23,10 +23,10 @@ class Controller
     }
 
     /**
-     * @param Table $object The object to map the POST data to
+     * @param object $object The object to map the POST data to
      * @info: automatically use $this->request->post to map to Model instance
      */
-    public function mapPost(Table $object): void
+    public function mapPost(object $object): void
     {
         $name = get_class($object);
         if (!count($this->request->post)) {
@@ -109,8 +109,24 @@ class Controller
      */
     private function _handlePagination(Table $model): Table
     {
-        $model->setPage($this->request->getPageNumber() -1);
-        $model->limit($this->request->getPerPage());
+        if(isset($this->request->get["page_number"]))
+        {
+            if(!is_numeric(trim($this->request->get["page_number"])))
+            {
+                Response::badRequest("page_number shall be type if integer or number")->show();
+                die();
+            }
+            $page_number = (int) $this->request->get["page_number"];
+            if($page_number < 1)
+            {
+                Response::badRequest("page_number shall be positive int")->show();
+                die();
+            }
+
+            $model->setPage($page_number);
+            return $model;
+        }
+        $model->setPage(1);
         return $model;
     }
 
