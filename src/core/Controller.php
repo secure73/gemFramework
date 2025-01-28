@@ -23,10 +23,10 @@ class Controller
     }
 
     /**
-     * @param Table $object The object to map the POST data to
+     * @param object $object The object to map the POST data to
      * @info: automatically use $this->request->post to map to Model instance
      */
-    public function mapPost(Table $object): void
+    public function mapPost(object $object): void
     {
         $name = get_class($object);
         if (!count($this->request->post)) {
