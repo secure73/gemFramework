@@ -7,10 +7,9 @@ use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Response;
 
 /**
- * 
- * @method removeById()
- * @method removeJsonResponse()
- * @method removeByPostRequest()
+ * @method removeById(int $id)
+ * @method removeJsonResponse(int $id)
+ * @method removeByPostRequest(Request $request)
  */
 trait RemoveTrait
 {
