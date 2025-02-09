@@ -221,8 +221,7 @@ class Table extends PdoQuery
     /**
      * @param null|string $columnName
      * @param null|bool $ascending
-     * @default columName is id is not given
-     * @default order type is Descending if null
+     * @return $this
      */
     public function orderBy(string $columnName = null, bool $ascending = null): self
     {
