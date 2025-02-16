@@ -79,11 +79,11 @@ class Controller
     }
 
     /**
-     * Summary of createList
-     * @param mixed $columns
+     * columns "id,name,email" only return id name and email
+     * @param string|null $columns
      * @return JsonResponse
      */
-    public function createList(Table $model, ?array $columns): JsonResponse
+    public function createList(Table $model, ?string $columns = null): JsonResponse
     {
         $model = $this->_handleSearchable($model);
         $model = $this->_handleFindable($model);
