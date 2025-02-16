@@ -53,23 +53,19 @@ class Controller
      * @set $this->error type of ?string in case of exception
      * @info: automatically use $this->request->post map to  Model instance
      */
-    public function mapPostManuel(array $postNames , Table $object): void
+    public function mapPostManuel(array $postNames, Table $object): void
     {
         $objectClassName = get_class($object);
-        foreach($postNames as $name)
-        {
-            if(!isset($this->request->post[$name]))
-            {
+        foreach ($postNames as $name) {
+            if (!isset($this->request->post[$name])) {
                 $this->error = "there is no post found in incoming request with given name $name";
                 Response::badRequest("post $name not setted on incoming request to set on $objectClassName")->show();
                 die();
             }
             try {
                 if (property_exists($object, $name)) {
-                    $object->$name =$this->request->post[$name];
-                }
-                else
-                {
+                    $object->$name = $this->request->post[$name];
+                } else {
                     $this->error = "object $objectClassName has no such property with name $name";
                     Response::unprocessableEntity("object $objectClassName has no such property with name $name")->show();
                     die();
@@ -82,13 +78,18 @@ class Controller
         }
     }
 
-    public function createList(Table $model):JsonResponse
+    /**
+     * Summary of createList
+     * @param mixed $columns
+     * @return JsonResponse
+     */
+    public function createList(Table $model, ?array $columns): JsonResponse
     {
         $model = $this->_handleSearchable($model);
         $model = $this->_handleFindable($model);
         $model = $this->_handleSortable($model);
         $model = $this->_handlePagination($model);
-        return Response::success($model->select()->run(),$model->getTotalCounts(),'list of '.$model->getTable().' fetched successfully');
+        return Response::success($model->select($columns)->run(), $model->getTotalCounts(), 'list of ' . $model->getTable() . ' fetched successfully');
     }
 
 
@@ -109,16 +110,13 @@ class Controller
      */
     private function _handlePagination(Table $model): Table
     {
-        if(isset($this->request->get["page_number"]))
-        {
-            if(!is_numeric(trim($this->request->get["page_number"])))
-            {
+        if (isset($this->request->get["page_number"])) {
+            if (!is_numeric(trim($this->request->get["page_number"]))) {
                 Response::badRequest("page_number shall be type if integer or number")->show();
                 die();
             }
             $page_number = (int) $this->request->get["page_number"];
-            if($page_number < 1)
-            {
+            if ($page_number < 1) {
                 Response::badRequest("page_number shall be positive int")->show();
                 die();
             }
@@ -138,12 +136,11 @@ class Controller
     {
         $sort_des = $this->request->getSortable();
         $sort_asc = $this->request->getSortableAsc();
-        if($sort_des)
-        {
+        if ($sort_des) {
             $model->orderBy($sort_des);
         }
-        if($sort_asc){
-            $model->orderBy($sort_asc,true);
+        if ($sort_asc) {
+            $model->orderBy($sort_asc, true);
         }
         return $model;
     }
@@ -152,26 +149,21 @@ class Controller
     private function _handleFindable(Table $model): Table
     {
         $array_orderby = $this->request->getFindable();
-        if(count($array_orderby) == 0)
-        {
+        if (count($array_orderby) == 0) {
             return $model;
         }
-        foreach($array_orderby as $key => $value)
-        {
+        foreach ($array_orderby as $key => $value) {
             $array_orderby[$key] = $this->_sanitizeInput($value);
         }
         $array_exited_object_properties = get_class_vars(get_class($model));
-        foreach($array_orderby as $key => $value)
-        {
-            if(!array_key_exists($key,$array_exited_object_properties))
-            {
+        foreach ($array_orderby as $key => $value) {
+            if (!array_key_exists($key, $array_exited_object_properties)) {
                 Response::badRequest("filterable key $key not found in object properties")->show();
                 die();
             }
         }
-        foreach($array_orderby as $key => $value)
-        {
-            $model->whereLike($key,$value);
+        foreach ($array_orderby as $key => $value) {
+            $model->whereLike($key, $value);
         }
         return $model;
     }
@@ -184,46 +176,39 @@ class Controller
     {
         $arr_errors = null;
         $array_searchable = $this->request->getFilterable();
-        if(count( $array_searchable) == 0)
-        {
+        if (count($array_searchable) == 0) {
             return $model;
         }
-        foreach($array_searchable as $key => $value)
-        {
+        foreach ($array_searchable as $key => $value) {
             $array_searchable[$key] = $this->_sanitizeInput($value);
         }
         $array_exited_object_properties = get_class_vars(get_class($model));
-        foreach($array_searchable as $key => $value)
-        {
-            if(!array_key_exists($key,$array_exited_object_properties))
-            {
+        foreach ($array_searchable as $key => $value) {
+            if (!array_key_exists($key, $array_exited_object_properties)) {
                 Response::badRequest("searchable key $key not found in object properties")->show();
                 die();
             }
         }
 
-        foreach($array_searchable as $key => $value)
-        {
-           try {
+        foreach ($array_searchable as $key => $value) {
+            try {
                 $model->$key = $value;
-           } catch (\Exception $e) {
-               $arr_errors .= $e->getMessage().",";
-           }
+            } catch (\Exception $e) {
+                $arr_errors .= $e->getMessage() . ",";
+            }
         }
 
-        if($arr_errors)
-        {
+        if ($arr_errors) {
             Response::badRequest($arr_errors)->show();
             die();
         }
-        foreach($array_searchable as $key => $value)
-        {
-            $model->where($key,$value);
+        foreach ($array_searchable as $key => $value) {
+            $model->where($key, $value);
         }
-      return $model;
+        return $model;
     }
 
-    
+
     /**
      * Basic input sanitization
      */
