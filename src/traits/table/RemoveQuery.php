@@ -17,7 +17,7 @@ trait RemoveQuery
      * NOTE:  remove Object from Database.
      * @ in case of success return count removed items.
      */
-    public final function removeQuery(int $id): int
+    public function removeQuery(int $id): int
     {
         return $this->removeConditionalQuery('id', $id);
     }
