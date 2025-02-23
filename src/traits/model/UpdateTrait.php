@@ -4,7 +4,6 @@ use Gemvc\Http\Response;
 use Gemvc\Http\JsonResponse;
 /**
  * Summary of UpdateTrait
- * @method update()
  * @method updateJsonResponse()
  */
 trait UpdateTrait
