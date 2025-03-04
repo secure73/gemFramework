@@ -115,7 +115,7 @@ class Controller
     /**
      * Handles pagination parameters
      */
-    private function _handlePagination(object $model): Table
+    private function _handlePagination(object $model): object
     {
         if (isset($this->request->get["page_number"])) {
             if (!is_numeric(trim($this->request->get["page_number"]))) {
@@ -139,7 +139,7 @@ class Controller
     /**
      * Handles sorting/ordering parameters
      */
-    private function _handleSortable(object $model): Table
+    private function _handleSortable(object $model): object
     {
         $sort_des = $this->request->getSortable();
         $sort_asc = $this->request->getSortableAsc();
@@ -153,7 +153,7 @@ class Controller
     }
 
 
-    private function _handleFindable(object $model): Table
+    private function _handleFindable(object $model): object
     {
         $array_orderby = $this->request->getFindable();
         if (count($array_orderby) == 0) {
@@ -179,8 +179,7 @@ class Controller
     /**
      * Handles all filter types (create where)
      */
-    
-    private function _handleSearchable(object $model): Table
+    private function _handleSearchable(object $model): object
     {
         $arr_errors = null;
         $array_searchable = $this->request->getFilterable();
