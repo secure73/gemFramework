@@ -46,7 +46,7 @@ trait IdTrait
         $result = $this->byId($id);
         if(!$result)
         {
-            Response::notFound('not found')->show();
+            Response::notFound(get_class($this).' not found with given id: '.$id)->show();
             die();
         }
         return $result;
