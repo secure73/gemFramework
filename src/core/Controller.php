@@ -80,17 +80,24 @@ class Controller
 
     /**
      * columns "id,name,email" only return id name and email
+     * @param object $model
      * @param string|null $columns
      * @return JsonResponse
      */
-    public function createList(Table $model, ?string $columns = null): JsonResponse
+    public function createList(object $model, ?string $columns = null): JsonResponse
     {
+        //if model dont have select method throw error
+        if (!method_exists($model, 'select')) {
+            return Response::internalError('Model must have select method i.e extended from Table or Model Class');
+        }
         $model = $this->_handleSearchable($model);
         $model = $this->_handleFindable($model);
         $model = $this->_handleSortable($model);
         $model = $this->_handlePagination($model);
         return Response::success($model->select($columns)->run(), $model->getTotalCounts(), 'list of ' . $model->getTable() . ' fetched successfully');
     }
+
+
 
 
 
