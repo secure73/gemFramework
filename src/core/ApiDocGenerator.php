@@ -186,7 +186,7 @@ class ApiDocGenerator
     {
         $docComment = $method->getDocComment();
         /**@phpstan-ignore-next-line */
-        if (preg_match('/@method\s+(GET|POST|PUT|DELETE|PATCH)/i', $docComment, $matches)) {
+        if (preg_match('/@http\s+(GET|POST|PUT|DELETE|PATCH)/i', $docComment, $matches)) {
             return strtoupper($matches[1]);
         }
         return 'POST'; // default to POST if no method specified
