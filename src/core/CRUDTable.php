@@ -4,12 +4,9 @@ namespace Gemvc\Core;
 
 use Gemvc\Database\PdoQuery;
 use Gemvc\Http\Response;
-use Gemvc\Traits\Table\UpdateQuery;
-
 
 class CRUDTable extends PdoQuery
 {
-    use UpdateQuery;
     private ?string $_query;
     private bool $_isSelectSet;
     private bool $_no_limit;
@@ -128,14 +125,24 @@ class CRUDTable extends PdoQuery
         }
         $query = "UPDATE $table SET ";
         $arrayBind = [];          
-        /**  @phpstan-ignore-next-line */
-        foreach ($this as $key => $value) {
-            $query .= " {$key} = :{$key},";
-            $arrayBind[":{$key}"] = $value;
+        
+        // Get only public properties
+        $reflection = new \ReflectionClass($this);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+        
+        foreach ($properties as $property) {
+            $key = $property->getName();
+            $value = $property->getValue($this);
+            if ($key !== $idWhereKey) { // Skip the ID field
+                $query .= " {$key} = :{$key},";
+                $arrayBind[":{$key}"] = $value;
+            }
         }
+
         $query = rtrim($query, ',');
         $query .= " WHERE {$idWhereKey} = :{$idWhereKey} ";
         $arrayBind[":{$idWhereKey}"] = $idWhereValue;
+        
         $this->updateQuery($query, $arrayBind);
         if($this->getError()) {
             Response::internalError("error in update Query: ".$this->getTable()." , ".$this->getError())->show();
