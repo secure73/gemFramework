@@ -121,19 +121,13 @@ class CRUDTable extends PdoQuery
             $this->setError('table is not set in function getTable');
             Response::internalError($this->getError())->show();
             die();
-
         }
         $query = "UPDATE $table SET ";
         $arrayBind = [];          
         
-        // Get only public properties
-        $reflection = new \ReflectionClass($this);
-        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-        
-        foreach ($properties as $property) {
-            $key = $property->getName();
-            $value = $property->getValue($this);
-            if ($key !== $idWhereKey) { // Skip the ID field
+        foreach ($this as $key => $value) {
+            // Skip private properties (starting with underscore)
+            if (!str_starts_with($key, '_') && $key !== $idWhereKey) {
                 $query .= " {$key} = :{$key},";
                 $arrayBind[":{$key}"] = $value;
             }
