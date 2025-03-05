@@ -126,6 +126,11 @@ class ApiDocGenerator
                 continue;
             }
 
+            $docComment = $method->getDocComment();
+            if ($docComment !== false && str_contains($docComment, '@hidden')) {
+                continue;
+            }
+
             $endpoints[$method->getName()] = $this->getMethodDetails($method, $reflection);
         }
 
