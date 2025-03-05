@@ -67,5 +67,13 @@ class ApiService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    protected function mockResponse(string $method): array
+    {
+        return [];
+    }
+
 
 }
