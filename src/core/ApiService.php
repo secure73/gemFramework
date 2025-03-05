@@ -70,7 +70,7 @@ class ApiService
     /**
      * @return array<string, mixed>
      */
-    protected static function mockResponse(string $method): array
+    public static function mockResponse(string $method): array
     {
         return [];
     }
