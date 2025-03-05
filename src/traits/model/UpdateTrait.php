@@ -11,7 +11,7 @@ trait UpdateTrait
 
     public function updateJsonResponse():JsonResponse
     {
-        $result = $this->updateSingleQuery();
+        $result = $this->update('id', $this->id);
         if($result === null)
         {
             return Response::internalError("error in update Query: ".$this->getTable().": ".$this->getError());
