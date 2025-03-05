@@ -4,9 +4,12 @@ namespace Gemvc\Core;
 
 use Gemvc\Database\PdoQuery;
 use Gemvc\Http\Response;
+use Gemvc\Traits\Table\UpdateQuery;
+
 
 class CRUDTable extends PdoQuery
 {
+    use UpdateQuery;
     private ?string $_query;
     private bool $_isSelectSet;
     private bool $_no_limit;

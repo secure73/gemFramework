@@ -114,7 +114,7 @@ class ApiDocGenerator
 
     /**
      * @param ReflectionClass<T> $reflection
-     * @return array<string, array{method: string, url: string, description: string, response?: string}>
+     * @return array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string}>
      */
     private function getEndpoints(ReflectionClass $reflection): array
     {
@@ -139,7 +139,7 @@ class ApiDocGenerator
 
     /**
      * @param ReflectionClass<T> $class
-     * @return array{method: string, url: string, description: string, response?: string}
+     * @return array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string}
      */
     private function getMethodDetails(ReflectionMethod $method, ReflectionClass $class): array
     {
@@ -176,7 +176,8 @@ class ApiDocGenerator
         // Add mock response if available
         if (method_exists($class->getName(), 'mockResponse')) {
             $mockData = $class->getName()::mockResponse($method->getName());
-            $details['response'] = json_encode($mockData, JSON_PRETTY_PRINT);
+            $encoded = json_encode($mockData, JSON_PRETTY_PRINT);
+            $details['response'] = $encoded === false ? '{}' : $encoded;
         }
 
         return $details;

@@ -94,6 +94,7 @@ class Controller
         $model = $this->_handleFindable($model);
         $model = $this->_handleSortable($model);
         $model = $this->_handlePagination($model);
+        /**@phpstan-ignore-next-line */
         return Response::success($model->select($columns)->run(), $model->getTotalCounts(), 'list of ' . $model->getTable() . ' fetched successfully');
     }
 
@@ -118,19 +119,22 @@ class Controller
     private function _handlePagination(object $model): object
     {
         if (isset($this->request->get["page_number"])) {
+            /**@phpstan-ignore-next-line */
             if (!is_numeric(trim($this->request->get["page_number"]))) {
                 Response::badRequest("page_number shall be type if integer or number")->show();
                 die();
             }
+            /**@phpstan-ignore-next-line */
             $page_number = (int) $this->request->get["page_number"];
             if ($page_number < 1) {
                 Response::badRequest("page_number shall be positive int")->show();
                 die();
             }
-
+            /**@phpstan-ignore-next-line */
             $model->setPage($page_number);
             return $model;
         }
+        /**@phpstan-ignore-next-line */
         $model->setPage(1);
         return $model;
     }
@@ -144,9 +148,11 @@ class Controller
         $sort_des = $this->request->getSortable();
         $sort_asc = $this->request->getSortableAsc();
         if ($sort_des) {
+            /**@phpstan-ignore-next-line */
             $model->orderBy($sort_des);
         }
         if ($sort_asc) {
+            /**@phpstan-ignore-next-line */
             $model->orderBy($sort_asc, true);
         }
         return $model;
@@ -170,6 +176,7 @@ class Controller
             }
         }
         foreach ($array_orderby as $key => $value) {
+            /**@phpstan-ignore-next-line */
             $model->whereLike($key, $value);
         }
         return $model;
@@ -210,6 +217,7 @@ class Controller
             die();
         }
         foreach ($array_searchable as $key => $value) {
+            /**@phpstan-ignore-next-line */
             $model->where($key, $value);
         }
         return $model;

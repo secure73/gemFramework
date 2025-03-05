@@ -9,7 +9,7 @@ use Gemvc\Http\Response;
 class Documentation
 {
     /**
-     * @param array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>}>}> $documentation
+     * @param array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false}>}> $documentation
      */
     private function generateHtmlView(array $documentation): string
     {
@@ -231,7 +231,7 @@ class Documentation
                         <div class="main-content">
                             <div class="response-section">
                                 <div class="response-code">
-                                    <pre><code>{$this->formatJson($method['response'] ?? '')}</code></pre>
+                                    <pre><code>{$this->formatJson($method['response'] ?? null)}</code></pre>
                                 </div>
                             </div>
                         </div>
@@ -289,27 +289,13 @@ class Documentation
         return $html;
     }
 
-    private function formatJson(?string $json): string
-    {
-        if (empty($json)) {
-            return 'No example response available';
-        }
-
-        $data = json_decode($json, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $json;
-        }
-
-        // Remove any markdown code block markers and "Example Response:" text
-        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $json = str_replace(['```json', '```', 'Example Response:'], '', $json);
-        return trim($json);
-    }
-
+    /**
+     * @param array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false} $method
+     */
     private function generateParameterTable(array $method): string
     {
-        $hasParams = !empty($method['parameters']);
-        $hasQueryParams = !empty($method['query_parameters']);
+        $hasParams = isset($method['parameters']) && !empty($method['parameters']);
+        $hasQueryParams = isset($method['query_parameters']) && !empty($method['query_parameters']);
 
         if (!$hasParams && !$hasQueryParams) {
             return '<p>No parameters required</p>';
@@ -318,7 +304,7 @@ class Documentation
         $html = '';
 
         // Regular Parameters
-        if ($hasParams) {
+        if ($hasParams && isset($method['parameters'])) {
             $html .= '<h4>Body Parameters</h4>';
             $html .= '<table class="parameter-table">';
             $html .= '<tr><th>Parameter</th><th>Type</th><th>Required</th></tr>';
@@ -389,6 +375,27 @@ class Documentation
         return $html;
     }
 
+    /**
+     * @param string|false|null $json
+     */
+    private function formatJson($json): string
+    {
+        if (empty($json)) {
+            return 'No example response available';
+        }
+
+        $data = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return (string)$json; // Cast to string to ensure type safety
+        }
+
+        // Remove any markdown code block markers and "Example Response:" text
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $json = (string)$json; // Cast to string to ensure type safety
+        $json = str_replace(['```json', '```', 'Example Response:'], '', $json);
+        return trim($json);
+    }
+
     public function show(): JsonResponse
     {
         $generator = new ApiDocGenerator();
@@ -404,144 +411,5 @@ class Documentation
         // Generate HTML view of the documentation
         echo $this->generateHtmlView($documentation);
         die();
-    }
-
-    // Add this method to store base styles
-    private function getBaseStyles(): string
-    {
-        return <<<CSS
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                line-height: 1.6;
-                margin: 0;
-                padding: 20px;
-                background: #f5f5f5;
-            }
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            .endpoint {
-                background: white;
-                border-radius: 8px;
-                padding: 20px;
-                margin-bottom: 20px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            .endpoint-header {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 15px;
-            }
-            .method {
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-weight: bold;
-                font-size: 14px;
-                text-transform: uppercase;
-            }
-            .method-get { background: #e3f2fd; color: #1976d2; }
-            .method-post { background: #e8f5e9; color: #2e7d32; }
-            .method-put { background: #fff3e0; color: #f57c00; }
-            .method-delete { background: #ffebee; color: #c62828; }
-            .url {
-                font-family: monospace;
-                font-size: 16px;
-                color: #333;
-            }
-            .description {
-                color: #666;
-                margin-bottom: 20px;
-            }
-            .content-wrapper {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-                align-items: start;
-            }
-            .main-content {
-                flex: 1;
-            }
-            .parameters {
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 6px;
-                border-left: 4px solid #1976d2;
-            }
-            .parameters h3 {
-                margin-top: 0;
-                color: #1976d2;
-                font-size: 18px;
-                margin-bottom: 15px;
-            }
-            .parameter-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-                font-size: 14px;
-            }
-            .parameter-table th, .parameter-table td {
-                padding: 12px;
-                text-align: left;
-                border-bottom: 1px solid #e0e0e0;
-            }
-            .parameter-table th {
-                background: #e3f2fd;
-                font-weight: 600;
-                color: #1976d2;
-            }
-            .required {
-                color: #c62828;
-                font-size: 12px;
-                margin-left: 4px;
-            }
-            .response-section {
-                margin-top: 0;
-            }
-            .response-header {
-                font-weight: 600;
-                margin-bottom: 10px;
-                color: #333;
-            }
-            .response-code {
-                background: #f8f9fa;
-                padding: 15px;
-                border-radius: 6px;
-                font-family: monospace;
-                white-space: pre-wrap;
-                overflow-x: auto;
-                border: 1px solid #e0e0e0;
-                height: 100%;
-            }
-            .response-code pre {
-                margin: 0;
-                font-size: 14px;
-                line-height: 1.5;
-            }
-            .response-code code {
-                display: block;
-                padding: 10px;
-                background: #1e1e1e;
-                color: #d4d4d4;
-                border-radius: 4px;
-                overflow-x: auto;
-            }
-            .response-code .json-key { color: #9cdcfe; }
-            .response-code .json-string { color: #ce9178; }
-            .response-code .json-number { color: #b5cea8; }
-            .response-code .json-boolean { color: #569cd6; }
-            .response-code .json-null { color: #808080; }
-            .parameters h4 {
-                color: #1976d2;
-                font-size: 16px;
-                margin: 0 0 10px 0;
-            }
-            .parameters h5 {
-                color: #666;
-                font-size: 14px;
-                margin: 15px 0 8px 0;
-            }
-        CSS;
     }
 } 
