@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api;
+namespace Gemvc\Core;
 
 use ReflectionClass;
 use ReflectionMethod;
