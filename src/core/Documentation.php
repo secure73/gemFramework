@@ -96,10 +96,10 @@ class Documentation
                     font-size: 14px;
                     text-transform: uppercase;
                 }
-                .method-get { background: #e3f2fd; color: #1976d2; }
-                .method-post { background: #e8f5e9; color: #2e7d32; }
-                .method-put { background: #fff3e0; color: #f57c00; }
-                .method-delete { background: #ffebee; color: #c62828; }
+                .method-get { background: #e8f5e9; color: #2e7d32; }
+                .method-post { background: #fff3e0; color:rgb(221, 190, 17); }
+                .method-put { background: #fff3e0; color:rgb(0, 65, 245); }
+                .method-delete { background: #ffebee; color:rgb(221, 13, 13); }
                 .url {
                     font-family: monospace;
                     font-size: 16px;
