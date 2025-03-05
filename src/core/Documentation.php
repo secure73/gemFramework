@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Api;
+namespace Gemvc\Core;
 
-use App\Api\ApiDocGenerator;
+use Gemvc\Core\ApiDocGenerator;
 use Gemvc\Http\JsonResponse;
 use Gemvc\Http\Response;
 
