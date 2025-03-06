@@ -290,18 +290,39 @@ class Documentation
     }
 
     /**
-     * @param array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false} $method
+     * @param array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, urlparams?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false} $method
      */
     private function generateParameterTable(array $method): string
     {
         $hasParams = isset($method['parameters']) && !empty($method['parameters']);
+        $hasUrlParams = isset($method['urlparams']) && !empty($method['urlparams']);
         $hasQueryParams = isset($method['query_parameters']) && !empty($method['query_parameters']);
 
-        if (!$hasParams && !$hasQueryParams) {
+        if (!$hasParams && !$hasQueryParams && !$hasUrlParams) {
             return '<p>No parameters required</p>';
         }
 
         $html = '';
+
+        // URL Parameters
+        if ($hasUrlParams) {
+            $html .= '<h4>URL Parameters</h4>';
+            $html .= '<table class="parameter-table">';
+            $html .= '<tr><th>Parameter</th><th>Type</th><th>Required</th></tr>';
+            
+            foreach ($method['urlparams'] as $name => $param) {
+                $required = $param['required'] ? '<span class="required">*</span>' : '';
+                $html .= sprintf(
+                    '<tr><td>%s%s</td><td>%s</td><td>%s</td></tr>',
+                    htmlspecialchars($name),
+                    $required,
+                    htmlspecialchars($param['type']),
+                    $param['required'] ? 'Yes' : 'No'
+                );
+            }
+            
+            $html .= '</table>';
+        }
 
         // Regular Parameters
         if ($hasParams && isset($method['parameters'])) {
