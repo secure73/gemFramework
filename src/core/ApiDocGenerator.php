@@ -139,7 +139,7 @@ class ApiDocGenerator
 
     /**
      * @param ReflectionClass<T> $class
-     * @return array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string}
+     * @return array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, urlparams?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string}
      */
     private function getMethodDetails(ReflectionMethod $method, ReflectionClass $class): array
     {
@@ -148,6 +148,12 @@ class ApiDocGenerator
             'url' => $this->getEndpointUrl($class->getShortName(), $method->getName()),
             'description' => $this->getMethodDocComment($method)
         ];
+
+        // Get URL parameters from @urlparams
+        $docComment = $method->getDocComment();
+        if ($docComment !== false && preg_match('/@urlparams\s+(.+)$/m', $docComment, $matches)) {
+            $details['urlparams'] = $this->parseUrlParams($matches[1]);
+        }
 
         // Get method file content
         $methodFile = $method->getFileName();
@@ -296,5 +302,30 @@ class ApiDocGenerator
         // Remove comment markers and extra whitespace
         $docComment = preg_replace('/^\s*\/\*+\s*|^\s*\*+\/\s*|^\s*\*\s*/m', '', $docComment);
         return trim($docComment ?? '');
+    }
+
+    /**
+     * @return array<string, array{type: string, required: bool}>
+     */
+    private function parseUrlParams(string $params): array
+    {
+        $parameters = [];
+        $parts = explode(',', $params);
+        
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (preg_match('/(\?)?([^=]+)=(\w+)/', $part, $matches)) {
+                $required = empty($matches[1]); // If ? is present, it's optional
+                $name = trim($matches[2]);
+                $type = trim($matches[3]);
+                
+                $parameters[$name] = [
+                    'type' => $type,
+                    'required' => $required
+                ];
+            }
+        }
+
+        return $parameters;
     }
 } 
