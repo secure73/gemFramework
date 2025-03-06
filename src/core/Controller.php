@@ -79,11 +79,12 @@ class Controller
     }
 
     /**
-     * return array of objects from given model with pagination and sorting and filtering
-     * columns "id,name,email" only return id name and email
-     * @param object $model
-     * @param mixed $columns
+     * @template T of object
+     * @param T $model
+     * @param string|null $columns
      * @return array<object>
+     * array of objects from given model with pagination, sorting and filtering
+     * columns "id,name,email" only return id name and email
      */
     public function ListObjects(object $model, ?string $columns = null): array
     {
@@ -104,6 +105,7 @@ class Controller
             Response::internalError($model->getError())->show();
             die();
         }
+        /** @var array<T> $result */
         return $result;
     }
 
