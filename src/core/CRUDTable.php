@@ -49,6 +49,7 @@ class CRUDTable extends PdoQuery
      */
     public function insert():static
     {
+        /*
         unset($this->_query);
         unset($this->_isSelectSet);
         unset($this->_no_limit);
@@ -62,8 +63,7 @@ class CRUDTable extends PdoQuery
         unset($this->_arr_where);
         unset($this->_limit);
         unset($this->_isSelectSet);
-        
-        
+        */
         $table = $this->getTable();
         if (!$table) {
             Response::internalError($this->getError())->show();
@@ -76,6 +76,9 @@ class CRUDTable extends PdoQuery
         $query = "INSERT INTO {$table} ";
         /**  @phpstan-ignore-next-line */
         foreach ($this as $key => $value) {
+            if ($key[0] === '_') {
+                continue;
+            }
             $columns .= $key . ',';
             $params .= ':' . $key . ',';
             $arrayBind[':' . $key] = $value;
@@ -103,6 +106,7 @@ class CRUDTable extends PdoQuery
      */
     public function update(string $idWhereKey , mixed $idWhereValue):static
     {
+        /*
         unset($this->_query);
         unset($this->_isSelectSet);
         unset($this->_no_limit);
@@ -116,6 +120,7 @@ class CRUDTable extends PdoQuery
         unset($this->_arr_where);
         unset($this->_limit);
         unset($this->_isSelectSet);
+        */
         $table = $this->getTable();
         if (!$table) {
             $this->setError('table is not set in function getTable');
@@ -126,6 +131,9 @@ class CRUDTable extends PdoQuery
         $arrayBind = [];          
         
         foreach ($this as $key => $value) {
+            if ($key[0] === '_') {
+                continue;
+            }
             // Skip private properties (starting with underscore)
             if (!str_starts_with($key, '_') && $key !== $idWhereKey) {
                 $query .= " {$key} = :{$key},";
