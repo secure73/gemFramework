@@ -45,6 +45,9 @@ trait CreateTrait
         $arrayBind = [];
         $query = "INSERT INTO {$table} ";
         foreach ((object) $this as $key => $value) {
+            if ($key[0] === '_') {
+                continue;
+            }
             $columns .= $key . ',';
             $params .= ':' . $key . ',';
             $arrayBind[':' . $key] = $value;
@@ -72,5 +75,4 @@ trait CreateTrait
         return Response::created($result,1, 'Object created successfully');
     }
 
-    
 }
