@@ -169,7 +169,7 @@ class ApiDocGenerator
             ));
             
             // Get validation rules from validatePost or validatePostWithCompany within the method scope
-            if (preg_match('/(?:validatePost|validatePostWithCompany)\(\s*\[\s*(.*?)\s*\]\s*\)/s', $methodContent, $matches)) {
+            if (preg_match('/(?:validatePosts|validatePostWithCompany)\(\s*\[\s*(.*?)\s*\]\s*\)/s', $methodContent, $matches)) {
                 $details['parameters'] = $this->parseValidationRules($matches[1]);
             }
 
