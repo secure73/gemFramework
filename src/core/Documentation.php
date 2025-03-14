@@ -333,7 +333,7 @@ class Documentation
                                     description: method.description,
                                     url: {
                                         raw: method.method === 'GET' && method.urlparams 
-                                            ? '{{base_url}}' + method.url + '/?' + Object.keys(method.urlparams).map(function(key) { return key + '='; }).join('&')
+                                            ? '{{base_url}}' + method.url + (method.url.endsWith('/') ? '?' : '/?') + Object.keys(method.urlparams).map(function(key) { return key + '='; }).join('&')
                                             : '{{base_url}}' + method.url,
                                         host: ['{{base_url}}'],
                                         path: method.url.split('/').filter(Boolean),
