@@ -326,15 +326,12 @@ class ApiDocGenerator
         $docComment = $method->getDocComment();
         if ($docComment === false) return '';
         
-        // Look for @description tag and capture everything until the next @ tag or end
-        if (preg_match('/@description\s+(.*?)(?=\s*@|$)/s', $docComment, $matches)) {
-            // Clean up the description: remove extra whitespace and * from PHPDoc format
-            $description = preg_replace('/^\s*\*\s*/m', '', $matches[1]);
-            return trim($description);
+        // Look for @description tag and capture only the description text
+        if (preg_match('/@description\s+([^\n@]+)/', $docComment, $matches)) {
+            return trim($matches[1]);
         }
         
-        // If no @description tag found, use the regular doc comment
-        return $this->formatDocComment($docComment);
+        return '';  // Return empty if no description found
     }
 
     private function formatDocComment(?string $docComment): string
