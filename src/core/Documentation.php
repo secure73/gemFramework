@@ -304,8 +304,7 @@ class Documentation
         $html .= <<<HTML
             </div>
             <script>
-            // Safely parse the PHP-injected JSON with proper string quotes
-            const documentation = {$this->formatJson(json_encode($documentation))};
+            const documentation = {$this->formatJson(json_encode($documentation, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))};
             
             function downloadPostmanCollection() {
                 try {
@@ -333,14 +332,14 @@ class Documentation
                                     method: method.method,
                                     description: method.description,
                                     url: {
-                                        raw: "{{base_url}}" + method.url,
-                                        host: ["{{base_url}}"],
+                                        raw: '{{base_url}}' + method.url,
+                                        host: ['{{base_url}}'],
                                         path: method.url.split('/').filter(Boolean)
                                     },
                                     header: [
                                         {
-                                            key: "Content-Type",
-                                            value: "application/json"
+                                            key: 'Content-Type',
+                                            value: 'application/json'
                                         }
                                     ]
                                 }
@@ -352,8 +351,8 @@ class Documentation
                                 Object.entries(method.urlparams).forEach(([name, param]) => {
                                     request.request.url.variable.push({
                                         key: name,
-                                        value: "",
-                                        description: `Type: ${param.type}${param.required ? ' (Required)' : ''}`
+                                        value: '',
+                                        description: 'Type: ' + param.type + (param.required ? ' (Required)' : '')
                                     });
                                 });
                             }
@@ -361,16 +360,16 @@ class Documentation
                             // Add Body Parameters
                             if (method.parameters) {
                                 request.request.body = {
-                                    mode: "formdata",
+                                    mode: 'formdata',
                                     formdata: []
                                 };
                                 
                                 Object.entries(method.parameters).forEach(([name, param]) => {
                                     request.request.body.formdata.push({
                                         key: name,
-                                        value: "",
-                                        type: "text",
-                                        description: `Type: ${param.type}${param.required ? ' (Required)' : ''}`
+                                        value: '',
+                                        type: 'text',
+                                        description: 'Type: ' + param.type + (param.required ? ' (Required)' : '')
                                     });
                                 });
                             }
