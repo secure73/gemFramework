@@ -332,9 +332,19 @@ class Documentation
                                     method: method.method,
                                     description: method.description,
                                     url: {
-                                        raw: '{{base_url}}' + method.url,
+                                        raw: method.method === 'GET' && method.urlparams 
+                                            ? '{{base_url}}' + method.url + '/?' + Object.keys(method.urlparams).map(function(key) { return key + '='; }).join('&')
+                                            : '{{base_url}}' + method.url,
                                         host: ['{{base_url}}'],
-                                        path: method.url.split('/').filter(Boolean)
+                                        path: method.url.split('/').filter(Boolean),
+                                        query: method.method === 'GET' && method.urlparams
+                                            ? Object.keys(method.urlparams).map(function(key) {
+                                                return {
+                                                    key: key,
+                                                    value: ''
+                                                };
+                                            })
+                                            : []
                                     },
                                     header: [
                                         {
@@ -345,8 +355,8 @@ class Documentation
                                 }
                             };
 
-                            // Add URL Parameters
-                            if (method.urlparams) {
+                            // Add URL Parameters for non-GET methods
+                            if (method.urlparams && method.method !== 'GET') {
                                 request.request.url.variable = [];
                                 Object.entries(method.urlparams).forEach(([name, param]) => {
                                     request.request.url.variable.push({
