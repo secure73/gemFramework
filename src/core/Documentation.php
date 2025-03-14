@@ -304,91 +304,97 @@ class Documentation
         $html .= <<<HTML
             </div>
             <script>
-            const documentation = JSON.parse({$this->formatJson(json_encode($documentation))});
+            // Safely parse the PHP-injected JSON with proper string quotes
+            const documentation = {$this->formatJson(json_encode($documentation))};
             
             function downloadPostmanCollection() {
-                const collection = {
-                    info: {
-                        name: 'API Documentation',
-                        _postman_id: Date.now().toString(),
-                        schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
-                    },
-                    item: []
-                };
-
-                // Convert documentation to Postman format
-                for (const [endpointName, endpoint] of Object.entries(documentation)) {
-                    const folder = {
-                        name: endpointName,
-                        description: endpoint.description,
+                try {
+                    const collection = {
+                        info: {
+                            name: 'API Documentation',
+                            _postman_id: Date.now().toString(),
+                            schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+                        },
                         item: []
                     };
 
-                    for (const [methodName, method] of Object.entries(endpoint.endpoints)) {
-                        const request = {
-                            name: methodName,
-                            request: {
-                                method: method.method,
-                                description: method.description,
-                                url: {
-                                    raw: "{{base_url}}" + method.url,
-                                    host: ["{{base_url}}"],
-                                    path: method.url.split('/').filter(Boolean)
-                                },
-                                header: [
-                                    {
-                                        key: "Content-Type",
-                                        value: "application/json"
-                                    }
-                                ]
-                            }
+                    // Convert documentation to Postman format
+                    Object.entries(documentation).forEach(([endpointName, endpoint]) => {
+                        const folder = {
+                            name: endpointName,
+                            description: endpoint.description,
+                            item: []
                         };
 
-                        // Add URL Parameters
-                        if (method.urlparams) {
-                            request.request.url.variable = [];
-                            for (const [name, param] of Object.entries(method.urlparams)) {
-                                request.request.url.variable.push({
-                                    key: name,
-                                    value: "",
-                                    description: `Type: \${param.type}\${param.required ? ' (Required)' : ''}`
-                                });
-                            }
-                        }
-
-                        // Add Body Parameters
-                        if (method.parameters) {
-                            request.request.body = {
-                                mode: "formdata",
-                                formdata: []
+                        Object.entries(endpoint.endpoints).forEach(([methodName, method]) => {
+                            const request = {
+                                name: methodName,
+                                request: {
+                                    method: method.method,
+                                    description: method.description,
+                                    url: {
+                                        raw: "{{base_url}}" + method.url,
+                                        host: ["{{base_url}}"],
+                                        path: method.url.split('/').filter(Boolean)
+                                    },
+                                    header: [
+                                        {
+                                            key: "Content-Type",
+                                            value: "application/json"
+                                        }
+                                    ]
+                                }
                             };
-                            
-                            for (const [name, param] of Object.entries(method.parameters)) {
-                                request.request.body.formdata.push({
-                                    key: name,
-                                    value: "",
-                                    type: "text",
-                                    description: `Type: \${param.type}\${param.required ? ' (Required)' : ''}`
+
+                            // Add URL Parameters
+                            if (method.urlparams) {
+                                request.request.url.variable = [];
+                                Object.entries(method.urlparams).forEach(([name, param]) => {
+                                    request.request.url.variable.push({
+                                        key: name,
+                                        value: "",
+                                        description: `Type: ${param.type}${param.required ? ' (Required)' : ''}`
+                                    });
                                 });
                             }
-                        }
 
-                        folder.item.push(request);
-                    }
+                            // Add Body Parameters
+                            if (method.parameters) {
+                                request.request.body = {
+                                    mode: "formdata",
+                                    formdata: []
+                                };
+                                
+                                Object.entries(method.parameters).forEach(([name, param]) => {
+                                    request.request.body.formdata.push({
+                                        key: name,
+                                        value: "",
+                                        type: "text",
+                                        description: `Type: ${param.type}${param.required ? ' (Required)' : ''}`
+                                    });
+                                });
+                            }
 
-                    collection.item.push(folder);
+                            folder.item.push(request);
+                        });
+
+                        collection.item.push(folder);
+                    });
+
+                    // Create and download the file
+                    const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'api_collection.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } catch (error) {
+                    console.error('Error generating Postman collection:', error);
+                    alert('Error generating Postman collection. Please check the console for details.');
                 }
-
-                // Create and download the file
-                const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'api_collection.json';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
             }
 
             function toggleAccordion(header) {
