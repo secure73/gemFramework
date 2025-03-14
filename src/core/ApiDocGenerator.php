@@ -10,7 +10,20 @@ use ReflectionMethod;
  */
 class ApiDocGenerator
 {
-    /** @var array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, response?: string}>}> */
+    /**
+     * @var array<string, array{
+     *     description: string,
+     *     endpoints: array<string, array{
+     *         method: string,
+     *         url: string,
+     *         description: string,
+     *         parameters?: array<string, array{type: string, required: bool}>,
+     *         urlparams?: array<string, array{type: string, required: bool}>,
+     *         query_parameters?: array<string, array<string, array{type: string, required: bool}>>,
+     *         response?: string
+     *     }>
+     * }>
+     */
     private array $docs = [];
     private string $apiPath;
 
@@ -24,7 +37,18 @@ class ApiDocGenerator
     }
 
     /**
-     * @return array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, response?: string}>}>
+     * @return array<string, array{
+     *     description: string,
+     *     endpoints: array<string, array{
+     *         method: string,
+     *         url: string,
+     *         description: string,
+     *         parameters?: array<string, array{type: string, required: bool}>,
+     *         urlparams?: array<string, array{type: string, required: bool}>,
+     *         query_parameters?: array<string, array<string, array{type: string, required: bool}>>,
+     *         response?: string
+     *     }>
+     * }>
      */
     public function generate(): array
     {
@@ -114,7 +138,15 @@ class ApiDocGenerator
 
     /**
      * @param ReflectionClass<T> $reflection
-     * @return array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string}>
+     * @return array<string, array{
+     *     method: string,
+     *     url: string,
+     *     description: string,
+     *     parameters?: array<string, array{type: string, required: bool}>,
+     *     urlparams?: array<string, array{type: string, required: bool}>,
+     *     query_parameters?: array<string, array<string, array{type: string, required: bool}>>,
+     *     response?: string
+     * }>
      */
     private function getEndpoints(ReflectionClass $reflection): array
     {
@@ -146,7 +178,7 @@ class ApiDocGenerator
         $details = [
             'method' => $this->getHttpMethodFromDoc($method),
             'url' => $this->getEndpointUrl($class->getShortName(), $method->getName()),
-            'description' => $this->getMethodDocComment($method)
+            'description' => $this->getMethodDocComment($method) ?: 'No description available'
         ];
 
         // Get URL parameters from @urlparams
@@ -292,7 +324,17 @@ class ApiDocGenerator
     private function getMethodDocComment(ReflectionMethod $method): string
     {
         $docComment = $method->getDocComment();
-        return $this->formatDocComment($docComment === false ? null : $docComment);
+        if ($docComment === false) return '';
+        
+        // Look for @description tag and capture everything until the next @ tag or end
+        if (preg_match('/@description\s+(.*?)(?=\s*@|$)/s', $docComment, $matches)) {
+            // Clean up the description: remove extra whitespace and * from PHPDoc format
+            $description = preg_replace('/^\s*\*\s*/m', '', $matches[1]);
+            return trim($description);
+        }
+        
+        // If no @description tag found, use the regular doc comment
+        return $this->formatDocComment($docComment);
     }
 
     private function formatDocComment(?string $docComment): string
@@ -327,5 +369,19 @@ class ApiDocGenerator
         }
 
         return $parameters;
+    }
+
+    private function validateDescription(string $description): string
+    {
+        // Remove any HTML tags for security
+        $description = strip_tags($description);
+        
+        // Limit description length if too long
+        $maxLength = 2000;
+        if (strlen($description) > $maxLength) {
+            $description = substr($description, 0, $maxLength) . '...';
+        }
+        
+        return $description;
     }
 } 

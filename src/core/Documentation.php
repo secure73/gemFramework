@@ -54,6 +54,19 @@ class Documentation
                 border-radius: 8px;
                 overflow: hidden;
             }
+            .endpoint-description {
+                margin: 10px 0 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-left: 4px solid #1976d2;
+                color: #666;
+                font-size: 14px;
+                line-height: 1.6;
+                white-space: pre-line;
+            }
+            .endpoint-description:empty {
+                display: none;
+            }
         CSS;
 
         // Update the HTML template
@@ -226,6 +239,9 @@ class Documentation
                     <div class="endpoint-header">
                         <span class="method method-{$methodClass}">{$method['method']}</span>
                         <span class="url">{$method['url']}</span>
+                    </div>
+                    <div class="endpoint-description">
+                        {$this->formatDescription($method['description'])}
                     </div>
                     <div class="content-wrapper">
                         <div class="main-content">
@@ -415,6 +431,14 @@ class Documentation
         $json = (string)$json; // Cast to string to ensure type safety
         $json = str_replace(['```json', '```', 'Example Response:'], '', $json);
         return trim($json);
+    }
+
+    private function formatDescription(string $description): string
+    {
+        // Convert line breaks to <br> tags and escape HTML
+        $description = htmlspecialchars($description, ENT_QUOTES | ENT_HTML5);
+        $description = nl2br($description);
+        return $description;
     }
 
     public function show(): JsonResponse
