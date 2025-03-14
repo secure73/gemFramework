@@ -67,6 +67,29 @@ class Documentation
             .endpoint-description:empty {
                 display: none;
             }
+            .header-section {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            .export-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: #1976d2;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                text-decoration: none;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+            .export-button:hover {
+                background: #1565c0;
+            }
         CSS;
 
         // Update the HTML template
@@ -215,7 +238,17 @@ class Documentation
         </head>
         <body>
             <div class="container">
-                <h1>API Documentation</h1>
+                <div class="header-section">
+                    <h1>API Documentation</h1>
+                    <button onclick="downloadPostmanCollection()" class="export-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Export to Postman
+                    </button>
+                </div>
         HTML;
 
         foreach ($documentation as $endpointName => $endpoint) {
@@ -271,6 +304,93 @@ class Documentation
         $html .= <<<HTML
             </div>
             <script>
+            const documentation = JSON.parse({$this->formatJson(json_encode($documentation))});
+            
+            function downloadPostmanCollection() {
+                const collection = {
+                    info: {
+                        name: 'API Documentation',
+                        _postman_id: Date.now().toString(),
+                        schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+                    },
+                    item: []
+                };
+
+                // Convert documentation to Postman format
+                for (const [endpointName, endpoint] of Object.entries(documentation)) {
+                    const folder = {
+                        name: endpointName,
+                        description: endpoint.description,
+                        item: []
+                    };
+
+                    for (const [methodName, method] of Object.entries(endpoint.endpoints)) {
+                        const request = {
+                            name: methodName,
+                            request: {
+                                method: method.method,
+                                description: method.description,
+                                url: {
+                                    raw: "{{base_url}}" + method.url,
+                                    host: ["{{base_url}}"],
+                                    path: method.url.split('/').filter(Boolean)
+                                },
+                                header: [
+                                    {
+                                        key: "Content-Type",
+                                        value: "application/json"
+                                    }
+                                ]
+                            }
+                        };
+
+                        // Add URL Parameters
+                        if (method.urlparams) {
+                            request.request.url.variable = [];
+                            for (const [name, param] of Object.entries(method.urlparams)) {
+                                request.request.url.variable.push({
+                                    key: name,
+                                    value: "",
+                                    description: `Type: \${param.type}\${param.required ? ' (Required)' : ''}`
+                                });
+                            }
+                        }
+
+                        // Add Body Parameters
+                        if (method.parameters) {
+                            request.request.body = {
+                                mode: "formdata",
+                                formdata: []
+                            };
+                            
+                            for (const [name, param] of Object.entries(method.parameters)) {
+                                request.request.body.formdata.push({
+                                    key: name,
+                                    value: "",
+                                    type: "text",
+                                    description: `Type: \${param.type}\${param.required ? ' (Required)' : ''}`
+                                });
+                            }
+                        }
+
+                        folder.item.push(request);
+                    }
+
+                    collection.item.push(folder);
+                }
+
+                // Create and download the file
+                const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'api_collection.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+
             function toggleAccordion(header) {
                 const content = header.nextElementSibling;
                 const isActive = header.classList.contains('active');
