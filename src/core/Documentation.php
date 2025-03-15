@@ -31,24 +31,25 @@ class Documentation
         </head>
         <body>
             <div class="container">
-                <div class="header-section">
-                    <h1>API Documentation</h1>
-                    <button onclick="downloadPostmanCollection()" class="export-button">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Export to Postman
-                    </button>
+                <div class="nav-tree">
+                    <div class="header-section">
+                        <h1>API Documentation</h1>
+                        <button onclick="downloadPostmanCollection()" class="export-button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export to Postman
+                        </button>
+                    </div>
+                    <div class="tree-content">
+                        {$this->generateTreeNavigation($documentation)}
+                    </div>
                 </div>
-        HTML;
-
-        foreach ($documentation as $endpointName => $endpoint) {
-            $html .= $this->generateEndpointSection($endpointName, $endpoint);
-        }
-
-        $html .= <<<HTML
+                <div class="content-area">
+                    <div id="endpoint-content"></div>
+                </div>
             </div>
             <script>
                 {$this->getJavaScript($documentation)}
@@ -60,61 +61,34 @@ class Documentation
         return $html;
     }
 
-    private function generateEndpointSection(string $endpointName, array $endpoint): string
+    private function generateTreeNavigation(array $documentation): string
     {
-        $html = <<<HTML
-        <div class="service-section">
-            <div class="service-header" onclick="toggleAccordion(this)">
-                <h2>{$endpointName}</h2>
-                <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2">
-                    <path d="M19 9l-7 7-7-7" />
-                </svg>
-            </div>
-            <div class="service-content">
-                <p class="description">{$endpoint['description']}</p>
-                <div class="endpoints">
-        HTML;
-
-        foreach ($endpoint['endpoints'] as $methodName => $method) {
-            $html .= $this->generateMethodSection($methodName, $method);
-        }
-
-        $html .= <<<HTML
+        $html = '';
+        foreach ($documentation as $serviceName => $service) {
+            $html .= <<<HTML
+            <div class="tree-item">
+                <div class="service-name" onclick="toggleService(this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                    {$serviceName}
                 </div>
-            </div>
-        </div>
-        HTML;
+                <div class="service-methods" style="display: none;">
+            HTML;
 
-        return $html;
-    }
-
-    private function generateMethodSection(string $methodName, array $method): string
-    {
-        $methodClass = strtolower($method['method']);
-        return <<<HTML
-        <div class="endpoint">
-            <div class="endpoint-header">
-                <span class="method method-{$methodClass}">{$method['method']}</span>
-                <span class="url">{$method['url']}</span>
-            </div>
-            <div class="endpoint-description">
-                {$this->formatDescription($method['description'])}
-            </div>
-            <div class="content-wrapper">
-                <div class="main-content">
-                    <div class="response-section">
-                        <div class="response-code">
-                            <pre><code>{$this->formatJson($method['response'] ?? null)}</code></pre>
-                        </div>
+            foreach ($service['endpoints'] as $methodName => $method) {
+                $methodClass = strtolower($method['method']);
+                $html .= <<<HTML
+                    <div class="method-item" onclick="showEndpoint('{$serviceName}', '{$methodName}')">
+                        <span class="method-icon method-{$methodClass}">{$method['method']}</span>
+                        {$methodName}
                     </div>
-                </div>
-                <div class="parameters">
-                    <h3>Parameters</h3>
-                    {$this->generateParameterTable($method)}
-                </div>
-            </div>
-        </div>
-        HTML;
+                HTML;
+            }
+
+            $html .= '</div></div>';
+        }
+        return $html;
     }
 
     private function getStyles(): string
@@ -124,12 +98,89 @@ class Documentation
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
                 line-height: 1.6;
                 margin: 0;
-                padding: 20px;
+                padding: 0;
                 background: #f5f5f5;
+                height: 100vh;
+                overflow: hidden;
             }
             .container {
-                max-width: 1200px;
-                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 300px 1fr;
+                height: 100vh;
+                overflow: hidden;
+            }
+            .nav-tree {
+                background: #fff;
+                border-right: 1px solid #e0e0e0;
+                padding: 20px;
+                overflow-y: auto;
+                height: 100vh;
+            }
+            .content-area {
+                padding: 20px;
+                overflow-y: auto;
+                height: 100vh;
+            }
+            .tree-item {
+                margin: 8px 0;
+            }
+            .service-name {
+                font-weight: 600;
+                color: #1976d2;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px;
+                border-radius: 4px;
+                transition: background-color 0.2s;
+            }
+            .service-name:hover {
+                background: #f5f5f5;
+            }
+            .method-item {
+                margin-left: 24px;
+                padding: 6px 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: background-color 0.2s;
+            }
+            .method-item:hover {
+                background: #f5f5f5;
+            }
+            .method-icon {
+                width: 16px;
+                height: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 3px;
+                font-size: 10px;
+                font-weight: bold;
+                color: white;
+            }
+            .method-get { background: #2e7d32; }
+            .method-post { background: rgb(221, 190, 17); }
+            .method-put { background: rgb(0, 65, 245); }
+            .method-delete { background: rgb(221, 13, 13); }
+            .endpoint-details {
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .endpoint-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #f8f9fa;
+                border-radius: 6px;
             }
             .endpoint {
                 background: white;
@@ -325,6 +376,120 @@ class Documentation
         return <<<JS
             const documentation = {$this->formatJson(json_encode($documentation, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))};
             
+            function toggleService(element) {
+                const methodsContainer = element.nextElementSibling;
+                const isExpanded = methodsContainer.style.display === 'block';
+                const arrow = element.querySelector('svg');
+                
+                methodsContainer.style.display = isExpanded ? 'none' : 'block';
+                arrow.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(90deg)';
+            }
+
+            function showEndpoint(serviceName, methodName) {
+                const service = documentation[serviceName];
+                const endpoint = service.endpoints[methodName];
+                const methodClass = endpoint.method.toLowerCase();
+                
+                const content = `
+                    <div class="endpoint-details">
+                        <div class="endpoint-header">
+                            <span class="method method-\${methodClass}">\${endpoint.method}</span>
+                            <span class="url">\${endpoint.url}</span>
+                        </div>
+                        <div class="endpoint-description">
+                            \${endpoint.description || 'No description available'}
+                        </div>
+                        <div class="content-wrapper">
+                            <div class="main-content">
+                                <div class="response-section">
+                                    <div class="response-code">
+                                        <pre><code>\${formatJson(endpoint.response)}</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="parameters">
+                                <h3>Parameters</h3>
+                                \${generateParameterTable(endpoint)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('endpoint-content').innerHTML = content;
+            }
+
+            function generateParameterTable(endpoint) {
+                const hasParams = endpoint.parameters && Object.keys(endpoint.parameters).length > 0;
+                const hasUrlParams = endpoint.urlparams && Object.keys(endpoint.urlparams).length > 0;
+                const hasQueryParams = endpoint.query_parameters && Object.keys(endpoint.query_parameters).length > 0;
+
+                if (!hasParams && !hasQueryParams && !hasUrlParams) {
+                    return '<p>No parameters required</p>';
+                }
+
+                let html = '';
+
+                if (hasUrlParams) {
+                    html += '<h4>URL Parameters</h4>';
+                    html += generateParamTable(endpoint.urlparams);
+                }
+
+                if (hasParams) {
+                    html += '<h4>Body Parameters</h4>';
+                    html += generateParamTable(endpoint.parameters);
+                }
+
+                if (hasQueryParams) {
+                    html += '<h4>Query Parameters</h4>';
+                    if (endpoint.query_parameters.filters) {
+                        html += '<h5>Filters</h5>';
+                        html += generateParamTable(endpoint.query_parameters.filters);
+                    }
+                    if (endpoint.query_parameters.sort) {
+                        html += '<h5>Sort</h5>';
+                        html += generateParamTable(endpoint.query_parameters.sort);
+                    }
+                    if (endpoint.query_parameters.search) {
+                        html += '<h5>Search</h5>';
+                        html += generateParamTable(endpoint.query_parameters.search);
+                    }
+                }
+
+                return html;
+            }
+
+            function generateParamTable(params) {
+                let html = `
+                    <table class="parameter-table">
+                        <tr><th>Parameter</th><th>Type</th><th>Required</th></tr>
+                `;
+                
+                for (const [name, param] of Object.entries(params)) {
+                    const required = param.required ? '<span class="required">*</span>' : '';
+                    html += `
+                        <tr>
+                            <td>\${name}\${required}</td>
+                            <td>\${param.type}</td>
+                            <td>\${param.required ? 'Yes' : 'No'}</td>
+                        </tr>
+                    `;
+                }
+                
+                html += '</table>';
+                return html;
+            }
+
+            function formatJson(json) {
+                if (!json) return 'No example response available';
+                try {
+                    const parsed = typeof json === 'string' ? JSON.parse(json) : json;
+                    return JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    return json;
+                }
+            }
+
+            // Postman export functionality
             function downloadPostmanCollection() {
                 try {
                     const collection = {
@@ -336,7 +501,6 @@ class Documentation
                         item: []
                     };
 
-                    // Convert documentation to Postman format
                     Object.entries(documentation).forEach(([endpointName, endpoint]) => {
                         const folder = {
                             name: endpointName,
@@ -352,17 +516,15 @@ class Documentation
                                     description: method.description,
                                     url: {
                                         raw: method.method === 'GET' && method.urlparams 
-                                            ? '{{base_url}}' + method.url + (method.url.endsWith('/') ? '?' : '/?') + Object.keys(method.urlparams).map(function(key) { return key + '='; }).join('&')
+                                            ? '{{base_url}}' + method.url + (method.url.endsWith('/') ? '?' : '/?') + Object.keys(method.urlparams).map(key => key + '=').join('&')
                                             : '{{base_url}}' + method.url,
                                         host: ['{{base_url}}'],
                                         path: method.url.split('/').filter(Boolean),
                                         query: method.method === 'GET' && method.urlparams
-                                            ? Object.keys(method.urlparams).map(function(key) {
-                                                return {
-                                                    key: key,
-                                                    value: ''
-                                                };
-                                            })
+                                            ? Object.keys(method.urlparams).map(key => ({
+                                                key: key,
+                                                value: ''
+                                            }))
                                             : []
                                     },
                                     header: [
@@ -374,7 +536,6 @@ class Documentation
                                 }
                             };
 
-                            // Add URL Parameters for non-GET methods
                             if (method.urlparams && method.method !== 'GET') {
                                 request.request.url.variable = [];
                                 Object.entries(method.urlparams).forEach(([name, param]) => {
@@ -386,7 +547,6 @@ class Documentation
                                 });
                             }
 
-                            // Add Body Parameters
                             if (method.parameters) {
                                 request.request.body = {
                                     mode: 'formdata',
@@ -409,7 +569,6 @@ class Documentation
                         collection.item.push(folder);
                     });
 
-                    // Create and download the file
                     const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -425,24 +584,13 @@ class Documentation
                 }
             }
 
-            function toggleAccordion(header) {
-                const content = header.nextElementSibling;
-                const isActive = header.classList.contains('active');
-                
-                // Close all accordions
-                document.querySelectorAll('.service-header').forEach(h => {
-                    h.classList.remove('active');
-                    h.nextElementSibling.classList.remove('active');
-                    h.nextElementSibling.style.display = 'none';
-                });
-                
-                // Open clicked accordion if it wasn't active
-                if (!isActive) {
-                    header.classList.add('active');
-                    content.classList.add('active');
-                    content.style.display = 'block';
+            // Open first service by default
+            document.addEventListener('DOMContentLoaded', function() {
+                const firstService = document.querySelector('.service-name');
+                if (firstService) {
+                    toggleService(firstService);
                 }
-            }
+            });
         JS;
     }
 
