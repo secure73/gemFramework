@@ -9,12 +9,239 @@ use Gemvc\Http\Response;
 class Documentation
 {
     /**
-     * @param array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false}>}> $documentation
+     * @param array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, urlparams?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false}>}> $documentation
      */
     private function generateHtmlView(array $documentation): string
     {
-        // Add these styles to the existing <style> section
-        $additionalStyles = <<<CSS
+        return $this->generateHtmlStructure($documentation);
+    }
+
+    private function generateHtmlStructure(array $documentation): string
+    {
+        $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>API Documentation</title>
+            <style>
+                {$this->getStyles()}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header-section">
+                    <h1>API Documentation</h1>
+                    <button onclick="downloadPostmanCollection()" class="export-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Export to Postman
+                    </button>
+                </div>
+        HTML;
+
+        foreach ($documentation as $endpointName => $endpoint) {
+            $html .= $this->generateEndpointSection($endpointName, $endpoint);
+        }
+
+        $html .= <<<HTML
+            </div>
+            <script>
+                {$this->getJavaScript($documentation)}
+            </script>
+        </body>
+        </html>
+        HTML;
+
+        return $html;
+    }
+
+    private function generateEndpointSection(string $endpointName, array $endpoint): string
+    {
+        $html = <<<HTML
+        <div class="service-section">
+            <div class="service-header" onclick="toggleAccordion(this)">
+                <h2>{$endpointName}</h2>
+                <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2">
+                    <path d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="service-content">
+                <p class="description">{$endpoint['description']}</p>
+                <div class="endpoints">
+        HTML;
+
+        foreach ($endpoint['endpoints'] as $methodName => $method) {
+            $html .= $this->generateMethodSection($methodName, $method);
+        }
+
+        $html .= <<<HTML
+                </div>
+            </div>
+        </div>
+        HTML;
+
+        return $html;
+    }
+
+    private function generateMethodSection(string $methodName, array $method): string
+    {
+        $methodClass = strtolower($method['method']);
+        return <<<HTML
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method method-{$methodClass}">{$method['method']}</span>
+                <span class="url">{$method['url']}</span>
+            </div>
+            <div class="endpoint-description">
+                {$this->formatDescription($method['description'])}
+            </div>
+            <div class="content-wrapper">
+                <div class="main-content">
+                    <div class="response-section">
+                        <div class="response-code">
+                            <pre><code>{$this->formatJson($method['response'] ?? null)}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="parameters">
+                    <h3>Parameters</h3>
+                    {$this->generateParameterTable($method)}
+                </div>
+            </div>
+        </div>
+        HTML;
+    }
+
+    private function getStyles(): string
+    {
+        return <<<CSS
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                line-height: 1.6;
+                margin: 0;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .endpoint {
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .endpoint-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            .method {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+            }
+            .method-get { background: #e8f5e9; color: #2e7d32; }
+            .method-post { background: #fff3e0; color:rgb(221, 190, 17); }
+            .method-put { background: #fff3e0; color:rgb(0, 65, 245); }
+            .method-delete { background: #ffebee; color:rgb(221, 13, 13); }
+            .url {
+                font-family: monospace;
+                font-size: 16px;
+                color: #333;
+            }
+            .description {
+                color: #666;
+                margin-bottom: 20px;
+            }
+            .content-wrapper {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                align-items: start;
+            }
+            .main-content {
+                flex: 1;
+            }
+            .parameters {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 6px;
+                border-left: 4px solid #1976d2;
+            }
+            .parameters h3 {
+                margin-top: 0;
+                color: #1976d2;
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            .parameter-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+                font-size: 14px;
+            }
+            .parameter-table th, .parameter-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            .parameter-table th {
+                background: #e3f2fd;
+                font-weight: 600;
+                color: #1976d2;
+            }
+            .required {
+                color: #c62828;
+                font-size: 12px;
+                margin-left: 4px;
+            }
+            .response-section {
+                margin-top: 0;
+            }
+            .response-header {
+                font-weight: 600;
+                margin-bottom: 10px;
+                color: #333;
+            }
+            .response-code {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 6px;
+                font-family: monospace;
+                white-space: pre-wrap;
+                overflow-x: auto;
+                border: 1px solid #e0e0e0;
+                height: 100%;
+            }
+            .response-code pre {
+                margin: 0;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+            .response-code code {
+                display: block;
+                padding: 10px;
+                background: #1e1e1e;
+                color: #d4d4d4;
+                border-radius: 4px;
+                overflow-x: auto;
+            }
+            .response-code .json-key { color: #9cdcfe; }
+            .response-code .json-string { color: #ce9178; }
+            .response-code .json-number { color: #b5cea8; }
+            .response-code .json-boolean { color: #569cd6; }
+            .response-code .json-null { color: #808080; }
             .service-header {
                 display: flex;
                 align-items: center;
@@ -91,219 +318,11 @@ class Documentation
                 background: #1565c0;
             }
         CSS;
+    }
 
-        // Update the HTML template
-        $html = <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>API Documentation</title>
-            <style>
-                body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                    line-height: 1.6;
-                    margin: 0;
-                    padding: 20px;
-                    background: #f5f5f5;
-                }
-                .container {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                }
-                .endpoint {
-                    background: white;
-                    border-radius: 8px;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-                .endpoint-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    margin-bottom: 15px;
-                }
-                .method {
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    font-size: 14px;
-                    text-transform: uppercase;
-                }
-                .method-get { background: #e8f5e9; color: #2e7d32; }
-                .method-post { background: #fff3e0; color:rgb(221, 190, 17); }
-                .method-put { background: #fff3e0; color:rgb(0, 65, 245); }
-                .method-delete { background: #ffebee; color:rgb(221, 13, 13); }
-                .url {
-                    font-family: monospace;
-                    font-size: 16px;
-                    color: #333;
-                }
-                .description {
-                    color: #666;
-                    margin-bottom: 20px;
-                }
-                .content-wrapper {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
-                    align-items: start;
-                }
-                .main-content {
-                    flex: 1;
-                }
-                .parameters {
-                    background: #f8f9fa;
-                    padding: 20px;
-                    border-radius: 6px;
-                    border-left: 4px solid #1976d2;
-                }
-                .parameters h3 {
-                    margin-top: 0;
-                    color: #1976d2;
-                    font-size: 18px;
-                    margin-bottom: 15px;
-                }
-                .parameter-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 10px;
-                    font-size: 14px;
-                }
-                .parameter-table th, .parameter-table td {
-                    padding: 12px;
-                    text-align: left;
-                    border-bottom: 1px solid #e0e0e0;
-                }
-                .parameter-table th {
-                    background: #e3f2fd;
-                    font-weight: 600;
-                    color: #1976d2;
-                }
-                .required {
-                    color: #c62828;
-                    font-size: 12px;
-                    margin-left: 4px;
-                }
-                .response-section {
-                    margin-top: 0;
-                }
-                .response-header {
-                    font-weight: 600;
-                    margin-bottom: 10px;
-                    color: #333;
-                }
-                .response-code {
-                    background: #f8f9fa;
-                    padding: 15px;
-                    border-radius: 6px;
-                    font-family: monospace;
-                    white-space: pre-wrap;
-                    overflow-x: auto;
-                    border: 1px solid #e0e0e0;
-                    height: 100%;
-                }
-                .response-code pre {
-                    margin: 0;
-                    font-size: 14px;
-                    line-height: 1.5;
-                }
-                .response-code code {
-                    display: block;
-                    padding: 10px;
-                    background: #1e1e1e;
-                    color: #d4d4d4;
-                    border-radius: 4px;
-                    overflow-x: auto;
-                }
-                .response-code .json-key { color: #9cdcfe; }
-                .response-code .json-string { color: #ce9178; }
-                .response-code .json-number { color: #b5cea8; }
-                .response-code .json-boolean { color: #569cd6; }
-                .response-code .json-null { color: #808080; }
-                .parameters h4 {
-                    color: #1976d2;
-                    font-size: 16px;
-                    margin: 0 0 10px 0;
-                }
-                .parameters h5 {
-                    color: #666;
-                    font-size: 14px;
-                    margin: 15px 0 8px 0;
-                }
-                {$additionalStyles}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header-section">
-                    <h1>API Documentation</h1>
-                    <button onclick="downloadPostmanCollection()" class="export-button">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Export to Postman
-                    </button>
-                </div>
-        HTML;
-
-        foreach ($documentation as $endpointName => $endpoint) {
-            $html .= <<<HTML
-            <div class="service-section">
-                <div class="service-header" onclick="toggleAccordion(this)">
-                    <h2>{$endpointName}</h2>
-                    <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2">
-                        <path d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="service-content">
-                    <p class="description">{$endpoint['description']}</p>
-                    <div class="endpoints">
-            HTML;
-
-            foreach ($endpoint['endpoints'] as $methodName => $method) {
-                $methodClass = strtolower($method['method']);
-                $html .= <<<HTML
-                <div class="endpoint">
-                    <div class="endpoint-header">
-                        <span class="method method-{$methodClass}">{$method['method']}</span>
-                        <span class="url">{$method['url']}</span>
-                    </div>
-                    <div class="endpoint-description">
-                        {$this->formatDescription($method['description'])}
-                    </div>
-                    <div class="content-wrapper">
-                        <div class="main-content">
-                            <div class="response-section">
-                                <div class="response-code">
-                                    <pre><code>{$this->formatJson($method['response'] ?? null)}</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="parameters">
-                            <h3>Parameters</h3>
-                            {$this->generateParameterTable($method)}
-                        </div>
-                    </div>
-                </div>
-                HTML;
-            }
-
-            $html .= <<<HTML
-                    </div>
-                </div>
-            </div>
-            HTML;
-        }
-
-        // Add JavaScript for accordion functionality
-        $html .= <<<HTML
-            </div>
-            <script>
+    private function getJavaScript(array $documentation): string
+    {
+        return <<<JS
             const documentation = {$this->formatJson(json_encode($documentation, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))};
             
             function downloadPostmanCollection() {
@@ -424,24 +443,11 @@ class Documentation
                     content.style.display = 'block';
                 }
             }
-
-            // Open first accordion by default
-            document.addEventListener('DOMContentLoaded', function() {
-                const firstHeader = document.querySelector('.service-header');
-                if (firstHeader) {
-                    toggleAccordion(firstHeader);
-                }
-            });
-            </script>
-        </body>
-        </html>
-        HTML;
-
-        return $html;
+        JS;
     }
 
     /**
-     * @param array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, urlparams?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false} $method
+     * @param array<string, array{description: string, endpoints: array<string, array{method: string, url: string, description: string, parameters?: array<string, array{type: string, required: bool}>, urlparams?: array<string, array{type: string, required: bool}>, query_parameters?: array<string, array<string, array{type: string, required: bool}>>, response?: string|false}>}> $documentation
      */
     private function generateParameterTable(array $method): string
     {
