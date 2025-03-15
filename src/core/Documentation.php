@@ -30,6 +30,11 @@ class Documentation
             </style>
         </head>
         <body>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18"/>
+                </svg>
+            </button>
             <div class="container">
                 <div class="nav-tree">
                     <div class="header-section">
@@ -105,7 +110,7 @@ class Documentation
             }
             .container {
                 display: grid;
-                grid-template-columns: 300px 1fr;
+                grid-template-columns: 350px 1fr;
                 height: 100vh;
                 overflow: hidden;
             }
@@ -115,6 +120,7 @@ class Documentation
                 padding: 20px;
                 overflow-y: auto;
                 height: 100vh;
+                min-width: 350px;
             }
             .content-area {
                 padding: 20px;
@@ -350,6 +356,12 @@ class Documentation
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .header-section h1 {
+                margin: 0;
+                font-size: 24px;
             }
             .export-button {
                 display: inline-flex;
@@ -364,9 +376,71 @@ class Documentation
                 border: none;
                 cursor: pointer;
                 transition: background-color 0.2s;
+                white-space: nowrap;
+                min-height: 40px;
             }
             .export-button:hover {
                 background: #1565c0;
+            }
+            .mobile-menu-toggle {
+                display: none;
+                background: none;
+                border: none;
+                padding: 10px;
+                cursor: pointer;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1001;
+                background: #1976d2;
+                border-radius: 4px;
+            }
+            .mobile-menu-toggle svg {
+                width: 24px;
+                height: 24px;
+                color: white;
+            }
+            @media (max-width: 1024px) {
+                .container {
+                    grid-template-columns: 300px 1fr;
+                }
+                .nav-tree {
+                    min-width: 300px;
+                }
+            }
+            @media (max-width: 768px) {
+                .container {
+                    grid-template-columns: 1fr;
+                }
+                .nav-tree {
+                    position: fixed;
+                    left: 0;
+                    top: 0;
+                    width: 280px;
+                    transform: translateX(-100%);
+                    transition: transform 0.3s ease;
+                    z-index: 1000;
+                }
+                .nav-tree.active {
+                    transform: translateX(0);
+                }
+                .content-area {
+                    margin-left: 0;
+                }
+                .header-section {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+                .export-button {
+                    width: 100%;
+                    justify-content: center;
+                }
+                .mobile-menu-toggle {
+                    display: block;
+                }
+                .container {
+                    padding-top: 60px;
+                }
             }
         CSS;
     }
@@ -583,6 +657,31 @@ class Documentation
                     alert('Error generating Postman collection. Please check the console for details.');
                 }
             }
+
+            function toggleMobileMenu() {
+                const navTree = document.querySelector('.nav-tree');
+                navTree.classList.toggle('active');
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const navTree = document.querySelector('.nav-tree');
+                const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+                
+                if (window.innerWidth <= 768 && 
+                    !navTree.contains(event.target) && 
+                    !mobileMenuToggle.contains(event.target)) {
+                    navTree.classList.remove('active');
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const navTree = document.querySelector('.nav-tree');
+                if (window.innerWidth > 768) {
+                    navTree.classList.remove('active');
+                }
+            });
 
             // Open first service by default
             document.addEventListener('DOMContentLoaded', function() {
