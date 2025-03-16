@@ -183,9 +183,9 @@
       }
     },
     "responses": {
-      "success": {"code": 200, "body": {"..."}},
-      "validation": {"code": 422, "body": {"..."}},
-      "error": {"code": 500, "body": {"..."}}
+      "success": {"code": 200, "body": {"...": "..."}},
+      "validation": {"code": 422, "body": {"...": "..."}},
+      "error": {"code": 500, "body": {"...": "..."}}
     }
   }
 }

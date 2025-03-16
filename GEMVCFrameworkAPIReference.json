@@ -110,5 +110,12 @@
       "usage": ["example rules"],
       "custom": ["how to extend"]
     }
+  },
+  "types": {
+    "JsonResponse": {
+      "structure": {"success": "bool", "data": "mixed", "errors": "array"},
+      "methods": ["success", "error", "withData"],
+      "examples": ["usage examples"]
+    }
   }
 }
