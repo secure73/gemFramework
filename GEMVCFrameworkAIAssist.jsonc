@@ -9,6 +9,20 @@
       "cursor": true,
       "copilot": true,
       "codeium": true
+    },
+    "libraryIntegration": {
+      "path": "vendor/gemvc/library",
+      "documentation": {
+        "main": "Documentation.md",
+        "aiAssist": "AIAssist.jsonc",
+        "apiReference": "GEMVCLibraryAPIReference.json"
+      },
+      "components": {
+        "http": "HTTP handling",
+        "helper": "Utility functions",
+        "database": "Database operations",
+        "email": "Email functionality"
+      }
     }
   },
 

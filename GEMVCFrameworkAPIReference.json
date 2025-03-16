@@ -50,5 +50,27 @@
         }
       }
     }
+  },
+  "libraryReference": {
+    "location": "vendor/gemvc/library",
+    "documentation": "Documentation.md",
+    "components": {
+      "http": {
+        "description": "HTTP handling components",
+        "reference": "library/src/http/"
+      },
+      "helper": {
+        "description": "Helper utilities",
+        "reference": "library/src/helper/"
+      },
+      "database": {
+        "description": "Database operations",
+        "reference": "library/src/database/"
+      },
+      "email": {
+        "description": "Email functionality",
+        "reference": "library/src/email/"
+      }
+    }
   }
 }

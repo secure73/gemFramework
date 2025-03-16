@@ -15,6 +15,7 @@
 9. [Best Practices](#best-practices)
 10. [Environment Configuration](#environment-configuration)
 11. [Support & Contributing](#support-&-contributing)
+12. [Library Integration](#library-integration)
 
 ## Installation
 
@@ -547,3 +548,18 @@ class UserModel extends UserTable {
     /** @var array<RoleModel> */
     public array $_roles;  // Non-DB property starts with _
 }
+```
+
+## Library Integration
+
+The GEMVC Framework is built on top of the GEMVC Library. For detailed library documentation, refer to:
+- `/vendor/gemvc/library/Documentation.md`
+- `/vendor/gemvc/library/AIAssist.jsonc`
+
+### Library Components
+- `http/`: HTTP request/response handling
+- `helper/`: Utility functions and helpers
+- `database/`: Database operations and query building
+- `email/`: Email handling and templating
+
+For complete library functionality, always refer to the library documentation.
