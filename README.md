@@ -19,11 +19,6 @@ Built on top of the powerful GEMVC Library, the GEMVC Framework provides a compl
   - `GEMVCFrameworkAPIReference.json`: Framework API documentation
   - `FrameworkREADME.md`: This file
 
-- **Library Integration:**
-  - [`AIAssist.jsonc`](../library/AIAssist.jsonc): Core library AI assistance
-  - [`GEMVCLibraryAPIReference.json`](../library/GEMVCLibraryAPIReference.json): Library API reference
-  - [`README.md`](../library/README.md): Library documentation
-
 ### AI Tool Support
 - **Cursor**: Full context-aware code completion
 - **GitHub Copilot**: Intelligent code suggestions
