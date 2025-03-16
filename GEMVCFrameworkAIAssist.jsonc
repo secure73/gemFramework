@@ -27,61 +27,10 @@
   },
 
   "layers": {
-    "service": {
-      "purpose": "Authentication and validation layer",
-      "baseClasses": {
-        "ApiService": "Public endpoint base",
-        "AuthService": "Protected endpoint base"
-      },
-      "location": "app/api/",
-      "naming": {
-        "pattern": "PascalCase",
-        "suffix": "Optional 'Service' suffix",
-        "examples": [
-          "UserService",
-          "Classroom",
-          "PublicAuth"
-        ]
-      }
-    },
-    "controller": {
-      "purpose": "Business logic layer",
-      "baseClass": "Controller",
-      "location": "app/controller/",
-      "features": {
-        "mapPost": "Type-safe POST mapping",
-        "request": "Request data access",
-        "response": "JsonResponse handling"
-      }
-    },
-    "model": {
-      "purpose": "Data logic and response layer",
-      "extends": "Table classes",
-      "location": "app/model/",
-      "features": {
-        "specialProperties": {
-          "underscore": "Non-database properties",
-          "example": "_classroom_teachers"
-        },
-        "traits": {
-          "location": "vendor/gemvc/framework/src/traits/model/",
-          "common": [
-            "CreateTrait",
-            "UpdateTrait",
-            "RemoveTrait",
-            "ListTrait"
-          ]
-        }
-      }
-    },
-    "table": {
-      "purpose": "Database interaction layer",
-      "location": "app/table/",
-      "baseClasses": {
-        "Table": "Basic table operations",
-        "CRUDTable": "Full CRUD support"
-      }
-    }
+    "service": "Authentication and validation layer",
+    "controller": "Business logic layer",
+    "model": "Data logic and response layer",
+    "table": "Database interaction layer"
   },
 
   "patterns": {
@@ -186,6 +135,42 @@
       "success": {"code": 200, "body": {"...": "..."}},
       "validation": {"code": 422, "body": {"...": "..."}},
       "error": {"code": 500, "body": {"...": "..."}}
+    },
+    "fullCycle": {
+      "request": {
+        "url": "/api/users/create",
+        "method": "POST",
+        "headers": {},
+        "body": {}
+      },
+      "processing": {
+        "service": "code example",
+        "controller": "code example",
+        "model": "code example"
+      },
+      "response": {
+        "success": {},
+        "error": {}
+      }
+    }
+  },
+
+  "lifecycle": {
+    "request": {
+      "stages": [
+        {
+          "name": "Bootstrap",
+          "class": "Bootstrap",
+          "methods": ["initialize", "route"],
+          "example": "code example"
+        },
+        {
+          "name": "Service",
+          "validations": ["input", "auth"],
+          "example": "code example"
+        }
+        // ... other stages
+      ]
     }
   }
 }

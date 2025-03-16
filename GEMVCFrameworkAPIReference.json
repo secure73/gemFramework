@@ -8,10 +8,15 @@
         "ApiService": {
           "methods": {
             "validatePosts": {
-              "description": "Validates POST data",
-              "parameters": ["array $schema"],
-              "returns": "void",
-              "throws": ["ValidationException"]
+              "signature": "public function validatePosts(array $schema): void",
+              "parameters": {
+                "schema": {
+                  "type": "array",
+                  "validation": ["rules", "examples"]
+                }
+              },
+              "throws": ["ValidationException"],
+              "examples": ["usage examples"]
             }
           }
         },
@@ -116,6 +121,46 @@
       "structure": {"success": "bool", "data": "mixed", "errors": "array"},
       "methods": ["success", "error", "withData"],
       "examples": ["usage examples"]
+    }
+  },
+  "errorHandling": {
+    "exceptions": {
+      "ValidationException": {
+        "when": "Input validation fails",
+        "handling": "code example",
+        "response": "response format"
+      },
+      "AuthException": {
+        "when": "Authentication fails",
+        "handling": "code example",
+        "response": "response format"
+      }
+    }
+  },
+  "events": {
+    "beforeRequest": {
+      "timing": "Before request processing",
+      "handlers": ["available handlers"],
+      "usage": "example code"
+    },
+    "afterResponse": {
+      "timing": "After response generation",
+      "handlers": ["available handlers"],
+      "usage": "example code"
+    }
+  },
+  "security": {
+    "authentication": {
+      "jwt": {
+        "validation": "process description",
+        "renewal": "token renewal process",
+        "storage": "token storage approach"
+      },
+      "authorization": {
+        "roles": ["role types"],
+        "permissions": ["permission types"],
+        "checking": "authorization process"
+      }
     }
   }
 }
