@@ -4,25 +4,27 @@
 **License:** MIT
 
 ## Table of Contents
-1. [Installation](#installation)
-2. [Getting Started](#getting-started)
+1. [Installation & Setup](#installation--setup)
+2. [Architecture Overview](#architecture-overview)
 3. [Core Components](#core-components)
-4. [Database Operations](#database-operations)
-5. [Services](#services)
-6. [Authentication](#authentication)
-7. [Traits](#traits)
+4. [Framework Layers](#framework-layers)
+5. [Request Handling](#request-handling)
+6. [Authentication & Authorization](#authentication--authorization)
+7. [Database Operations](#database-operations)
 8. [Error Handling](#error-handling)
-9. [Best Practices](#best-practices)
-10. [Environment Configuration](#environment-configuration)
-11. [Support & Contributing](#support-&-contributing)
-12. [Library Integration](#library-integration)
+9. [Documentation System](#documentation-system)
+10. [Library Integration](#library-integration)
+11. [Best Practices](#best-practices)
+12. [Environment Configuration](#environment-configuration)
+13. [Support & Contributing](#support--contributing)
 
-## Installation
+## Installation & Setup
 
 ### Requirements
 - PHP >= 7.4
 - MySQL/MariaDB
 - Composer
+- PHPStan Level 9 compatibility
 
 ### Quick Start
 ```bash
@@ -31,7 +33,7 @@ cd [your_project_name]
 php -S localhost:8000 -t public
 ```
 
-### Application Directory Structure
+### Directory Structure
 your_project_name/
 ├── app/
 │   ├── api/              # API Services (extends ApiService/AuthService)
@@ -48,53 +50,20 @@ your_project_name/
 ├── composer.json
 └── index.php
 
-### Framework Directory Structure
-
-1. **Application Structure**
-
-## License
-The Gemvc Framework is open-sourced software licensed under the MIT license.
-
-# GEMVC Framework Documentation
-
-## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Core Components](#core-components)
-   - [Bootstrap](#bootstrap)
-   - [Request Class](#request-class)
-   - [ApiService](#apiservice)
-   - [AuthService](#authservice)
-3. [Framework Layers](#framework-layers)
-   - [Service Layer](#service-layer)
-   - [Controller Layer](#controller-layer)
-   - [Model Layer](#model-layer)
-   - [Table Layer](#table-layer)
-   - [Database Layer](#database-layer)
-4. [Request Lifecycle](#request-lifecycle)
-5. [Authentication & Authorization](#authentication--authorization)
-6. [Request Handling](#request-handling)
-7. [Documentation System](#documentation-system)
-8. [Error Handling](#error-handling)
-9. [Best Practices](#best-practices)
-10. [Additional Core Features](#additional-core-features)
-11. [Environment Configuration](#environment-configuration)
-12. [Support & Contributing](#support-&-contributing)
-
 ## Architecture Overview
 
-GEMVC follows a clean architecture pattern with bidirectional flow:
-
-Incoming Request Flow:
+### Request-Response Flow
+1. **Incoming Request Flow**:
 ```
 Frontend Request → index.php → Bootstrap + Request → Service → Controller → Model → Table → Database
 ```
 
-Response Flow:
+2. **Response Flow**:
 ```
 Database → Table → Model → Controller → Service → Response
 ```
 
-The Model layer can return different types based on the scenario:
+3. **Return Types**:
 - JsonResponse (direct API response)
 - Objects (for further processing)
 - Simple types (bool, int, string)
@@ -146,8 +115,9 @@ class AuthService extends ApiService {
 }
 ```
 
-## Request Lifecycle
+## Framework Layers
 
+### Request Lifecycle
 1. **Request Initialization**
    - Server-specific request creation (Apache/Swoole)
    - Request normalization
@@ -164,9 +134,9 @@ class AuthService extends ApiService {
    - Business logic execution
    - Response generation
 
-## Service Layer
+### Service Layer
 
-### Public Services
+#### Public Services
 For unauthenticated endpoints:
 ```php
 class PublicService extends ApiService {
@@ -177,7 +147,7 @@ class PublicService extends ApiService {
 }
 ```
 
-### Protected Services
+#### Protected Services
 For authenticated endpoints:
 ```php
 class SecureService extends ApiService {
@@ -189,9 +159,9 @@ class SecureService extends ApiService {
 }
 ```
 
-## Controller Layer
+### Controller Layer
 
-### Architectural Principle
+#### Architectural Principle
 In GEMVC, Controllers should ONLY be called by the Service (API) Layer. This strict architectural rule ensures:
 
 1. **Single Entry Point**
@@ -225,7 +195,7 @@ Request → Service (API Layer) → Controller → Response
     - Request Sanitization
 ```
 
-### Decoupled Architecture
+#### Decoupled Architecture
 GEMVC implements a decoupled controller pattern where any Service can use any Controller. This design provides several benefits:
 
 1. **Clean URL Patterns**
@@ -255,7 +225,7 @@ class TeacherService extends AuthService {
 }
 ```
 
-### Key Benefits
+#### Key Benefits
 - **Clean URLs**: Consistent `/api/service-name/method` pattern
 - **Code Reuse**: Same controller can serve multiple services
 - **Separation of Concerns**: 
@@ -264,7 +234,7 @@ class TeacherService extends AuthService {
 - **Flexibility**: Any service can use any controller method
 - **DRY Principle**: No need to duplicate controller logic
 
-### Type-Safe Construction
+#### Type-Safe Construction
 ```php
 class ClassLessonController extends Controller {
     // Type-safe constructor enables PHPStan level 9!
@@ -274,7 +244,7 @@ class ClassLessonController extends Controller {
 }
 ```
 
-### Magical mapPost Method
+#### Magical mapPost Method
 The `mapPost` method is a crucial feature that safely maps request data to objects:
 
 ```php
@@ -312,7 +282,7 @@ class Controller {
 }
 ```
 
-### Usage in Controllers
+#### Usage in Controllers
 ```php
 class UserController extends Controller {
     public function create(): JsonResponse {
@@ -323,7 +293,7 @@ class UserController extends Controller {
 }
 ```
 
-### Key Benefits
+#### Key Benefits
 1. **Type Safety**
    - Enables PHPStan level 9
    - Strict type checking
@@ -442,38 +412,82 @@ $response = $this->request->forwardToRemoteApi('http://api.example.com/endpoint'
 $response = $this->request->forwardPost('http://api.example.com/endpoint', $authHeader);
 ```
 
+## Error Handling
+
+### Overview
+GEMVC provides a standardized error handling system across all layers:
+- Consistent error responses
+- Type-safe exception handling
+- Validation error management
+- HTTP status code alignment
+
+### Standard Error Responses
+
+1. **Basic Error Types**
+```php
+// Validation error
+return $this->error('Validation failed', 422, $errors);
+
+// Not found error
+return $this->error('Resource not found', 404);
+
+// Server error
+return $this->error('Internal server error', 500);
+
+// Success response
+return $this->success(['data' => $result]);
+```
+
+2. **Exception Handling Pattern**
+```php
+try {
+    $result = $this->process();
+    return $this->success($result);
+} catch (ValidationException $e) {
+    return $this->error($e->getMessage(), 422);
+} catch (ModelNotFoundException $e) {
+    return $this->error('Resource not found', 404);
+} catch (Exception $e) {
+    return $this->error('An error occurred', 500);
+}
+```
+
 ## Documentation System
 
-### Auto-Generated Documentation
-GEMVC automatically generates API documentation from your code:
+### Overview
+GEMVC automatically generates API documentation from your code with:
 - Endpoint listings
 - Request/response schemas
 - Authentication requirements
 - Input validation rules
 - Example responses
 
-### Documentation Directives
-GEMVC provides documentation directives to control API documentation:
+### Documentation Features
 
-1. **@hidden Directive**
-   ```php
-   /**
-    * @hidden
-    * This service won't appear in API documentation
-    */
-   class InternalService extends ApiService {
-       /**
-        * @hidden
-        * This method will also be hidden
-        */
-       public function internalMethod(): JsonResponse {
-       }
-   }
-   ```
+1. **Auto-Generated Documentation**
+- Service endpoints
+- Method parameters
+- Response formats
+- Validation rules
+- Authentication requirements
 
-Note: Additional documentation directives are available for enhanced API documentation. These are covered in the advanced documentation.
+2. **Documentation Directives**
+```php
+/**
+ * @hidden
+ * This service won't appear in API documentation
+ */
+class InternalService extends ApiService {
+    /**
+     * @hidden
+     * This method will also be hidden
+     */
+    public function internalMethod(): JsonResponse {
+    }
+}
+```
 
-### Mock Responses
+3. **Mock Response System**
 ```php
 public static function mockResponse(string $method): array {
     return match($method) {
@@ -489,40 +503,18 @@ public static function mockResponse(string $method): array {
 }
 ```
 
-## Error Handling
-
-### Standard Error Responses
-```php
-// Validation error
-return $this->error('Validation failed', 422, $errors);
-
-// Not found error
-return $this->error('Resource not found', 404);
-
-// Server error
-return $this->error('Internal server error', 500);
-
-// Success response
-return $this->success(['data' => $result]);
-```
-
-### Exception Handling Pattern
-```php
-try {
-    $result = $this->process();
-    return $this->success($result);
-} catch (ValidationException $e) {
-    return $this->error($e->getMessage(), 422);
-} catch (ModelNotFoundException $e) {
-    return $this->error('Resource not found', 404);
-} catch (Exception $e) {
-    return $this->error('An error occurred', 500);
-}
-```
+### Advanced Documentation
+Additional documentation directives and features are available:
+- Method grouping
+- API versioning
+- Response examples
+- Security specifications
 
 ## Best Practices
 
-### Service Layer
+### Service Layer Best Practices
+
+1. **Standard Service Structure**
 ```php
 class UserService extends AuthService {
     public function create(): JsonResponse {
@@ -541,38 +533,163 @@ class UserService extends AuthService {
 }
 ```
 
-class UserModel extends UserTable {
-    public int $id;
-    public string $name;
-    
-    /** @var array<RoleModel> */
-    public array $_roles;  // Non-DB property starts with _
+2. **Key Principles**
+- Always extend ApiService or AuthService
+- Validate inputs before processing
+- Use authorization before business logic
+- Follow consistent method naming
+- Return JsonResponse types
+
+### Controller Layer Best Practices
+
+1. **Controller Rules**
+- Only called by Services
+- Use mapPost for data binding
+- Return JsonResponse
+- Keep business logic isolated
+- Follow single responsibility
+
+2. **Type Safety**
+```php
+class UserController extends Controller {
+    public function create(): JsonResponse {
+        $model = new UserModel();
+        $this->mapPost($model);  // Type-safe mapping
+        return $model->createWithJsonResponse();
+    }
 }
 ```
 
+### Model Layer Best Practices
+
+1. **Property Naming**
+```php
+class UserModel extends UserTable {
+    //Table layer  Database properties
+    //public int $id;  which is inherited from UserTable 
+    //public string $name; which is inherited from UserTable 
+    
+    // Non-DB properties (other Model) start with underscore
+    /** @var array<RoleModel> */
+    public array $_roles;
+}
+```
+
+2. **Model Guidelines**
+- Use type declarations
+- Document complex properties
+- Prefix non-DB fields with underscore
+- Extend appropriate Table class
+- Implement relevant traits
+
+### Data Handling Best Practices
+
+1. **Input Validation**
+```php
+// Always validate at service level
+$this->validatePosts([
+    'name' => 'required|string',
+    'email' => 'required|email',
+    '?optional' => 'string'
+]);
+```
+
+2. **Error Handling**
+```php
+try {
+    // Process data
+    return $this->success($result);
+} catch (ValidationException $e) {
+    return $this->error($e->getMessage(), 422);
+}
+```
+
+### Security Best Practices
+
+1. **Authentication**
+- Always validate JWT tokens
+- Check role permissions
+- Validate company context
+- Verify user context
+
+2. **Data Protection**
+```php
+class AuthService extends ApiService {
+    public function __construct(Request $request) {
+        parent::__construct($request);
+        $this->auth = new Auth($request);
+        
+        // Always validate context
+        if (!$this->auth->token || !$this->auth->token->company_id) {
+            Response::forbidden('token not belong to company')->show();
+            die();
+        }
+    }
+}
+```
+
+### Code Quality Best Practices
+
+1. **Type Safety**
+- Enable PHPStan level 9
+- Use strict type declarations
+- Document complex types
+- Validate property existence
+
+2. **Code Organization**
+- Follow consistent naming
+- Use appropriate traits
+- Maintain layer separation
+- Document public methods
+
 ## Library Integration
 
+### Overview
 The GEMVC Framework is built on top of the GEMVC Library. For detailed library documentation, refer to:
 - `/vendor/gemvc/library/Documentation.md`
 - `/vendor/gemvc/library/AIAssist.jsonc`
 
+### Architecture Flow
+GEMVC Framework (API Layer)
+         ↓
+GEMVC Library (Core Layer)
+         ↓
+    PHP Core
+```
+
 ### Library Components
-- `http/`: HTTP request/response handling
-- `helper/`: Utility functions and helpers
-- `database/`: Database operations and query building
-- `email/`: Email handling and templating
+1. **HTTP Layer** (`http/`)
+   - Request/response handling
+   - Input validation
+   - JWT processing
+   - API routing
 
-For complete library functionality, always refer to the library documentation.
+2. **Database Layer** (`database/`)
+   - Query building
+   - Database operations
+   - Connection management
+   - Transaction handling
 
-### Integration Pattern
+3. **Helper Layer** (`helper/`)
+   - File operations
+   - Image processing
+   - Security utilities
+   - Validation helpers
 
-1. **HTTP Layer Integration**:
+4. **Email System** (`email/`)
+   - Email handling
+   - Template processing
+   - SMTP integration
+
+### Integration Patterns
+
+1. **HTTP Layer Integration**
 ```php
-// Library provides base HTTP handling
+// Library base class
 namespace Gemvc\Library\Http;
 class Request { /* base functionality */ }
 
-// Framework extends with specific needs
+// Framework extension
 namespace Gemvc\Framework\Core;
 class ApiService {
     protected Request $request;  // Uses Library's Request
@@ -580,27 +697,27 @@ class ApiService {
 }
 ```
 
-2. **Database Layer Integration**:
+2. **Database Layer Integration**
 ```php
-// Library provides database foundation
+// Library base class
 namespace Gemvc\Library\Database;
 class QueryBuilder { /* base queries */ }
 
-// Framework adds business logic layer
+// Framework extension
 namespace Gemvc\Framework\Core;
 class Table extends QueryBuilder {
     // Adds API-specific methods
 }
 ```
 
-3. **Helper Integration**:
+3. **Helper Integration**
 ```php
-// Library provides utility functions
+// Library utilities
 namespace Gemvc\Library\Helper;
 class FileHelper { /* file operations */ }
 class ImageHelper { /* image processing */ }
 
-// Framework uses these helpers in its components
+// Framework usage
 use Gemvc\Library\Helper\FileHelper;
 class UploadService extends ApiService {
     public function upload() {
@@ -610,27 +727,20 @@ class UploadService extends ApiService {
 }
 ```
 
-4. **Email Integration**:
+4. **Email Integration**
 ```php
-// Library provides email functionality
+// Library email system
 namespace Gemvc\Library\Email;
 class EmailSender { /* email operations */ }
 
-// Framework integrates for notifications
+// Framework integration
 use Gemvc\Library\Email\EmailSender;
 class NotificationService extends ApiService {
     protected EmailSender $emailSender;
 }
 ```
 
-Key Integration Points:
-1. Framework extends library base classes
-2. Framework uses library utilities directly
-3. Framework adds API-specific layers
-4. Framework provides trait system for extensions
-
-### Library Core Dependencies
-The framework relies on these essential library components:
+### Core Dependencies
 
 1. **Database Core**
 ```php
@@ -663,9 +773,7 @@ use Gemvc\Library\Helper\{
 // Framework uses these for core operations
 ```
 
-4. **Integration Flow**
-```markdown
-### Integration Architecture
+### Request-Response Flow
 
 1. **Request Flow**
 ```
@@ -692,11 +800,8 @@ Library Response Formatting
 ↓
 Client Response
 ```
-```
 
-3. **Library Extension Points**
-```markdown
-### Framework Extensions of Library
+### Library Extension Points
 
 1. **Database Layer**
 ```php
@@ -730,10 +835,7 @@ class ApiService {
     public function validatePosts() {}
 }
 ```
-```
 
-4. **Version Compatibility**
-```markdown
 ### Version Compatibility
 
 The framework version 5.9.14 requires:
@@ -745,18 +847,423 @@ Key compatibility points:
 1. Database interface versions
 2. HTTP component versions
 3. Helper utility versions
+
+### Key Integration Points
+1. Framework extends library base classes
+2. Framework uses library utilities directly
+3. Framework adds API-specific layers
+4. Framework provides trait system for extensions
 ```
 
-Would you like me to create a complete updated version of the Library Integration section incorporating all these missing elements?
+## Database Operations
 
-GEMVC Framework
-    ↓
-GEMVC Library
-    ↓
-PHP Core
+### Overview
+GEMVC provides a robust database layer built on top of the Library's QueryBuilder:
+- Type-safe database operations
+- CRUD functionality
+- Transaction support
+- Query building
+- Relationship handling
+
+### Table Layer
+
+1. **Basic Table Structure**
+```php
+class UserTable extends Table {
+    protected string $table = 'users';
+    protected string $primary_key = 'id';
+    
+    // Optional: Define relationships
+    protected array $relations = [
+        'roles' => ['type' => 'many', 'table' => 'user_roles']
+    ];
+}
 ```
 
-// Framework relies on Library components
-use Gemvc\Library\Database\QueryBuilder;
-use Gemvc\Library\Http\Request;
-use Gemvc\Library\Helper\SecurityHelper;
+2. **CRUD Operations**
+```php
+class UserTable extends Table {
+    // Create
+    public function create(array $data): int {
+        return $this->insert($data);
+    }
+
+    // Read
+    public function findById(int $id): ?object {
+        return $this->where('id', $id)->first();
+    }
+
+    // Update
+    public function updateUser(int $id, array $data): bool {
+        return $this->where('id', $id)->update($data);
+    }
+
+    // Delete
+    public function remove(int $id): bool {
+        return $this->where('id', $id)->delete();
+    }
+}
+```
+
+### Query Building
+
+1. **Basic Queries**
+```php
+// Select with conditions
+$users = $this->table
+    ->select(['id', 'name', 'email'])
+    ->where('status', 'active')
+    ->get();
+
+// Complex conditions
+$results = $this->table
+    ->where('age', '>', 18)
+    ->whereIn('role', ['admin', 'manager'])
+    ->orderBy('created_at', 'DESC')
+    ->limit(10)
+    ->get();
+```
+
+2. **Relationships**
+```php
+// Define relationship
+protected array $relations = [
+    'posts' => [
+        'type' => 'many',
+        'table' => 'posts',
+        'foreign_key' => 'user_id'
+    ]
+];
+
+// Use relationship
+$userWithPosts = $this->table
+    ->with('posts')
+    ->where('id', $userId)
+    ->first();
+```
+
+### Transactions
+
+1. **Basic Transaction**
+```php
+try {
+    $this->beginTransaction();
+    
+    $userId = $this->users->create($userData);
+    $this->profiles->create(['user_id' => $userId, ...]);
+    
+    $this->commit();
+    return true;
+} catch (Exception $e) {
+    $this->rollback();
+    return false;
+}
+```
+
+2. **Nested Transactions**
+```php
+$this->beginTransaction();
+try {
+    // First operation
+    $this->beginTransaction();
+    $this->users->create($userData);
+    $this->commit();
+
+    // Second operation
+    $this->beginTransaction();
+    $this->profiles->create($profileData);
+    $this->commit();
+
+    $this->commit();
+} catch (Exception $e) {
+    $this->rollback();
+    throw $e;
+}
+```
+
+### Model Integration
+
+1. **Table-Model Binding**
+```php
+class UserModel extends UserTable {
+    public int $id;
+    public string $name;
+    public string $email;
+    
+    // Non-DB properties
+    public array $_roles;
+}
+```
+
+2. **Type-Safe Operations**
+```php
+class UserModel extends UserTable {
+    public function createWithValidation(): JsonResponse {
+        $this->validate();
+        $id = $this->create([
+            'name' => $this->name,
+            'email' => $this->email
+        ]);
+        return $this->success(['id' => $id]);
+    }
+}
+```
+
+### Query Optimization
+
+1. **Index Usage**
+```php
+// Efficient query using indexes
+$result = $this->table
+    ->select(['id', 'name'])
+    ->where('email', $email)  // Assuming email is indexed
+    ->first();
+```
+
+2. **Eager Loading**
+```php
+// Prevent N+1 problems
+$users = $this->table
+    ->with(['posts', 'profile'])
+    ->where('status', 'active')
+    ->get();
+```
+
+### Best Practices
+
+1. **Query Building**
+- Use prepared statements (automatic)
+- Leverage indexes
+- Implement pagination
+- Use eager loading
+- Keep transactions short
+
+2. **Data Protection**
+- Validate before insert/update
+- Use type declarations
+- Implement soft deletes
+- Handle relationships carefully
+```
+
+## Support & Contributing
+
+### Getting Support
+
+1. **Documentation Resources**
+- Official Documentation: `/vendor/gemvc/library/Documentation.md`
+- API Reference: `/vendor/gemvc/library/APIReference.json`
+- AI Assist Guide: `/vendor/gemvc/library/AIAssist.jsonc`
+
+2. **Community Support**
+- GitHub Issues: Report bugs and feature requests
+- Discussion Forum: Ask questions and share solutions
+- Stack Overflow: Tag questions with `gemvc`
+
+### Reporting Issues
+
+1. **Bug Reports**
+```php
+// Include minimal reproduction code
+class ExampleController extends Controller {
+    public function problematicMethod(): JsonResponse {
+        // Code that demonstrates the issue
+        return $this->error('Description of the problem');
+    }
+}
+```
+
+2. **Issue Template**
+```markdown
+### Description
+[Clear description of the issue]
+
+### Steps to Reproduce
+1. [First Step]
+2. [Second Step]
+3. [Additional Steps...]
+
+### Expected Behavior
+[What you expected to happen]
+
+### Actual Behavior
+[What actually happened]
+
+### Environment
+- GEMVC Version: 5.9.14
+- PHP Version: 7.4
+- Database: MySQL 8.0
+```
+
+### Contributing Guidelines
+
+1. **Code Style**
+- Follow PSR-12 coding standards
+- Maintain PHPStan level 9 compatibility
+- Include type declarations
+- Document public methods
+- Write unit tests
+
+2. **Pull Request Process**
+```bash
+# Fork and clone the repository
+git clone https://github.com/your-username/gemvc.git
+cd gemvc
+
+# Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Make your changes
+# Add tests
+# Update documentation
+
+# Submit pull request
+```
+
+### Development Setup
+
+1. **Local Development**
+```bash
+# Install dependencies
+composer install
+
+# Run tests
+./vendor/bin/phpunit
+
+# Check code style
+./vendor/bin/phpcs
+
+# Static analysis
+./vendor/bin/phpstan analyse
+```
+
+2. **Testing Guidelines**
+```php
+class ExampleTest extends TestCase {
+    public function testFeature(): void {
+        // Arrange
+        $service = new ExampleService($request);
+
+        // Act
+        $response = $service->process();
+
+        // Assert
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertTrue($response->isSuccess());
+    }
+}
+```
+
+### Documentation Contributions
+
+1. **Documentation Standards**
+- Clear, concise explanations
+- Practical code examples
+- Proper markdown formatting
+- Updated table of contents
+- Version-specific notes
+
+2. **Example Documentation**
+```php
+/**
+ * Processes the user request with validation
+ *
+ * @param array<string, mixed> $data Input data
+ * @return JsonResponse
+ * @throws ValidationException When validation fails
+ *
+ * @example
+ * $service = new UserService($request);
+ * $response = $service->process([
+ *     'name' => 'John Doe',
+ *     'email' => 'john@example.com'
+ * ]);
+ */
+public function process(array $data): JsonResponse {
+    // Implementation
+}
+```
+
+### Version Control
+
+1. **Branching Strategy**
+```bash
+# Stable release branch
+git checkout -b main
+
+# Development branch
+git checkout -b develop
+
+# Feature branches
+git checkout -b feature/your-feature-name
+
+# Hotfix branches
+git checkout -b hotfix/your-hotfix-name
+```
+
+2. **Commit Guidelines**
+```
+feat: Add new feature
+fix: Bug fix
+docs: Documentation changes
+test: Add or update tests
+refactor: Code refactoring
+style: Code style changes
+```
+
+### Release Process
+
+1. **Version Numbering**
+- Major.Minor.Patch (e.g., 5.9.14)
+- Follow semantic versioning
+- Document breaking changes
+
+2. **Release Checklist**
+```markdown
+- [ ] Update version number
+- [ ] Run full test suite
+- [ ] Update changelog
+- [ ] Update documentation
+- [ ] Tag release
+- [ ] Update composer.json
+```
+
+### Community Guidelines
+
+1. **Code of Conduct**
+- Be respectful and inclusive
+- Focus on constructive feedback
+- Help others learn
+- Follow project standards
+
+2. **Support Channels**
+- GitHub Issues: Bug reports
+- Discussions: Questions
+- Email: Security issues
+- Wiki: Documentation
+
+### Security Policy
+
+1. **Reporting Security Issues**
+- Email: security@gemvc.com
+- Do not disclose publicly
+- Include detailed information
+- Expect acknowledgment
+
+2. **Security Best Practices**
+```php
+// Always validate input
+$this->validatePosts([
+    'email' => 'email|required',
+    'token' => 'string|required'
+]);
+
+// Use proper authentication
+$this->auth->authorize(['admin']);
+
+// Sanitize output
+return $this->success(
+    SecurityHelper::sanitize($data)
+);
+```
+
+This completes the full reorganization of the documentation. The document now includes all major sections with clear structure, examples, and guidelines. Would you like me to review any specific section in more detail or make any adjustments to the organization?
