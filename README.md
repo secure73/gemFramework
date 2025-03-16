@@ -209,14 +209,16 @@ TOKEN_ISSUER='your_api'
 ### 2. Start Building
 ```php
 // Create an API endpoint
-class UserController {
-    public function getUsers(ApacheRequest $request) {
-        $users = QueryBuilder::select('id', 'name')
-            ->from('users')
-            ->whereEqual('status', 'active')
-            ->run($this->db);
-            
-        return (new JsonResponse())->success($users);
+class Classroom extends APIService {
+   public function __construct(Request $request)
+    {
+        parent::__construct($request);
+    }
+    public function create(): JsonResponse
+    {
+        $this->auth->authorize(['company-admin']);
+        $this->validatePostWithCompany(['name'=>'string','course_id'=>'int','subject_id'=>'int','start_date'=>'date','end_date'=>'date','?  location'=>'string','?description'=>'string']);
+        return (new ClassroomController($this->request))->create();
     }
 }
 ```
