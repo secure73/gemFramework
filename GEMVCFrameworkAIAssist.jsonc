@@ -143,5 +143,49 @@
       "Request initialization",
       "Framework bootstrap"
     ]
+  },
+
+  "ApiService": {
+    "methods": {
+      "authorize": {
+        "parameters": [{"name": "roles", "type": "array<string>"}],
+        "returns": "bool",
+        "throws": ["AuthorizationException"],
+        "examples": ["..."]
+      }
+    }
+  },
+
+  "exceptions": {
+    "ValidationException": {
+      "when": "Input validation fails",
+      "properties": ["errors", "message"],
+      "handling": "example code"
+    }
+  },
+
+  "traits": {
+    "CreateTrait": {
+      "methods": ["create", "createWithValidation"],
+      "properties": ["required", "optional"],
+      "usage": "example code",
+      "combinations": ["with other traits"]
+    }
+  },
+
+  "examples": {
+    "requests": {
+      "create": {
+        "endpoint": "/api/users/create",
+        "method": "POST",
+        "body": {"name": "string", "email": "string"},
+        "headers": {"Authorization": "Bearer ..."}
+      }
+    },
+    "responses": {
+      "success": {"code": 200, "body": {"..."}},
+      "validation": {"code": 422, "body": {"..."}},
+      "error": {"code": 500, "body": {"..."}}
+    }
   }
 }

@@ -98,5 +98,17 @@
         }
       }
     }
+  },
+  "patterns": {
+    "authentication": {
+      "flow": "step-by-step process",
+      "examples": ["code samples"],
+      "bestPractices": ["security tips"]
+    },
+    "validation": {
+      "types": ["available validators"],
+      "usage": ["example rules"],
+      "custom": ["how to extend"]
+    }
   }
 }
