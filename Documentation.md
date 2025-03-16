@@ -563,3 +563,200 @@ The GEMVC Framework is built on top of the GEMVC Library. For detailed library d
 - `email/`: Email handling and templating
 
 For complete library functionality, always refer to the library documentation.
+
+### Integration Pattern
+
+1. **HTTP Layer Integration**:
+```php
+// Library provides base HTTP handling
+namespace Gemvc\Library\Http;
+class Request { /* base functionality */ }
+
+// Framework extends with specific needs
+namespace Gemvc\Framework\Core;
+class ApiService {
+    protected Request $request;  // Uses Library's Request
+    // Adds API-specific features
+}
+```
+
+2. **Database Layer Integration**:
+```php
+// Library provides database foundation
+namespace Gemvc\Library\Database;
+class QueryBuilder { /* base queries */ }
+
+// Framework adds business logic layer
+namespace Gemvc\Framework\Core;
+class Table extends QueryBuilder {
+    // Adds API-specific methods
+}
+```
+
+3. **Helper Integration**:
+```php
+// Library provides utility functions
+namespace Gemvc\Library\Helper;
+class FileHelper { /* file operations */ }
+class ImageHelper { /* image processing */ }
+
+// Framework uses these helpers in its components
+use Gemvc\Library\Helper\FileHelper;
+class UploadService extends ApiService {
+    public function upload() {
+        $file = new FileHelper($_FILES['upload']);
+        // Framework-specific logic
+    }
+}
+```
+
+4. **Email Integration**:
+```php
+// Library provides email functionality
+namespace Gemvc\Library\Email;
+class EmailSender { /* email operations */ }
+
+// Framework integrates for notifications
+use Gemvc\Library\Email\EmailSender;
+class NotificationService extends ApiService {
+    protected EmailSender $emailSender;
+}
+```
+
+Key Integration Points:
+1. Framework extends library base classes
+2. Framework uses library utilities directly
+3. Framework adds API-specific layers
+4. Framework provides trait system for extensions
+
+### Library Core Dependencies
+The framework relies on these essential library components:
+
+1. **Database Core**
+```php
+use Gemvc\Library\Database\{
+    QueryBuilder,
+    PdoQuery,
+    QueryExecuter
+};
+// Framework's Table system extends these
+```
+
+2. **HTTP Foundation**
+```php
+use Gemvc\Library\Http\{
+    Request,
+    Response,
+    JsonResponse
+};
+// Framework's API layer is built on these
+```
+
+3. **Helper Utilities**
+```php
+use Gemvc\Library\Helper\{
+    FileHelper,
+    ImageHelper,
+    SecurityHelper,
+    ValidationHelper
+};
+// Framework uses these for core operations
+```
+
+4. **Integration Flow**
+```markdown
+### Integration Architecture
+
+1. **Request Flow**
+```
+Client Request
+↓
+Library HTTP Handler (base processing)
+↓
+Framework Bootstrap (API routing)
+↓
+Framework Service (API logic)
+↓
+Library Database (data operations)
+```
+
+2. **Response Flow**
+```
+Library Database Result
+↓
+Framework Model Processing
+↓
+Framework Controller Logic
+↓
+Library Response Formatting
+↓
+Client Response
+```
+```
+
+3. **Library Extension Points**
+```markdown
+### Framework Extensions of Library
+
+1. **Database Layer**
+```php
+// Library base
+namespace Gemvc\Library\Database;
+class QueryBuilder {
+    protected function buildQuery() {}
+}
+
+// Framework extension
+namespace Gemvc\Framework\Core;
+class Table extends QueryBuilder {
+    // Adds API-specific query building
+    public function createWithJsonResponse(): JsonResponse {}
+}
+```
+
+2. **Request Processing**
+```php
+// Library base
+namespace Gemvc\Library\Http;
+class Request {
+    public function validate() {}
+}
+
+// Framework extension
+namespace Gemvc\Framework\Core;
+class ApiService {
+    protected Request $request;
+    // Adds API-specific validation
+    public function validatePosts() {}
+}
+```
+```
+
+4. **Version Compatibility**
+```markdown
+### Version Compatibility
+
+The framework version 5.9.14 requires:
+- GEMVC Library ≥ 3.27.8
+- PHP ≥ 7.4
+- PHPStan Level 9 compatibility
+
+Key compatibility points:
+1. Database interface versions
+2. HTTP component versions
+3. Helper utility versions
+```
+
+Would you like me to create a complete updated version of the Library Integration section incorporating all these missing elements?
+
+GEMVC Framework
+    ↓
+GEMVC Library
+    ↓
+PHP Core
+```
+
+// Framework relies on Library components
+use Gemvc\Library\Database\QueryBuilder;
+use Gemvc\Library\Http\Request;
+use Gemvc\Library\Helper\SecurityHelper;
