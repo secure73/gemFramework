@@ -1325,3 +1325,33 @@ return $this->success(
 ```
 
 This completes the full reorganization of the documentation. The document now includes all major sections with clear structure, examples, and guidelines. Would you like me to review any specific section in more detail or make any adjustments to the organization?
+
+### Bootstrap Implementation
+The framework is initialized in your project's `index.php`:
+
+```php
+// Required at project root: index.php
+require_once 'vendor/autoload.php';
+
+use Gemvc\Core\Bootstrap;
+use Gemvc\Http\ApacheRequest;
+use Gemvc\Http\NoCors;
+use Symfony\Component\Dotenv\Dotenv;
+
+// Handle CORS
+NoCors::NoCors();
+
+// Load environment variables
+$dotenv = new Dotenv();
+$dotenv->load(__DIR__.'/app/.env');
+
+// Initialize framework
+$webserver = new ApacheRequest();
+$bootstrap = new Bootstrap($webserver->request);
+```
+
+Key components:
+1. **CORS Handling**: `NoCors::NoCors()`
+2. **Environment Loading**: Using Symfony Dotenv
+3. **Request Initialization**: `ApacheRequest`
+4. **Framework Bootstrap**: `Bootstrap` class

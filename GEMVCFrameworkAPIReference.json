@@ -72,5 +72,31 @@
         "reference": "library/src/email/"
       }
     }
+  },
+  "core": {
+    "Bootstrap": {
+      "namespace": "Gemvc\\Core",
+      "constructor": {
+        "parameters": {
+          "request": "Gemvc\\Http\\RequestInterface"
+        }
+      }
+    },
+    "ApacheRequest": {
+      "namespace": "Gemvc\\Http",
+      "properties": {
+        "request": "RequestInterface"
+      }
+    },
+    "NoCors": {
+      "namespace": "Gemvc\\Http",
+      "methods": {
+        "NoCors": {
+          "static": true,
+          "returns": "void",
+          "description": "Configures CORS headers for API access"
+        }
+      }
+    }
   }
 }

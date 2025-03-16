@@ -119,5 +119,29 @@
       "Implement proper traits",
       "Type-safe properties"
     ]
+  },
+
+  "bootstrap": {
+    "initialization": {
+      "location": "index.php",
+      "required": {
+        "autoload": "vendor/autoload.php",
+        "environment": "app/.env",
+        "components": [
+          "Gemvc\\Core\\Bootstrap",
+          "Gemvc\\Http\\ApacheRequest",
+          "Gemvc\\Http\\NoCors"
+        ]
+      },
+      "dependencies": {
+        "symfony/dotenv": "Environment variable loading"
+      }
+    },
+    "sequence": [
+      "CORS configuration",
+      "Environment loading",
+      "Request initialization",
+      "Framework bootstrap"
+    ]
   }
 }

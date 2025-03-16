@@ -221,6 +221,40 @@ class UserController {
 }
 ```
 
+# 🚀 Quick Start
+
+### Project Initialization
+```php
+// index.php
+require_once 'vendor/autoload.php';
+
+use Gemvc\Core\Bootstrap;
+use Gemvc\Http\ApacheRequest;
+use Gemvc\Http\NoCors;
+use Symfony\Component\Dotenv\Dotenv;
+
+// Configure CORS
+NoCors::NoCors();
+
+// Load environment configuration
+$dotenv = new Dotenv();
+$dotenv->load(__DIR__.'/app/.env');
+
+// Initialize framework
+$webserver = new ApacheRequest();
+$bootstrap = new Bootstrap($webserver->request);
+```
+
+### Required Configuration
+Make sure your `app/.env` file contains:
+```env
+DB_HOST=localhost
+DB_NAME=your_db
+DB_USER=root
+DB_PASSWORD=secret
+```
+```
+
 ## 💪 Core Features
 
 ### 🏗️ Modern Architecture
