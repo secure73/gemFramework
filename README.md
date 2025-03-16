@@ -9,7 +9,7 @@ Built on top of the powerful GEMVC Library, the GEMVC Framework provides a compl
 4. [GEMVC Core](#-gemvc)
 5. [Quick Start](#-quick-start)
 6. [Core Features](#-core-features)
-7. [Documentation](#-documentation)
+7. [Documentation](#-Documentation.md)
 
 ## 🤖 AI-Ready Architecture
 
