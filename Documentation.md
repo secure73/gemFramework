@@ -52,10 +52,68 @@ your_project_name/
 
 ## Architecture Overview
 
-### Request-Response Flow
-1. **Incoming Request Flow**:
+### System Architecture
+The GEMVC Framework follows a layered architecture with clear separation of concerns:
+
+```mermaid
+graph TB
+    Client[Client Application] --> API[API Layer/Services]
+    API --> Auth[Authentication]
+    API --> Controller[Controller Layer]
+    Controller --> Model[Model Layer]
+    Model --> Table[Table Layer]
+    Table --> DB[(Database)]
+    
+    subgraph "GEMVC Framework"
+        API
+        Auth
+        Controller
+        Model
+        Table
+    end
+    
+    subgraph "GEMVC Library"
+        LibHTTP[HTTP Handler]
+        LibDB[Database Core]
+        LibHelper[Helper Utilities]
+        LibEmail[Email System]
+    end
+    
+    API --> LibHTTP
+    Table --> LibDB
+    Controller --> LibHelper
+    API --> LibEmail
 ```
-Frontend Request → index.php → Bootstrap + Request → Service → Controller → Model → Table → Database
+
+### Request-Response Flow
+1. **Detailed Request Lifecycle**:
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant B as Bootstrap
+    participant S as Service
+    participant A as Auth
+    participant CT as Controller
+    participant M as Model
+    participant T as Table
+    participant D as Database
+
+    C->>B: HTTP Request
+    B->>B: Parse URL
+    B->>S: Route to Service
+    S->>A: Validate JWT
+    A->>S: Auth Result
+    S->>S: Validate Input
+    S->>CT: Process Request
+    CT->>M: Map Data
+    M->>T: Query Build
+    T->>D: Execute Query
+    D->>T: Query Result
+    T->>M: Map Result
+    M->>CT: Return Data
+    CT->>S: Format Response
+    S->>C: JSON Response
 ```
 
 2. **Response Flow**:
