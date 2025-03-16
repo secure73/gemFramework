@@ -1,0 +1,54 @@
+{
+  "frameworkName": "GEMVC Framework",
+  "version": "1.0.0",
+  "extends": "GEMVC Library v3.27.8",
+  "layers": {
+    "service": {
+      "baseClasses": {
+        "ApiService": {
+          "methods": {
+            "validatePosts": {
+              "description": "Validates POST data",
+              "parameters": ["array $schema"],
+              "returns": "void",
+              "throws": ["ValidationException"]
+            }
+          }
+        },
+        "AuthService": {
+          "extends": "ApiService",
+          "properties": {
+            "auth": "Auth instance",
+            "company_id": "Current company ID",
+            "user_id": "Current user ID"
+          }
+        }
+      }
+    },
+    "controller": {
+      "baseClass": {
+        "Controller": {
+          "methods": {
+            "mapPost": {
+              "description": "Maps POST data to object",
+              "parameters": ["object $object"],
+              "returns": "void"
+            }
+          }
+        }
+      }
+    },
+    "model": {
+      "traits": {
+        "CreateTrait": {
+          "methods": {
+            "createWithJsonResponse": {
+              "returns": "JsonResponse",
+              "description": "Creates record and returns response"
+            }
+          }
+        }
+      }
+    }
+  }
+}

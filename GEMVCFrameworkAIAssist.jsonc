@@ -1,0 +1,109 @@
+{
+  "framework": {
+    "name": "GEMVC Framework",
+    "version": "1.0.0",
+    "extends": "GEMVC Library v3.27.8",
+    "architecture": "layered-microservice",
+    "phpVersion": ">=8.0",
+    "aiSupport": {
+      "cursor": true,
+      "copilot": true,
+      "codeium": true
+    }
+  },
+
+  "layers": {
+    "service": {
+      "purpose": "Authentication and validation layer",
+      "baseClasses": {
+        "ApiService": "Public endpoint base",
+        "AuthService": "Protected endpoint base"
+      },
+      "location": "app/api/",
+      "naming": {
+        "pattern": "PascalCase",
+        "suffix": "Optional 'Service' suffix",
+        "examples": [
+          "UserService",
+          "Classroom",
+          "PublicAuth"
+        ]
+      }
+    },
+    "controller": {
+      "purpose": "Business logic layer",
+      "baseClass": "Controller",
+      "location": "app/controller/",
+      "features": {
+        "mapPost": "Type-safe POST mapping",
+        "request": "Request data access",
+        "response": "JsonResponse handling"
+      }
+    },
+    "model": {
+      "purpose": "Data logic and response layer",
+      "extends": "Table classes",
+      "location": "app/model/",
+      "features": {
+        "specialProperties": {
+          "underscore": "Non-database properties",
+          "example": "_classroom_teachers"
+        },
+        "traits": {
+          "location": "vendor/gemvc/framework/src/traits/model/",
+          "common": [
+            "CreateTrait",
+            "UpdateTrait",
+            "RemoveTrait",
+            "ListTrait"
+          ]
+        }
+      }
+    },
+    "table": {
+      "purpose": "Database interaction layer",
+      "location": "app/table/",
+      "baseClasses": {
+        "Table": "Basic table operations",
+        "CRUDTable": "Full CRUD support"
+      }
+    }
+  },
+
+  "patterns": {
+    "request": {
+      "flow": "Frontend → Service → Controller → Model → Table",
+      "validation": {
+        "service": "Input validation",
+        "controller": "Business rules",
+        "model": "Data integrity"
+      }
+    },
+    "response": {
+      "flow": "Table → Model → Controller → Service → Frontend",
+      "types": {
+        "JsonResponse": "Direct API response",
+        "object": "Further processing",
+        "primitive": "Simple returns"
+      }
+    }
+  },
+
+  "bestPractices": {
+    "services": [
+      "Always extend ApiService or AuthService",
+      "Validate inputs first",
+      "Use authorization before logic"
+    ],
+    "controllers": [
+      "Only called by Services",
+      "Use mapPost for data binding",
+      "Return JsonResponse"
+    ],
+    "models": [
+      "Use underscore for non-DB props",
+      "Implement proper traits",
+      "Type-safe properties"
+    ]
+  }
+}
