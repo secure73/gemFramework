@@ -33,14 +33,19 @@ php -S localhost:8000 -t public
 ### Application Directory Structure
 your_project_name/
 ├── app/
-│ ├── Controllers/
-│ ├── Models/
-│ ├── Services/
-│ └── Traits/
-├── vendor/gemvc/
-|----framework/   GEMVC Framework
-|----library/     GEMVC Library
-|-index.php
+│   ├── api/              # API Services (extends ApiService/AuthService)
+│   ├── controller/       # Business Logic
+│   ├── model/           # Data Logic
+│   ├── table/           # Database Operations
+│   └── .env             # Environment config
+├── vendor/
+│   ├── gemvc/framework/
+│   │   └── src/
+│   │       ├── core/    # Framework core
+│   │       └── traits/  # Framework traits
+│   └── gemvc/library/   # GEMVC Library
+├── composer.json
+└── index.php
 
 ### Framework Directory Structure
 
@@ -308,15 +313,10 @@ class Controller {
 
 ### Usage in Controllers
 ```php
-class ClassLessonController extends Controller {
+class UserController extends Controller {
     public function create(): JsonResponse {
-        // 1. Create model instance
-        $model = new ClassLessonModel();
-        
-        // 2. Safely map POST data to model
-        $this->mapPost($model);  // Type-safe mapping!
-        
-        // 3. Use mapped model
+        $model = new UserModel();
+        $this->mapPost($model);  // Type-safe mapping
         return $model->createWithJsonResponse();
     }
 }
@@ -525,132 +525,25 @@ try {
 ```php
 class UserService extends AuthService {
     public function create(): JsonResponse {
-        // 1. Authorization
+        // 1. Authorization first
         $this->auth->authorize(['admin']);
-
-        // 2. Validation
-$this->validatePosts([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users'
+        
+        // 2. Validation second
+        $this->validatePosts([
+            'name' => 'required|string',
+            'email' => 'required|email'
         ]);
         
-        // 3. Process
+        // 3. Controller call last
         return (new UserController($this->request))->create();
     }
 }
 ```
 
-### Controller Layer
-```php
-class UserController extends Controller {
-    public function create(): JsonResponse {
-        // 1. Create model instance
-        $model = new UserModel();
-        
-        // 2. Safe data mapping
-        $this->mapPost($model);
-        
-        // 3. Database transaction
-        return $this->table->transaction(function() use ($model) {
-            return $model->createWithJsonResponse();
-        });
-    }
-}
-```
-
-### Model Layer
-```php
 class UserModel extends UserTable {
-    // 1. Type-safe properties
     public int $id;
-    public string $email;
     public string $name;
     
-    // 2. Non-database properties
     /** @var array<RoleModel> */
-    public array $_roles;
-    
-    // 3. Relationship handling
-    public function getWithRoles(): self {
-        $user = $this->findOrFail($this->id);
-        $user->_roles = (new RoleModel())->forUser($this->id);
-        return $user;
-    }
+    public array $_roles;  // Non-DB property starts with _
 }
-```
-
-## API Documentation
-
-### Documentation Example
-```php
-/**
- * @api {post} /api/users Create User
- * @apiName CreateUser
- * @apiGroup Users
- * 
- * @apiParam {String} name User's name
- * @apiParam {String} email User's email
- * @apiParam {String} password User's password
- * 
- * @apiSuccess {Object} user Created user object
- * @apiError {Object} error Error response
- */
-public function create(): JsonResponse {
-    // Implementation
-}
-```
-
-### Hidden Directive
-```php
-/**
- * @hidden
- * This service/method won't appear in API documentation
- */
-class InternalService extends ApiService {
-    /**
-     * @hidden
-     * This method will be hidden
-     */
-    public function internalMethod(): JsonResponse {
-        // Implementation
-    }
-}
-```
-
-### Mock Responses
-```php
-public static function mockResponse(string $method): array {
-    return match($method) {
-        'create' => [
-            'success' => true,
-            'data' => [
-                'id' => 1,
-                'name' => 'Example User',
-                'email' => 'user@example.com'
-            ]
-        ],
-        default => ['success' => false]
-    };
-}
-```
-
-## Support & Contributing
-
-### Getting Help
-- GitHub Issues: [GEMVC Framework Issues](https://github.com/secure73/gemvc/issues)
-- Email Support: ali.khorsandfard@gmail.com
-
-### Contributing
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-### License
-MIT License - Copyright (c) 2023 Ali Khorsandfard
-
----
-
-*Documentation last updated for GEMVC Framework v5.9.14*  
-*Built with GEMVC Library v3.27.8*
