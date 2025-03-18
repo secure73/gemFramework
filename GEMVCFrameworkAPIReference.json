@@ -162,5 +162,98 @@
         "checking": "authorization process"
       }
     }
+  },
+  "cli": {
+    "commands": {
+      "create:service": {
+        "description": "Generates a complete service implementation",
+        "usage": "vendor/bin/gemvc create:service ServiceName",
+        "arguments": [
+          {
+            "name": "ServiceName",
+            "type": "string",
+            "required": true,
+            "description": "Name of the service to create"
+          }
+        ],
+        "generates": {
+          "files": [
+            {
+              "path": "app/api/{ServiceName}.php",
+              "type": "Service",
+              "extends": "ApiService",
+              "methods": [
+                {
+                  "name": "create",
+                  "returns": "JsonResponse",
+                  "http": "POST",
+                  "validation": {
+                    "name": "string",
+                    "description": "string"
+                  }
+                },
+                {
+                  "name": "read",
+                  "returns": "JsonResponse",
+                  "http": "GET",
+                  "params": ["id"]
+                },
+                {
+                  "name": "update",
+                  "returns": "JsonResponse",
+                  "http": "POST",
+                  "validation": {
+                    "id": "int",
+                    "name": "string",
+                    "description": "string"
+                  }
+                },
+                {
+                  "name": "delete",
+                  "returns": "JsonResponse",
+                  "http": "POST",
+                  "validation": {
+                    "id": "int"
+                  }
+                },
+                {
+                  "name": "list",
+                  "returns": "JsonResponse",
+                  "http": "GET",
+                  "features": {
+                    "filtering": true,
+                    "sorting": true,
+                    "pagination": true
+                  }
+                }
+              ]
+            },
+            {
+              "path": "app/controller/{ServiceName}Controller.php",
+              "type": "Controller",
+              "extends": "Controller",
+              "methods": ["create", "read", "update", "delete", "list"],
+              "features": ["type-safe mapping"]
+            },
+            {
+              "path": "app/model/{ServiceName}Model.php",
+              "type": "Model",
+              "extends": "{ServiceName}Table",
+              "methods": ["createModel", "readModel", "updateModel", "deleteModel"]
+            },
+            {
+              "path": "app/table/{ServiceName}Table.php",
+              "type": "Table",
+              "extends": "CRUDTable",
+              "properties": {
+                "id": "int",
+                "name": "string",
+                "description": "string"
+              }
+            }
+          ]
+        }
+      }
+    }
   }
 }

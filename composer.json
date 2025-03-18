@@ -13,9 +13,13 @@
             "Gemvc\\Traits\\" : "src/traits/",
             "Gemvc\\Traits\\Table\\" : "src/traits/table/",
             "Gemvc\\Traits\\Model\\" : "src/traits/model/",
-            "Gemvc\\Traits\\Controller\\" : "src/traits/controller/"
+            "Gemvc\\Traits\\Controller\\" : "src/traits/controller/",
+            "Gemvc\\CLI\\" : "src/CLI/"
         }
     },
+    "bin": [
+        "bin/gemvc"
+    ],
     "authors": [
         {
             "name": "Ali Khorsandfard",

@@ -17,6 +17,7 @@
 11. [Best Practices](#best-practices)
 12. [Environment Configuration](#environment-configuration)
 13. [Support & Contributing](#support--contributing)
+14. [CLI System](#cli-system)
 
 ## Installation & Setup
 
@@ -1355,3 +1356,70 @@ Key components:
 2. **Environment Loading**: Using Symfony Dotenv
 3. **Request Initialization**: `ApacheRequest`
 4. **Framework Bootstrap**: `Bootstrap` class
+```
+
+## CLI System
+
+### Overview
+GEMVC Framework includes a CLI system for rapid development:
+
+```bash
+vendor/bin/gemvc create:service ServiceName
+```
+
+### Generated Components
+
+1. **Service Layer** (`app/api/ServiceName.php`)
+```php
+class ServiceName extends ApiService {
+    public function create(): JsonResponse {
+        $this->validatePosts([
+            'name' => 'string',
+            'description' => 'string'
+        ]);
+        return (new ServiceNameController($this->request))->create();
+    }
+}
+```
+
+2. **Controller Layer** (`app/controller/ServiceNameController.php`)
+```php
+class ServiceNameController extends Controller {
+    public function create(): JsonResponse {
+        $model = new ServiceNameModel();
+        $this->mapPost($model);
+        return $model->createModel();
+    }
+}
+```
+
+3. **Model Layer** (`app/model/ServiceNameModel.php`)
+```php
+class ServiceNameModel extends ServiceNameTable {
+    public function createModel(): JsonResponse {
+        $success = $this->insert();
+        return Response::created($success, 1, "Created successfully");
+    }
+}
+```
+
+4. **Table Layer** (`app/table/ServiceNameTable.php`)
+```php
+class ServiceNameTable extends CRUDTable {
+    public int $id;
+    public string $name;
+    public string $description;
+
+    public function getTable(): string {
+        return 'service_names';
+    }
+}
+```
+
+### Generated Endpoints
+Each service includes these endpoints:
+1. `POST /api/service/create` - Create new record
+2. `GET /api/service/read/?id=1` - Read single record
+3. `POST /api/service/update` - Update record
+4. `POST /api/service/delete` - Delete record
+5. `GET /api/service/list` - List records with filtering/sorting

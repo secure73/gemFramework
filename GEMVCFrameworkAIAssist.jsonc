@@ -23,6 +23,62 @@
         "database": "Database operations",
         "email": "Email functionality"
       }
+    },
+    "cli": {
+      "enabled": true,
+      "commands": {
+        "create:service": {
+          "description": "Creates a complete service with CRUD operations",
+          "usage": "vendor/bin/gemvc create:service ServiceName",
+          "generates": {
+            "service": {
+              "path": "app/api/{ServiceName}.php",
+              "extends": "ApiService",
+              "methods": {
+                "create": {
+                  "http": "POST",
+                  "validation": ["name: string", "description: string"]
+                },
+                "read": {
+                  "http": "GET",
+                  "params": ["id: int"]
+                },
+                "update": {
+                  "http": "POST",
+                  "validation": ["id: int", "name: string", "description: string"]
+                },
+                "delete": {
+                  "http": "POST",
+                  "validation": ["id: int"]
+                },
+                "list": {
+                  "http": "GET",
+                  "features": ["filtering", "sorting", "pagination"]
+                }
+              }
+            },
+            "controller": {
+              "path": "app/controller/{ServiceName}Controller.php",
+              "extends": "Controller",
+              "features": ["type-safe mapping", "CRUD operations"]
+            },
+            "model": {
+              "path": "app/model/{ServiceName}Model.php",
+              "extends": "{ServiceName}Table",
+              "features": ["data logic", "response formatting"]
+            },
+            "table": {
+              "path": "app/table/{ServiceName}Table.php",
+              "extends": "CRUDTable",
+              "properties": {
+                "id": "int",
+                "name": "string",
+                "description": "string"
+              }
+            }
+          }
+        }
+      }
     }
   },
 
