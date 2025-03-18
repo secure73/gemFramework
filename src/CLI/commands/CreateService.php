@@ -1,8 +1,8 @@
 <?php
 
-namespace App\CLI\Commands;
+namespace Gemvc\CLI\Commands;
 
-use App\CLI\Command;
+use Gemvc\CLI\Command;
 
 class CreateService extends Command
 {

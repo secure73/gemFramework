@@ -1,32 +1,20 @@
 #!/usr/bin/env php
 <?php
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use App\CLI\Commands\CreateService;
-use App\CLI\Commands\Migrate;
+require __DIR__ . '/../vendor/autoload.php';
 
 $command = $argv[1] ?? '';
 $args = array_slice($argv, 2);
 
-$commands = [
-    'create:service' => CreateService::class,
-    'migrate' => Migrate::class
-];
-
-if (empty($command) || !isset($commands[$command])) {
-    echo "Usage: gemvc <command> [arguments]\n";
-    echo "\nAvailable commands:\n";
-    echo "  create:service <name>    Create a new service with all required files\n";
-    echo "  migrate                  Run all pending database migrations\n";
-    exit(1);
-}
-
-try {
-    $commandClass = $commands[$command];
-    $commandInstance = new $commandClass($args);
-    $commandInstance->execute();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
-    exit(1);
+switch ($command) {
+    case 'create:service':
+        $handler = new \Gemvc\CLI\Commands\CreateService($args);
+        $handler->execute();
+        break;
+    
+    default:
+        echo "Unknown command: $command\n";
+        echo "Available commands:\n";
+        echo "  create:service <ServiceName>  Create a new service\n";
+        exit(1);
 } 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\CLI;
+namespace Gemvc\CLI;
 
 abstract class Command
 {
-    protected $args;
+    protected array $args;
     protected $options;
 
     public function __construct(array $args = [], array $options = [])
@@ -30,18 +30,19 @@ abstract class Command
 
     protected function error(string $message): void
     {
-        $this->write("Error: " . $message, 'red');
+        echo "\033[31m{$message}\033[0m\n";
         exit(1);
     }
 
     protected function success(string $message): void
     {
-        $this->write($message, 'green');
+        echo "\033[32m{$message}\033[0m\n";
+        exit(0);
     }
 
     protected function info(string $message): void
     {
-        $this->write($message, 'blue');
+        echo "\033[32m{$message}\033[0m\n";
     }
 
     protected function warning(string $message): void
