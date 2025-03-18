@@ -1,32 +1,69 @@
 #!/usr/bin/env php
 <?php
 
-if (file_exists(__DIR__ . '/../../../autoload.php')) {
-    require __DIR__ . '/../../../autoload.php';  // When installed as dependency
-} else {
-    require __DIR__ . '/../vendor/autoload.php';  // When in development
+// Find project root
+$dir = dirname(__DIR__);
+while ($dir !== '/' && !file_exists($dir.'/composer.json')) {
+    $dir = dirname($dir);
 }
 
-// Verify installation
-try {
-    \Gemvc\CLI\InstallationTest::verify();
-} catch (\Exception $e) {
-    echo "\033[31mCLI Installation Error: " . $e->getMessage() . "\033[0m\n";
+if ($dir === '/') {
+    echo "\033[31mError: Could not find project root\033[0m\n";
     exit(1);
 }
 
-$command = $argv[1] ?? '';
+// Set project root
+define('PROJECT_ROOT', $dir);
+
+// Load autoloader
+if (file_exists(PROJECT_ROOT . '/vendor/autoload.php')) {
+    require PROJECT_ROOT . '/vendor/autoload.php';
+} else {
+    echo "\033[31mError: Autoloader not found\033[0m\n";
+    exit(1);
+}
+
+// Verify basic structure
+$requiredDirs = [
+    PROJECT_ROOT . '/app',
+    PROJECT_ROOT . '/app/api',
+    PROJECT_ROOT . '/app/controller',
+    PROJECT_ROOT . '/app/model',
+    PROJECT_ROOT . '/app/table'
+];
+
+foreach ($requiredDirs as $dir) {
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true)) {
+        echo "\033[31mError: Cannot create directory: $dir\033[0m\n";
+        exit(1);
+    }
+}
+
+// Process command
+$command = $argv[1] ?? '--help';
 $args = array_slice($argv, 2);
 
-switch ($command) {
-    case 'create:service':
-        $handler = new \Gemvc\CLI\Commands\CreateService($args);
-        $handler->execute();
-        break;
-    
-    default:
-        echo "Unknown command: $command\n";
-        echo "Available commands:\n";
-        echo "  create:service <ServiceName>  Create a new service\n";
-        exit(1);
+try {
+    switch ($command) {
+        case 'create:service':
+            if (empty($args[0])) {
+                echo "\033[31mError: Service name required\033[0m\n";
+                echo "Usage: gemvc create:service ServiceName\n";
+                exit(1);
+            }
+            $handler = new \Gemvc\CLI\Commands\CreateService($args);
+            $handler->execute();
+            break;
+
+        case '--help':
+        default:
+            echo "GEMVC Framework CLI v1.0.0\n\n";
+            echo "Available commands:\n";
+            echo "  create:service <ServiceName>  Create a new service\n";
+            echo "  --help                       Show this help message\n";
+            exit(0);
+    }
+} catch (\Exception $e) {
+    echo "\033[31mError: {$e->getMessage()}\033[0m\n";
+    exit(1);
 } 

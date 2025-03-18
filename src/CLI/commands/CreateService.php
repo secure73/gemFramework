@@ -16,17 +16,21 @@ class CreateService extends Command
         }
 
         $this->serviceName = $this->args[0];
-        $this->basePath = dirname(dirname(dirname(__DIR__)));
+        $this->basePath = PROJECT_ROOT;  // Use the defined project root
 
-        // Create necessary directories
-        $this->createDirectories();
+        try {
+            // Create necessary directories
+            $this->createDirectories();
 
-        $this->createService();
-        $this->createController();
-        $this->createModel();
-        $this->createTable();
+            $this->createService();
+            $this->createController();
+            $this->createModel();
+            $this->createTable();
 
-        $this->success("Service {$this->serviceName} created successfully!");
+            $this->success("Service {$this->serviceName} created successfully!");
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 
     private function createDirectories()
@@ -40,8 +44,8 @@ class CreateService extends Command
 
         foreach ($directories as $directory) {
             if (!is_dir($directory)) {
-                if (!mkdir($directory, 0755, true)) {
-                    $this->error("Failed to create directory: {$directory}");
+                if (!@mkdir($directory, 0755, true)) {
+                    throw new \RuntimeException("Failed to create directory: {$directory}");
                 }
                 $this->info("Created directory: {$directory}");
             }
