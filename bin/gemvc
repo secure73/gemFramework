@@ -1,13 +1,13 @@
 #!/usr/bin/env php
 <?php
 
-// Find project root
-$dir = dirname(__DIR__);
-while ($dir !== '/' && !file_exists($dir.'/composer.json')) {
+// Find project root by looking for vendor/gemvc/framework
+$dir = str_replace('\\', '/', getcwd());
+while ($dir !== '/' && $dir !== '' && !file_exists($dir.'/vendor/gemvc/framework')) {
     $dir = dirname($dir);
 }
 
-if ($dir === '/') {
+if ($dir === '/' || $dir === '') {
     echo "\033[31mError: Could not find project root\033[0m\n";
     exit(1);
 }
