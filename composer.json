@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "gemvc/library": "^3.11.1",
-        "php": ">=7.4"
+        "php": ">=8.0"
     },
     "license": "Apache-2.0",
     "autoload": {

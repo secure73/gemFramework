@@ -1,7 +1,7 @@
 {
   "framework": {
     "name": "GEMVC Framework",
-    "version": "1.0.0",
+    "version": "5.9.14",
     "extends": "GEMVC Library v3.27.8",
     "architecture": "layered-microservice",
     "phpVersion": ">=8.0",
@@ -79,6 +79,11 @@
           }
         }
       }
+    },
+    "requirements": {
+      "php": ">=8.0",
+      "library": ">=3.27.8",
+      "phpstan": "level 9"
     }
   },
 

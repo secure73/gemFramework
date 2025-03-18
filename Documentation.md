@@ -22,9 +22,10 @@
 ## Installation & Setup
 
 ### Requirements
-- PHP >= 7.4
+- PHP >= 8.0
 - MySQL/MariaDB
 - Composer
+- GEMVC Library >= 3.27.8
 - PHPStan Level 9 compatibility
 
 ### Quick Start
@@ -899,7 +900,7 @@ class ApiService {
 
 The framework version 5.9.14 requires:
 - GEMVC Library ≥ 3.27.8
-- PHP ≥ 7.4
+- PHP ≥ 8.0
 - PHPStan Level 9 compatibility
 
 Key compatibility points:
@@ -1149,7 +1150,7 @@ class ExampleController extends Controller {
 
 ### Environment
 - GEMVC Version: 5.9.14
-- PHP Version: 7.4
+- PHP Version: 8.0
 - Database: MySQL 8.0
 ```
 
@@ -1423,3 +1424,30 @@ Each service includes these endpoints:
 3. `POST /api/service/update` - Update record
 4. `POST /api/service/delete` - Delete record
 5. `GET /api/service/list` - List records with filtering/sorting
+```
+
+## Type Safety
+
+The GEMVC Framework leverages PHP 8's type system features including:
+- Union Types
+- Nullable Types
+- Return Type Declarations
+- Property Type Declarations
+- Constructor Property Promotion
+- Match Expressions
+
+Example:
+```php
+public function processRequest(
+    RequestInterface $request, 
+    ?array $options = null
+): Response|JsonResponse {
+    $result = match ($request->getMethod()) {
+        'GET' => $this->handleGet($request),
+        'POST' => $this->handlePost($request),
+        default => throw new InvalidMethodException()
+    };
+    
+    return $this->formatResponse($result);
+}
+```

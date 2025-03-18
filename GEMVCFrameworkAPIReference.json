@@ -255,5 +255,10 @@
         }
       }
     }
+  },
+  "metadata": {
+    "requirements": {
+      "php_version": ">=8.0"
+    }
   }
 }
