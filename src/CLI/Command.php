@@ -15,6 +15,20 @@ abstract class Command
 
     abstract public function execute();
 
+    private function supportsAnsiColors(): bool
+    {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            // On Windows, check if running in a terminal that supports ANSI
+            return (
+                false !== getenv('ANSICON') ||
+                'ON' === getenv('ConEmuANSI') ||
+                'xterm' === getenv('TERM') ||
+                'Hyper' === getenv('TERM_PROGRAM')
+            );
+        }
+        return true;
+    }
+
     protected function write(string $message, string $color = 'white'): void
     {
         $colors = [
@@ -25,28 +39,48 @@ abstract class Command
             'blue' => "\033[34m"
         ];
 
-        echo $colors[$color] . $message . "\033[0m";
+        if ($this->supportsAnsiColors()) {
+            echo $colors[$color] . $message . "\033[0m";
+        } else {
+            echo $message;
+        }
     }
 
     protected function error(string $message): void
     {
-        echo "\033[31m{$message}\033[0m\n";
+        if ($this->supportsAnsiColors()) {
+            echo "\033[31m{$message}\033[0m\n";
+        } else {
+            echo "Error: {$message}\n";
+        }
         exit(1);
     }
 
     protected function success(string $message): void
     {
-        echo "\033[32m{$message}\033[0m\n";
+        if ($this->supportsAnsiColors()) {
+            echo "\033[32m{$message}\033[0m\n";
+        } else {
+            echo "Success: {$message}\n";
+        }
         exit(0);
     }
 
     protected function info(string $message): void
     {
-        echo "\033[32m{$message}\033[0m\n";
+        if ($this->supportsAnsiColors()) {
+            echo "\033[32m{$message}\033[0m\n";
+        } else {
+            echo "Info: {$message}\n";
+        }
     }
 
     protected function warning(string $message): void
     {
-        $this->write($message, 'yellow');
+        if ($this->supportsAnsiColors()) {
+            echo "\033[33m{$message}\033[0m\n";
+        } else {
+            echo "Warning: {$message}\n";
+        }
     }
 } 
